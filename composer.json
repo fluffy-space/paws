@@ -1,0 +1,22 @@
+{
+    "name": "fluffy-space/paws",
+    "description": "Fluffy Paws - Web application framework. Treats included ;)",
+    "type": "project",
+    "require": {
+        "fluffy-space/fluffy": "^1.1",
+        "viewi/ui": "^1.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "FluffyPaws\\": "FluffyPaws/",            
+            "SharedPaws\\": "SharedPaws/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ivan Voitovych",
+            "email": "col606v@gmail.com"
+        }
+    ]
+}
