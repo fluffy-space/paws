@@ -9,8 +9,9 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "FluffyPaws\\": "FluffyPaws/",            
-            "SharedPaws\\": "SharedPaws/"
+            "FluffyPaws\\": "FluffyPaws/",
+            "SharedPaws\\": "SharedPaws/",
+            "Pupils\\": "Pupils/src/"
         }
     },
     "authors": [
