@@ -17,9 +17,7 @@ use FluffyPaws\Services\Sitemap\SitemapService;
 
 class StartUp implements IStartUp
 {
-    public function configure(BaseApp $app) {
-        
-    }
+    public function configure(BaseApp $app) {}
 
     public function configureServices(IServiceProvider $serviceProvider): void
     {
@@ -45,5 +43,5 @@ class StartUp implements IStartUp
 
     public function configureInstallDependencies(IServiceProvider $serviceProvider): void {}
 
-    public function buildDependencies() {}
+    public function buildDependencies(IServiceProvider $serviceProvider) {}
 }
