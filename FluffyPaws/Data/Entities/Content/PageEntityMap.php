@@ -4,6 +4,7 @@ namespace FluffyPaws\Data\Entities\Content;
 
 use Fluffy\Data\Entities\BaseEntityMap;
 use Fluffy\Data\Entities\CommonMap;
+use FluffyPaws\Data\Entities\Media\PictureEntity;
 
 class PageEntityMap extends BaseEntityMap
 {
@@ -20,6 +21,18 @@ class PageEntityMap extends BaseEntityMap
             'Unique' => true
         ]
     ];
+
+    public static function ForeignKeys(): array
+    {
+        return [
+            'Picture' => [
+                'Table' => PictureEntity::class,
+                'Columns' => ['PictureId'],
+                'References' => ['Id'],
+                'OnDelete' => CommonMap::$OnDeleteSetNull
+            ]
+        ];
+    }
 
     public static function Columns(): array
     {

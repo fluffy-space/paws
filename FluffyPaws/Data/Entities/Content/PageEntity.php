@@ -3,6 +3,7 @@
 namespace FluffyPaws\Data\Entities\Content;
 
 use Fluffy\Data\Entities\BaseEntity;
+use FluffyPaws\Data\Entities\Media\PictureEntity;
 
 class PageEntity extends BaseEntity
 {
@@ -12,6 +13,7 @@ class PageEntity extends BaseEntity
     public bool $AsHtml = false;
     public string $Body;
     public ?int $PictureId = null;
+    public ?PictureEntity $Picture = null;
     public bool $Published = false;
     public ?string $MetaKeywords = null;
     public ?string $MetaTitle = null;
