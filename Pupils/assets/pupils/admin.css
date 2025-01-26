@@ -1,0 +1,25 @@
+.w-300 {
+    max-width: 400px;
+    width: 100%;
+}
+
+.header-title {
+    font-size: 26px;
+}
+
+.header-link {
+    color: var(--menu-item-color-focus);
+    margin-left: 0.25rem;
+    overflow: hidden;
+}
+
+.layout-header {
+    height: 64px;
+    min-height: 64px;
+}
+
+.header-logo-icon {
+    fill: var(--blog-primary-color);
+    height: 36px;
+    width: 36px;
+}

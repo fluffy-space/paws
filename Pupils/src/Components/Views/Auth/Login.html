@@ -1,0 +1,27 @@
+<BoxLayout title="{t('login.title')}">
+    <h3 class="text-h3 mt-2 mb-4">{t('login.header')}</h3>
+    <ActionForm #loginForm (submit)="handleSubmit" classList="mt-8" autocomplete="on" id="login-form" action="/login"
+        method="post" rules="{$validation->getValidationRules()}">
+        <TextInput type="text" label="{t('login.email-or-phone')}" placeholder="{t('login.email-or-phone')}"
+            autocomplete="username" inputClass="form-control" wrapperClass="col-12" id="Email"
+            model="$loginModel->Email">
+            <div class="form-text">{t('login.forgot-your-password')} <a href="/reset-password"
+                    class="text-secondary">{t('login.reset-here')}</a></div>
+        </TextInput>
+
+        <TextInput type="password" label="{t('login.password')}" placeholder="{t('login.password')}"
+            autocomplete="current-password" inputClass="form-control" wrapperClass="col-12" id="Password"
+            name="Password" model="$loginModel->Password" />
+        <CheckBox label="{t('login.remember-me')}" id="RememberMe" model="$loginModel->RememberMe" />
+
+        <button type="submit" disabled="$loading" class="btn btn-primary mt-3 w-100">
+            {t('login.authorize-button')}
+        </button>
+
+        <ValidationMessage #generalMessages fallback="true" />
+
+        <div class="form-text mt-4">
+            {t('login.do-not-have-account')} <a href="/register" class="text-secondary">{t('login.register-here')}</a>
+        </div>
+    </ActionForm>
+</BoxLayout>

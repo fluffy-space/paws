@@ -1,0 +1,11 @@
+<BaseLayout title="$title">
+    <div class="d-flex align-items-center vh-100 bg-body-tertiary blog-layout">
+        <div class="m-auto mt-5 w-300">
+            <BoxLayoutHeader />
+            <div class="card shadow-sm p-4 mt-3">
+                <slot></slot>
+            </div>
+            <p class="mt-5 mb-3 text-body-secondary text-center">{t('layout.title')} © {date('Y')}</p>
+        </div>
+    </div>
+</BaseLayout>
