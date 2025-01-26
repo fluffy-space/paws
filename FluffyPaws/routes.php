@@ -89,4 +89,4 @@ $router->section('/api/', function (Router $router) {
 });
 
 // Viewi application
-// ...
+include __DIR__ . '/../Pupils/src/routes.php';
