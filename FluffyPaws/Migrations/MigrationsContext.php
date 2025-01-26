@@ -6,6 +6,7 @@ use Fluffy\Migrations\BaseMigrationsContext;
 use FluffyPaws\Migrations\Blog\BlogPostMigration;
 use FluffyPaws\Migrations\Content\PageMigration;
 use FluffyPaws\Migrations\Localization\LanguageMigration;
+use FluffyPaws\Migrations\Localization\LocaleEnglishMigration;
 use FluffyPaws\Migrations\Localization\LocaleResourceMigration;
 
 /** @namespaces **/
@@ -19,6 +20,7 @@ class MigrationsContext extends BaseMigrationsContext
         $this->runMigration(PageMigration::class);
         $this->runMigration(LanguageMigration::class);
         $this->runMigration(LocaleResourceMigration::class);
+        $this->runMigration(LocaleEnglishMigration::class);
         /** @insert **/
         // !Do not delete the line above!
     }
