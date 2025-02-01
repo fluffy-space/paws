@@ -1,0 +1,13 @@
+<BaseLayout title="admin">
+    <div class="layout-app" class.mini-sidebar="{$layout->miniSidebar || $layout->showMobileMenu}">
+        <AdminHeader />
+        <AdminMenu />
+        <main class="layout-container container-xl">
+            <div class="main-content">
+                <slot></slot>
+            </div>
+        </main>
+        <div class="modal-backdrop fade show sidebar-backdrop" class.d-none="{!$layout->showMobileMenu}"
+            (click)="$layout->showMobileMenu = !$layout->showMobileMenu"></div>
+    </div>
+</BaseLayout>
