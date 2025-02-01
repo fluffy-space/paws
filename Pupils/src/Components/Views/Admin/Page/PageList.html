@@ -1,0 +1,20 @@
+<AdminLayout title="Pages">
+    <h3 class="text-h3 mt-2 mb-4">Pages</h3>
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+            <DataTable items="$items" columns="$columns" filter="$filter" addLink="/admin/content/create" addText="Add Page" (search)="onSearch" (page)="onPageChange" (delete)="onDelete">
+                <slotContent name="column_Title" data="$page">
+                    <td>
+                        <div>{$page->Title}</div>
+                        <div class="mt-2">
+                            <a href="{'/' . $page->Slug}" target="_blank" rel="noopener noreferrer" class="px-2">
+                                {'/' . $page->Slug}
+                            </a>
+                        </div>
+                    </td>
+                </slotContent>
+            </DataTable>
+        </div>
+    </div>
+</AdminLayout>
