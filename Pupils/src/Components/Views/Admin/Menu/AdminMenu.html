@@ -1,0 +1,39 @@
+<div class="d-flex flex-column flex-shrink-1 layout-left position-fixed bottom-0 start-0 top-0 layout-sidebar">
+    <div class="layout-header d-flex px-3 border-bottom mini-justify-center">
+        <a href="/admin" class="d-flex align-items-center header-link text-decoration-none blog-layout logo-icon">
+            <Logo />
+            <span class="header-title menu-item-title ms-3">{t('layout.title')}</span>
+        </a>
+    </div>
+    <div class="align-self-stretch">
+        <ul class="nav menu-vertical mb-auto mt-3">
+            <li foreach="$menuItems as $menuItem" class="nav-item">
+                <a href="{$menuItem->url}" class="nav-link menu-link d-flex justify-content-between align-items-center"
+                    class.menu-link-active="{isActive($menuItem)}" role="button" (click)="onMenuClick($menuItem)">
+                    <div class="d-flex align-items-center">
+                        <span if="{$menuItem->icon}" class="icon-holder">
+                            <span class="p-1 icon-bg">
+                                <Icon name="{$menuItem->icon}" />
+                            </span>
+                        </span>
+                        <span class="menu-item-title">{$menuItem->title}</span>
+                    </div>
+                    <span if="{$menuItem->children}" class="me-3">
+                        <Icon name="bi-chevron-menu-down"
+                            classList="rotate {$menuItem->expanded ? 'rotate-180' : ''}" />
+                    </span>
+                </a>
+                <ul if="{$menuItem->children}" class="nav menu-vertical sub-menu-nav collapse"
+                    class.show="{$menuItem->expanded}">
+                    <li foreach="$menuItem->children as $childMenuItem" class="nav-item">
+                        <a href="{$childMenuItem->url}" title="$childMenuItem->title"
+                            class="nav-link sub-menu-link border-start d-flex align-items-center"
+                            class.menu-link-active="{isActive($childMenuItem)}">
+                            <span class="menu-item-title ms-3">{$childMenuItem->title}</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
