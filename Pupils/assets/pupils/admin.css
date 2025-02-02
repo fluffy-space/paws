@@ -331,27 +331,6 @@
     width: 100%;
 }
 
-.icon {
-    fill: currentColor;
-    width: 1.5em;
-    height: 1.5em;
-    vertical-align: middle;
-}
-
-.icon-sm {
-    width: 1em;
-    height: 1em;
-}
-
-.pagination {
-    margin-bottom: 0;
-}
-
-.modal-content>.btn-close {
-    align-self: end;
-    margin: 10px 10px 0 0;
-}
-
 .flex-row-fluid {
     flex: 1 auto;
     min-width: 0;
