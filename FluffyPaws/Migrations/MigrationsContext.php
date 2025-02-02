@@ -8,6 +8,7 @@ use FluffyPaws\Migrations\Content\PageMigration;
 use FluffyPaws\Migrations\Localization\LanguageMigration;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration;
 use FluffyPaws\Migrations\Localization\LocaleResourceMigration;
+use FluffyPaws\Migrations\Media\PictureMigration;
 
 /** @namespaces **/
 // !Do not delete the line above!
@@ -21,6 +22,7 @@ class MigrationsContext extends BaseMigrationsContext
         $this->runMigration(LanguageMigration::class);
         $this->runMigration(LocaleResourceMigration::class);
         $this->runMigration(LocaleEnglishMigration::class);
+        $this->runMigration(PictureMigration::class);
         /** @insert **/
         // !Do not delete the line above!
     }
