@@ -14,6 +14,7 @@ use FluffyPaws\Services\Sitemap\SitemapService;
 use FluffyPaws\Services\Utils\SlugService;
 use SharedPaws\Models\Content\PageModel;
 use SharedPaws\Models\Content\PageValidation;
+use SharedPaws\Models\Media\PictureModel;
 
 class PageController extends BaseController
 {
@@ -57,7 +58,7 @@ class PageController extends BaseController
              * @var ?PictureEntity $picture
              */
             $picture = $this->pictures->getById($model->PictureId);
-            $model->Picture = $picture;
+            $model->Picture = $this->mapper->map(PictureModel::class, $picture);
         }
         return $model;
     }
@@ -117,7 +118,7 @@ class PageController extends BaseController
                  * @var ?PictureEntity $picture
                  */
                 $picture = $this->pictures->getById($model->PictureId);
-                $model->Picture = $picture;
+                $model->Picture = $this->mapper->map(PictureModel::class, $picture);;
             }
             $this->sitemapService->resetCache();
         }
