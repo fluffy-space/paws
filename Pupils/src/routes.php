@@ -1,6 +1,7 @@
 <?php
 
 use Pupils\Components\Views\Admin\Dashboard\Dashboard;
+use Pupils\Components\Views\Admin\Page\PageEdit;
 use Pupils\Components\Views\Admin\Page\PageList;
 use Pupils\Components\Views\Auth\Login;
 use Viewi\App;
@@ -19,5 +20,7 @@ $router->lazy('admin', function (Router $router) {
     $router->section('admin', function (Router $router) {
         $router->get('/', Dashboard::class);
         $router->get('/content', PageList::class);
+        $router->get('/content/create', PageEdit::class);
+        $router->get('/content/{id}', PageEdit::class);
     });
 });
