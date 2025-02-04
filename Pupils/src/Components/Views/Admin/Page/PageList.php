@@ -43,8 +43,8 @@ class PageList extends BaseComponent
         $this->columns = [
             new TableColumn('Id'),
             new TableColumn('Title'),
-            new TableColumn('Published', TableColumn::TYPE_BOOLEAN),
-            new TableColumn('CreatedOn', TableColumn::TYPE_DATETIME, 'Created'),
+            new TableColumn('Published', null, 'PublishedColumn'),
+            new TableColumn('CreatedOn', 'Created', 'DateColumn'),
         ];
     }
 

@@ -9,6 +9,7 @@ use SharedPaws\Models\Media\PictureModel;
 use Viewi\Components\Attributes\Middleware;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\DOM\DomEvent;
+use Viewi\Components\Environment\ClientTimer;
 use Viewi\Components\Http\HttpClient;
 use Viewi\Components\Routing\ClientRoute;
 use Viewi\UI\Components\Alerts\AlertService;
@@ -85,10 +86,8 @@ class PageEdit extends BaseComponent
 
     public function stopLoading(int $state)
     {
-        <<<'javascript'
-        setTimeout(() => $this.state = state, 500);
-        setTimeout(() => $this.state = 0, 2500);
-        javascript;
+        ClientTimer::setTimeoutStatic(fn() => ($this->state = $state), 500);
+        ClientTimer::setTimeoutStatic(fn() => ($this->state = ActionButton::STATE_PENDING), 2500);
     }
 
     public function handleResponse(bool $hasError, $response = null)
@@ -119,5 +118,5 @@ class PageEdit extends BaseComponent
     {
         $this->page->PictureId = $picture->Id;
         $this->page->Picture = $picture;
-    }    
+    }
 }
