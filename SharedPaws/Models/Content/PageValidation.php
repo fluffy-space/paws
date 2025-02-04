@@ -13,7 +13,7 @@ class PageValidation
         return ValidationRules::rules($this->page)
             //->required('Title')
             ->maxLength('Slug', 400)
-            //->required('Body')
+            ->required('Body')
             ->maxLength('MetaKeywords', 400)
             ->maxLength('MetaTitle', 400)
             ->maxLength('MetaDescription', 400)
