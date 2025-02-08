@@ -30,10 +30,7 @@ class AdminMenu extends BaseComponent
                 new MenuItem('Footer menu', '/admin/menu/footer', null, ['/admin/menu/footer/create'], "#^/admin/menu/footer/(.*)$#i")
             ]),
             new MenuItem('Blog', '/admin/blog', 'bi-pencil', ['/admin/blog/create'], "#^/admin/blog/(.*)$#i"),
-            new MenuItem('Products', '/admin/product', 'bi-card-checklist', ['/admin/product/create'], "#^/admin/product/(.*)$#i"),
-            new MenuItem('Discounts', '/admin/discount', 'bi-tags', ['/admin/discount/create'], "#^/admin/discount/(.*)$#i"),
-            new MenuItem('Orders', '/admin/order', 'bi-cart4', ['/admin/order/create'], "#^/admin/order/(.*)$#i"),
-            new MenuItem('Users', '/admin/users', 'bi-people-fill', ['/admin/users/create'], "#^/admin/users/(.*)$#i"),
+            new MenuItem('Users', '/admin/user', 'bi-people-fill', ['/admin/users/create'], "#^/admin/users/(.*)$#i"),
             new MenuItem('Email templates', '/admin/email-templates', 'bi-envelope-paper', ['/admin/email-templates/create'], "#^/admin/email-templates/(.*)$#i"),
             new MenuItem('Localization', '/admin/language', 'bi-translate', ['/admin/language/create'], "#^/admin/language/(.*)$#i"),
 
