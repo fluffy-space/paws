@@ -1,0 +1,55 @@
+<AdminLayout title="Edit blog post">
+    <EditHeader title="{$createMode ? 'Create blog post' : 'Edit blog post'}" backUrl="/admin/blog" createMode="$createMode" state="$state" (click)="onSave" />
+    <div if="$item && $validation" class="card shadow-sm p-4">
+        <ActionForm #actionForm (submit)="onSave" id="blog-form" action="/admin/blog" method="post"
+            rules="{$validation->getValidationRules()}">
+            <TextInput type="text" wrapperClass="col-12" label="Title" placeholder="Title of the blog post"
+                inputClass="form-control" id="Title" model="$item->Title" />
+
+            <TextInput type="text" label="Search engine friendly page name" placeholder="my-post" wrapperClass="col-12"
+                inputClass="form-control" id="Slug" model="$item->Slug" hint="Set a search engine friendly page name e.g. 'the-best-blog-post' to make your
+                page URL
+                'http://blog.com/the-best-blog-post'. Leave empty to generate it automatically based on the
+                title of the blog post." />
+
+            <CheckBox label="Published" id="Published" model="$item->Published"
+                hint="Check to make this post publicly available." />
+
+            <BaseInput name="Body" label="Body">
+                <RichEditor placeholder="The body of this page" id="Body" rows="5" model="$item->Body" />
+            </BaseInput>
+
+            <TextInput textarea richEditor label="Body overview"
+                placeholder="Brief overview of this blog post. If specified, then it will be used instead of full body on the main blog page."
+                id="BodyOverview" rows="5" model="$item->BodyOverview" />
+
+            <div class="mb-3">
+                <PictureUploader picture="{$item->Picture}" label="Main image" (uploaded)="imageUploaded"
+                    (removed)="removePicture" />
+            </div>
+
+            <CheckBox label="Include in sitemap" id="IncludeInSitemap" model="$item->IncludeInSitemap"
+                hint="Check to include this blog post in the sitemap." />
+
+            <CheckBox label="Allow comments" id="AllowComments" model="$item->AllowComments"
+                hint="When checked, users can leave comments about your blog post." />
+
+
+            <TextInput type="text" label="Meta keywords"
+                placeholder="Meta keywords to be added to blog post page header." id="MetaKeywords"
+                model="$item->MetaKeywords" />
+
+            <TextInput type="text" label="Meta title"
+                placeholder="Override the page title. The default is the title of the blog post." id="MetaTitle"
+                model="$item->MetaTitle" />
+
+            <TextInput textarea label="Meta description"
+                placeholder="Meta description to be added to blog post page header." id="MetaDescription" rows="5"
+                model="$item->MetaDescription"></TextInput>
+
+            <ValidationMessage #generalMessages fallback="true" wrapperClass="mb-3" />
+
+            <ActionButton text="{$createMode ? 'Create' : 'Save'}" state="$state" />
+        </ActionForm>
+    </div>
+</AdminLayout>
