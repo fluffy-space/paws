@@ -2,7 +2,6 @@
 
 namespace Pupils\Components\Services\Media;
 
-use Viewi\Bridge\IViewiBridge;
 use Viewi\Components\Environment\Platform;
 use Viewi\Components\Http\HttpClient;
 use Viewi\Components\IStartUp\IStartUp;
