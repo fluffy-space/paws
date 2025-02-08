@@ -1,61 +1,61 @@
 <AdminLayout title="{$createMode ? 'Create page' : 'Edit page'}">
-    <EditHeader createMode="$createMode" state="$state" (click)="onSave" />
-    <div if="$page && $validation" class="card shadow-sm p-4">
+    <EditHeader title="{$createMode ? 'Create page' : 'Edit page'}" backUrl="/admin/content" createMode="$createMode" state="$state" (click)="onSave" />
+    <div if="$item && $validation" class="card shadow-sm p-4">
         <ActionForm #actionForm (submit)="onSave" id="page-form" action="/admin/content" method="post"
             rules="{$validation->getValidationRules()}">
             <TextInput type="text" wrapperClass="col-12" label="Title" placeholder="Title of the page"
-                inputClass="form-control" id="Title" model="$page->Title" />
+                inputClass="form-control" id="Title" model="$item->Title" />
 
-            <CheckBox label="Home page?" id="HomePage" model="$page->HomePage"
+            <CheckBox label="Home page?" id="HomePage" model="$item->HomePage"
                 hint="Check to mark this page as a home page" />
 
-            <TextInput if="!$page->HomePage" type="text" label="Search engine friendly page name" placeholder="my-page"
-                wrapperClass="col-12" inputClass="form-control" id="Slug" model="$page->Slug" hint="Set a search engine friendly page name e.g. 'the-best-page' to make your
+            <TextInput if="!$item->HomePage" type="text" label="Search engine friendly page name" placeholder="my-page"
+                wrapperClass="col-12" inputClass="form-control" id="Slug" model="$item->Slug" hint="Set a search engine friendly page name e.g. 'the-best-page' to make your
                     page URL
                     'http://content.com/the-best-page'. Leave empty to generate it automatically." />
 
-            <CheckBox label="Published" id="Published" model="$page->Published"
+            <CheckBox label="Published" id="Published" model="$item->Published"
                 hint="Check to make this post publicly available." />
 
-            <CheckBox label="Edit as HTML" id="RawHtml" model="$page->AsHtml"
+            <CheckBox label="Edit as HTML" id="RawHtml" model="$item->AsHtml"
                 hint="Check to edit your content as HTML" />
 
-            <div if="$page->AsHtml">
+            <div if="$item->AsHtml">
                 <label for="Body" class="col-form-label">Body</label>
                 <Tabs classList="">
                     <Tab title="Edit" active>
                         <TextInput textarea codeEditor placeholder="The body of this page" id="Body" rows="12"
-                            model="$page->Body" />
+                            model="$item->Body" />
                     </Tab>
                     <Tab title="Preview">
                         <div class="raw-content">
-                            {{$page->Body}}
+                            {{$item->Body}}
                         </div>
                     </Tab>
                 </Tabs>
             </div>
             <BaseInput else name="Body" label="Body">
-                <RichEditor placeholder="The body of this page" id="Body" rows="5" model="$page->Body" />
+                <RichEditor placeholder="The body of this page" id="Body" rows="5" model="$item->Body" />
             </BaseInput>
 
 
             <div class="mb-3">
-                <PictureUploader picture="{$page->Picture}" label="Main image" (uploaded)="imageUploaded"
+                <PictureUploader picture="{$item->Picture}" label="Main image" (uploaded)="imageUploaded"
                     (removed)="removePicture" />
             </div>
 
-            <CheckBox label="Include in sitemap" id="IncludeInSitemap" model="$page->IncludeInSitemap"
+            <CheckBox label="Include in sitemap" id="IncludeInSitemap" model="$item->IncludeInSitemap"
                 hint="Check to include this page in the sitemap." />
 
             <TextInput type="text" label="Meta keywords" placeholder="Meta keywords to be added to page page header."
-                id="MetaKeywords" model="$page->MetaKeywords" />
+                id="MetaKeywords" model="$item->MetaKeywords" />
 
             <TextInput type="text" label="Meta title"
                 placeholder="Override the page title. The default is the title of the page." id="MetaTitle"
-                model="$page->MetaTitle" />
+                model="$item->MetaTitle" />
 
             <TextInput textarea label="Meta description" placeholder="Meta description to be added to page page header."
-                id="MetaDescription" rows="5" model="$page->MetaDescription"></TextInput>
+                id="MetaDescription" rows="5" model="$item->MetaDescription"></TextInput>
 
 
 
