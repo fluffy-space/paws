@@ -2,13 +2,14 @@
 
 namespace SharedPaws\Models\User;
 
+use SharedPaws\Validation\IValidationRules;
 use SharedPaws\Validation\ValidationRules;
 
-class UserValidation
+class UserValidation implements IValidationRules
 {
     public function __construct(private UserModel $user) {}
 
-    public function getValidationRules()
+    public function getValidationRules(): array
     {
         return ValidationRules::rules($this->user)
             ->requiredAtLeast('Email', 'Phone')

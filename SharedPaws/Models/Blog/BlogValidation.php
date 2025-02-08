@@ -2,13 +2,14 @@
 
 namespace SharedPaws\Models\Blog;
 
+use SharedPaws\Validation\IValidationRules;
 use SharedPaws\Validation\ValidationRules;
 
-class BlogValidation
+class BlogValidation implements IValidationRules
 {
     public function __construct(private BlogPostModel $post) {}
 
-    public function getValidationRules()
+    public function getValidationRules(): array
     {
         return ValidationRules::rules($this->post)
             ->required('Title')

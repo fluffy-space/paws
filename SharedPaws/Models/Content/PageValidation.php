@@ -2,13 +2,14 @@
 
 namespace SharedPaws\Models\Content;
 
+use SharedPaws\Validation\IValidationRules;
 use SharedPaws\Validation\ValidationRules;
 
-class PageValidation
+class PageValidation implements IValidationRules
 {
     public function __construct(private PageModel $page) {}
 
-    public function getValidationRules()
+    public function getValidationRules(): array
     {
         return ValidationRules::rules($this->page)
             //->required('Title')

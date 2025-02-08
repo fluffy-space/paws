@@ -8,10 +8,10 @@ use SharedPaws\Models\Media\PictureModel;
 class BlogPostModel extends BaseModel
 {
     public bool $IncludeInSitemap = true;
-    public string $Title;
-    public string $Slug;
-    public string $Body;
-    public string $BodyOverview;
+    public string $Title = '';
+    public string $Slug = '';
+    public string $Body = '';
+    public string $BodyOverview = '';
     public ?int $Author = null;
     public ?int $PictureId = null;
     public ?PictureModel $Picture = null;
