@@ -14,6 +14,7 @@ use FluffyPaws\Services\Sitemap\SitemapService;
 use FluffyPaws\Services\Utils\SlugService;
 use SharedPaws\Models\Blog\BlogPostModel;
 use SharedPaws\Models\Blog\BlogValidation;
+use SharedPaws\Models\Media\PictureModel;
 
 class BlogPostController extends BaseController
 {
@@ -131,7 +132,7 @@ class BlogPostController extends BaseController
                  * @var ?PictureEntity $picture
                  */
                 $picture = $this->pictures->getById($model->PictureId);
-                $model->Picture = $picture;
+                $model->Picture = $this->mapper->map(PictureModel::class, $picture);;
             }
             $this->sitemapService->resetCache();
         }
