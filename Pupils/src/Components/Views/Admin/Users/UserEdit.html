@@ -1,0 +1,44 @@
+<AdminLayout title="Edit user">
+    <EditHeader title="{$createMode ? 'Create user' : 'Edit user'}" backUrl="/admin/user" createMode="$createMode"
+        state="$state" (click)="onSave" />
+    <div if="$item && $validation" class="card shadow-sm p-4">
+        <ActionForm #actionForm (submit)="onSave" id="page-form" action="/admin/user" method="post"
+            rules="{$validation->getValidationRules()}">
+            <TextInput type="text" wrapperClass="col-12" label="First name" placeholder="Miki" inputClass="form-control"
+                id="FirstName" model="$item->FirstName" />
+
+            <TextInput type="text" wrapperClass="col-12" label="Last name" placeholder="Darkness"
+                inputClass="form-control" id="LastName" model="$item->LastName" />
+
+            <TextInput type="text" wrapperClass="col-12" label="Email" placeholder="miki@gmail.com"
+                inputClass="form-control" id="Email" model="$item->Email" />
+
+            <TextInput type="text" wrapperClass="col-12" label="Phone" placeholder="+380970000000"
+                inputClass="form-control" id="Phone" model="$item->Phone" />
+
+            <CheckBox label="Active" id="Active" model="$item->Active" hint="Check to mark this user active." />
+
+            <CheckBox label="EmailConfirmed" id="EmailConfirmed" model="$item->EmailConfirmed"
+                hint="Indicates that use has confirmed the email address." />
+
+            <CheckBox label="Admin rights" id="IsAdmin" model="$item->IsAdmin"
+                hint="Check to make this user an admin." />
+
+            <div if="{!$createMode}" class="mb-3">
+                <button type="button" class="btn btn-danger" (click)="togglePasswordChange">Change password</button>
+            </div>
+
+            <div if="{$createMode || $changePassword}" class="mb-3">
+                <TextInput type="password" wrapperClass="col-12" label="Password" placeholder="password"
+                    inputClass="form-control" id="NewPassword" model="$item->NewPassword" />
+
+                <TextInput type="password" wrapperClass="col-12" label="Confirm password" placeholder="password"
+                    inputClass="form-control" id="ConfirmPassword" model="$item->ConfirmPassword" />
+            </div>
+
+            <ValidationMessage #generalMessages fallback="true" wrapperClass="mb-3" />
+
+            <ActionButton text="{$createMode ? 'Create' : 'Save'}" state="$state" />
+        </ActionForm>
+    </div>
+</AdminLayout>

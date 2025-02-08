@@ -1,0 +1,20 @@
+<AdminLayout title="Users">
+    <ListPage title="Users" deleteMessage="{deleteMessage()}" columns="$columns" urlSegment="user" name="User">
+        <DataTable>
+            <slotContent name="column_FirstName" data="$item">
+                <td>
+                    <div>{$item->FirstName} {$item->LastName}</div>
+                    <div class="mt-2">
+                        {$item->UserName}
+                    </div>
+                    <div if="{$item->Email !== $item->UserName}" class="mt-2">
+                        {$item->Email}
+                    </div>
+                    <div if="{$item->Phone !== $item->UserName}" class="mt-2">
+                        {$item->Phone}
+                    </div>
+                </td>
+            </slotContent>
+        </DataTable>
+    </ListPage>
+</AdminLayout>
