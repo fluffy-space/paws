@@ -1,8 +1,8 @@
 
 <div class="d-flex justify-content-between mt-2 mb-4">
     <div>
-        <h3 class="text-h3">{$createMode ? 'Create page' : 'Edit page'}</h3>
-        <a class="icon-link" href="/admin/content">
+        <h3 if="$title" class="text-h3">$title</h3>
+        <a class="icon-link" href="$backUrl">
             <Icon name="bi-arrow-left" classList="icon" />
             Back
         </a>

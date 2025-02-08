@@ -9,6 +9,8 @@ class EditHeader extends BaseComponent
 {
     public bool $createMode = false;
     public int $state = 0;
+    public ?string $backUrl = null;
+    public ?string $title = null;
 
     public function onSave(DomEvent $event)
     {
