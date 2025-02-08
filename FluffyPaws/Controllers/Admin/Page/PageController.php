@@ -118,7 +118,7 @@ class PageController extends BaseController
                  * @var ?PictureEntity $picture
                  */
                 $picture = $this->pictures->getById($model->PictureId);
-                $model->Picture = $this->mapper->map(PictureModel::class, $picture);;
+                $model->Picture = $this->mapper->map(PictureModel::class, $picture);
             }
             $this->sitemapService->resetCache();
         }
