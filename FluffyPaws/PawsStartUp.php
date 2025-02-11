@@ -56,7 +56,9 @@ class PawsStartUp implements IStartUp
         // prepare routes and Viewi        
         $serviceProvider = $app->getProvider();
         $viewiApp = $serviceProvider->get(\Viewi\App::class);
-        $viewiApp->getConfig()->use(FluffyPupils::class);
+        $viewiConfig = $viewiApp->getConfig();
+        $viewiConfig->use(FluffyPupils::class);
+        $viewiConfig->noJsNamespace[] = 'Pupils\\Components\\Emails\\';
         include_once __DIR__ . '/routes.php';
     }
 
