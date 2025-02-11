@@ -109,11 +109,11 @@ class LocaleResourceController extends BaseController
         /**
          * @var LocaleResourceEntity $localeResourceEntity
          */
-        $LocaleResourceEntity = $this->localeResources->getById($id);
-        if (!$LocaleResourceEntity) {
+        $localeResourceEntity = $this->localeResources->getById($id);
+        if (!$localeResourceEntity) {
             return $this->NotFound();
         }
-        $success = $this->localeResources->delete($LocaleResourceEntity);
+        $success = $this->localeResources->delete($localeResourceEntity);
         $cacheKey = sprintf(LocaleResourceEntityMap::CACHE_KEY, $localeResourceEntity->LanguageId);
         $this->cache->delete($cacheKey);
         return $success;
