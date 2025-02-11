@@ -2,15 +2,14 @@
 
 namespace SharedPaws\Models\Localization;
 
+use SharedPaws\Validation\IValidationRules;
 use SharedPaws\Validation\ValidationRules;
 
-class LocaleResourceValidation
+class LocaleResourceValidation implements IValidationRules
 {
-    public function __construct(private LocaleResourceModel $model)
-    {
-    }
+    public function __construct(private LocaleResourceModel $model) {}
 
-    public function getValidationRules()
+    public function getValidationRules(): array
     {
         return ValidationRules::rules($this->model)
             ->required('Name')
