@@ -1,6 +1,7 @@
 <?php
 
 use FluffyPaws\Controllers\Admin\Blog\BlogPostController;
+use FluffyPaws\Controllers\Admin\EmailTemplate\EmailTemplateController;
 use FluffyPaws\Controllers\Admin\Localization\LanguageController;
 use FluffyPaws\Controllers\Admin\Localization\LocaleResourceController;
 use FluffyPaws\Controllers\Admin\Media\MediaController;
@@ -85,6 +86,9 @@ $router->section('/api/', function (Router $router) {
 
         // Media
         $router->post('picture/upload', [MediaController::class, 'Upload']);
+
+        // Email templates
+        $router->get('email-template/preview/{template}', [EmailTemplateController::class, 'GetPreview']);
     });
 });
 
