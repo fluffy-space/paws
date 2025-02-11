@@ -1,0 +1,8 @@
+<EmailLayout title="{t('email.activate.title')}">
+    <p>
+        {t('email.activate.please-confirm', ['name' => $user->FirstName, 'surname' => $user->LastName])}
+    </p>
+    <p>
+        <a href="{$baseUrl}/account/confirm/$verificationCode">{t('email.activate.click-here-to-activate')}</a>
+    </p>
+</EmailLayout>
