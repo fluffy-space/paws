@@ -2,12 +2,15 @@
 
 namespace Pupils\Components\Views\Admin\ListPage;
 
+use SharedPaws\Models\BaseModel;
+use SharedPaws\Validation\IValidationRules;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Http\HttpClient;
 use Viewi\Components\Routing\ClientRoute;
 use Viewi\DI\Inject;
 use Viewi\DI\Scope;
 use Viewi\UI\Components\Alerts\AlertService;
+use Viewi\UI\Components\Forms\FormContext;
 use Viewi\UI\Components\Modals\ModalService;
 use Viewi\UI\Components\Tables\DataTableContext;
 use Viewi\UI\Components\Tables\TableFilter;
@@ -21,6 +24,19 @@ class ListPage extends BaseComponent
     public TableFilter $filter;
     public array $columns = [];
     public $deleteMessage = null;
+    public bool $embedded = false;
+    public bool $editInline = false;
+    /**
+     * 
+     * @var callable($item): IValidationRules
+     */
+    public $validationFactory = null;
+    /**
+     * 
+     * @var callable(): BaseModel
+     */
+    public $newFactory = null;
+    public array $query = [];
 
     public function __construct(
         private HttpClient $http,
@@ -28,7 +44,9 @@ class ListPage extends BaseComponent
         private AlertService $messages,
         private ClientRoute $route,
         #[Inject(Scope::COMPONENT)]
-        private DataTableContext $tableContext
+        private DataTableContext $tableContext,
+        #[Inject(Scope::COMPONENT)]
+        private FormContext $form,
     ) {
         $this->filter = new TableFilter();
     }
@@ -41,20 +59,28 @@ class ListPage extends BaseComponent
             'columns' => $this->columns,
             'filter' => $this->filter,
             'addText' => "Add {$this->name}",
+            'editInline' => $this->editInline
         ]);
         $this->tableContext->on('search', fn($event) => $this->onSearch($event));
         $this->tableContext->on('page', fn($event) => $this->onPageChange($event));
         $this->tableContext->on('create', fn($event) => $this->onCreate($event));
         $this->tableContext->on('edit', fn($event) => $this->onEdit($event));
         $this->tableContext->on('delete', fn($event) => $this->onDelete($event));
+        $this->tableContext->on('save', fn($event) => $this->onSave($event));
+        $this->tableContext->on('cancel', fn() => $this->getData());
     }
 
     private function getData()
     {
         $searchEncoded = urlencode($this->filter->searchText);
-        $this->http->get("/api/admin/{$this->urlSegment}?page={$this->filter->paging->page}&size={$this->filter->paging->size}&search={$searchEncoded}")
+        $query = '';
+        foreach ($this->query as $name => $value) {
+            $query .= "&{$name}={$value}";
+        }
+        $this->http->get("/api/admin/{$this->urlSegment}?page={$this->filter->paging->page}&size={$this->filter->paging->size}&search={$searchEncoded}{$query}")
             ->then(function ($items) {
                 $this->items = $items['list'];
+                $this->cancelEdit();
                 $this->tableContext->passProps(['items' => $this->items]);
                 $this->filter->paging->setTotal($items['total']);
             }, function () {
@@ -93,11 +119,70 @@ class ListPage extends BaseComponent
 
     public function onEdit($item)
     {
-        $this->route->navigate("/admin/{$this->urlSegment}/{$item->Id}");
+        if ($this->editInline) {
+        } else {
+            $this->route->navigate("/admin/{$this->urlSegment}/{$item->Id}");
+        }
     }
 
     public function onCreate()
     {
-        $this->route->navigate("/admin/{$this->urlSegment}/create");
+        if ($this->editInline) {
+            if ($this->newFactory !== null) {
+                $newItem = ($this->newFactory)();
+                array_unshift($this->items, $newItem);
+                $this->items = [...$this->items];
+                $this->tableContext->passProps([
+                    'items' => $this->items,
+                    'editItem' => $newItem,
+                    'changeMode' => true
+                ]);
+            }
+        } else {
+            $this->route->navigate("/admin/{$this->urlSegment}/create");
+        }
+    }
+
+    public function onSave(BaseModel $item)
+    {
+        if ($this->validationFactory !== null) {
+            if (!$this->form->validate(($this->validationFactory)($item)->getValidationRules())) {
+                return;
+            }
+        }
+        $createMode = $item->Id === 0;
+        $this->http->request(
+            $createMode ? 'post' : 'put',
+            $createMode ? '/api/admin/locale-resource' : "/api/admin/{$this->urlSegment}/{$item->Id}",
+            $item
+        )
+            ->then(function (?BaseModel $model) use ($createMode) {
+                if ($model !== null) {
+                    $text = $createMode ? 'created' : 'saved';
+                    $this->messages->success("{$this->name} was successfully $text.", null, 5000);
+                }
+                $this->cancelEdit();
+                $this->getData();
+            }, function ($response) {
+                $this->handleResponse(true, $response);
+            });
+    }
+
+    public function cancelEdit()
+    {
+        $this->tableContext->passProps(['editItem' => null, 'changeMode' => false]);
+    }
+
+    public function handleResponse(bool $hasError, $response = null)
+    {
+        if ($hasError) {
+            if ($response['errors']) {
+                $this->messages->error($response['errors'][0], null, 5000);
+            } else if ($response['message']) {
+                $this->messages->error($response['message'], null, 5000);
+            } else {
+                $this->messages->error('Saving has failed', null, 5000);
+            }
+        }
     }
 }

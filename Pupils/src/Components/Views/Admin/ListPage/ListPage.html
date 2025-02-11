@@ -1,6 +1,6 @@
-<h3 if="$title" class="text-h3 mt-2 mb-4">$title</h3>
-<div class="card shadow-sm">
-    <div class="card-body">
+<h3 if="{$title && !$embedded}" class="text-h3 mt-2 mb-4">$title</h3>
+<div class.card="{!$embedded}" class.shadow-sm="{!$embedded}">
+    <div class.card-body="{!$embedded}">
         <slot>
             <DataTable />
         </slot>
