@@ -1,0 +1,47 @@
+<AdminLayout title="Edit language">
+    <EditHeader title="{$createMode ? 'Create language' : 'Edit language'}" backUrl="/admin/language"
+        createMode="$createMode" state="$state" (click)="onSave" />
+
+    <div class="card shadow-sm p-2">
+        <Tabs>
+            <Tab title="Information" active>
+                <div if="$item && $validation" class="">
+                    <ActionForm #actionForm (submit)="onSave" id="page-form" action="/admin/language" method="post"
+                        rules="{$validation->getValidationRules()}">
+                        <TextInput type="text" wrapperClass="col-12" label="Name" placeholder="English"
+                            inputClass="form-control" id="Name" model="$item->Name" />
+
+                        <TextInput type="text" wrapperClass="col-12" label="Language culture" placeholder="en-US"
+                            inputClass="form-control" id="LanguageCulture" model="$item->LanguageCulture">
+                            <div class="form-text">The language specific culture code. Need more info?
+                                <a href="https://docwiki.embarcadero.com/RADStudio/Athens/en/Language_Culture_Names,_Codes,_and_ISO_Values"
+                                    class="text-secondary" target="_blank" rel="noopener noreferrer">Find it
+                                    here.</a>
+                            </div>
+                        </TextInput>
+
+                        <TextInput type="text" wrapperClass="col-12" label="Unique SEO code" placeholder="en"
+                            inputClass="form-control" id="SeoCode" model="$item->SeoCode" />
+
+                        <CheckBox label="Right-to-left" id="Rtl" model="$item->Rtl"
+                            hint="Check to enable right-to-left support for this language. The active theme should support RTL (have appropriate CSS style file). And it affects only public store." />
+
+                        <CheckBox label="Published" id="Published" model="$item->Published"
+                            hint="Check to make this language publicly available." />
+
+                        <TextInput type="number" label="Display order" placeholder="0" wrapperClass="col-12"
+                            inputClass="form-control" id="DisplayOrder" model="$item->DisplayOrder"
+                            hint="Display order of the item." />
+
+                        <ValidationMessage #generalMessages fallback="true" wrapperClass="mb-3" />
+
+                        <ActionButton text="{$createMode ? 'Create' : 'Save'}" state="$state" />
+                    </ActionForm>
+                </div>
+            </Tab>
+            <Tab if="{!$createMode}" title="String resources">
+                <StringResourcesList language="$id" />
+            </Tab>
+        </Tabs>
+    </div>
+</AdminLayout>

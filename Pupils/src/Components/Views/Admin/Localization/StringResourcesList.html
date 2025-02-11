@@ -1,0 +1,18 @@
+<ListPage title="String resources" deleteMessage="{deleteMessage()}" columns="$columns" urlSegment="locale-resource"
+    name="String resource" query="{['languageId' => $language]}" newFactory="{getNewItem()}" validationFactory="{getValidation()}" embedded
+    editInline>
+    <DataTable>
+        <slotContent name="edit_Name" data="$item">
+            <td>
+                <TextInput type="text" inset="true" wrapperClass="col-12" placeholder="Name" inputClass="form-control"
+                    id="Name" model="$item->Name" />
+            </td>
+        </slotContent>
+        <slotContent name="edit_Value" data="$item">
+            <td>
+                <TextInput textarea type="text" inset="true" wrapperClass="col-12" placeholder="Value"
+                    inputClass="form-control" id="Value" model="$item->Value" />
+            </td>
+        </slotContent>
+    </DataTable>
+</ListPage>

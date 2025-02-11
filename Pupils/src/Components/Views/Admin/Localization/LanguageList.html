@@ -1,0 +1,10 @@
+<AdminLayout title="Languages">
+    <ListPage title="Languages" deleteMessage="{deleteMessage()}" columns="$columns" urlSegment="language"
+        name="Language">
+        <DataTable>
+            <slotContent name="column_LanguageCulture" data="$item">
+                <td>{$item->LanguageCulture} ({$item->SeoCode})</td>
+            </slotContent>
+        </DataTable>
+    </ListPage>
+</AdminLayout>
