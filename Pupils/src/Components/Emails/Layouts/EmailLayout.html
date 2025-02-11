@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>
+        $title | {t('layout.title')}
+    </title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <CssBundle links="{['/pupils/mail.css']}" minify purge combine inline />
+</head>
+
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+        style="border-spacing:0;background-color:#faf5fc; width:100%!important;table-layout:fixed;border-collapse:collapse;">
+        <tbody>
+            <tr>
+                <td align="center">
+
+                    <div
+                        style="border-radius: 20px; width: 500px; background-color:#ffffff; min-width: 318px; padding: 30px 0px; margin: 30px 0;">
+                        <table width="500" style="border-spacing:0;">
+                            <tbody>
+                                <tr>
+                                    <td align="center">
+                                        <h1>
+                                            <a href="{$baseUrl}" class="uk-link-reset logo-link logo-icon">
+                                                <EmailLogo />
+                                            </a>
+                                        </h1>
+                                        <hr class="uk-divider-icon">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0 20px;">
+                                        <h1
+                                            class="text-h3 text-center text-md-left font-weight-bold text-h4 text-sm-h4 mt-xl-4">
+                                            {t('email.layout.title')}
+                                        </h1>
+                                        <h2 class="text-h6 text-sm-h5 mt-4">
+                                            {t('email.layout.hero')}
+                                        </h2>
+                                        <slot></slot>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <hr class="uk-divider-icon">
+                                        <div class="light-navbar no-border text-center">
+                                            <ul class="inline-list">
+                                                <li><a href="{$baseUrl}/blog">{t('blog.list.title')}</a></li>
+                                            </ul>
+                                        </div>
+                                        <p class="text-center">&copy; {t('email.layout.title')} {date('Y')} -
+                                            {t('email.layout.all-rights-reserved')}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>
