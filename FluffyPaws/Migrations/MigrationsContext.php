@@ -7,6 +7,7 @@ use FluffyPaws\Migrations\Blog\BlogPostMigration;
 use FluffyPaws\Migrations\Content\PageMigration;
 use FluffyPaws\Migrations\Localization\LanguageMigration;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration;
+use FluffyPaws\Migrations\Localization\LocaleEnglishMigration02;
 use FluffyPaws\Migrations\Localization\LocaleResourceMigration;
 use FluffyPaws\Migrations\Media\PictureMigration;
 
@@ -23,6 +24,7 @@ class MigrationsContext extends BaseMigrationsContext
         $this->runMigration(LocaleResourceMigration::class);
         $this->runMigration(LocaleEnglishMigration::class);
         $this->runMigration(PictureMigration::class);
+        $this->runMigration(LocaleEnglishMigration02::class);
         /** @insert **/
         // !Do not delete the line above!
     }
