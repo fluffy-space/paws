@@ -1,5 +1,6 @@
 <AdminLayout title="{$createMode ? 'Create page' : 'Edit page'}">
-    <EditHeader title="{$createMode ? 'Create page' : 'Edit page'}" backUrl="/admin/content" createMode="$createMode" state="$state" (click)="onSave" />
+    <EditHeader title="{$createMode ? 'Create page' : 'Edit page'}" backUrl="/admin/content" createMode="$createMode"
+        state="$state" (click)="onSave" />
     <div if="$item && $validation" class="card shadow-sm p-4">
         <ActionForm #actionForm (submit)="onSave" id="page-form" action="/admin/content" method="post"
             rules="{$validation->getValidationRules()}">
@@ -24,8 +25,10 @@
                 <label for="Body" class="col-form-label">Body</label>
                 <Tabs classList="">
                     <Tab title="Edit" active>
-                        <TextInput textarea codeEditor placeholder="The body of this page" id="Body" rows="12"
-                            model="$item->Body" />
+                        <BaseInput name="Body" label="Body">
+                            <RichEditor codeEditor placeholder="The body of this page" id="Body" rows="5"
+                                model="$item->Body" />
+                        </BaseInput>
                     </Tab>
                     <Tab title="Preview">
                         <div class="raw-content">
