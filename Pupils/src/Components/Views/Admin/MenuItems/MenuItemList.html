@@ -1,0 +1,16 @@
+<AdminLayout title="Menu items">
+    <ListPage title="Menu items" deleteMessage="{deleteMessage()}" columns="$columns" urlSegment="{'menu/'.$area}"
+        apiUrl="menu" name="Menu item" query="{['location' => $locationId]}">
+        <DataTable>
+            <slotContent name="column_Title" data="$item">
+                <td>
+                    <div>{$item->Title}</div>
+                    <div if="{$item->Link}" class="mt-2">
+                        <a href="{$item->Link}" target="_blank" rel="noopener noreferrer" class="px-0">
+                            {$item->Link}
+                        </a>
+                    </div>
+                </td>
+            </slotContent>
+        </DataTable>
+</AdminLayout>

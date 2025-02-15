@@ -1,0 +1,46 @@
+<AdminLayout title="Edit menu item">
+    <EditHeader title="{$createMode ? 'Create menu item' : 'Edit menu item'}" backUrl="/admin/menu/$area"
+        createMode="$createMode" state="$state" (click)="onSave" />
+    <div if="$item && $validation" class="card shadow-sm p-4">
+        <ActionForm #actionForm (submit)="onSave" id="page-form" action="/admin/menu" method="post"
+            rules="{$validation->getValidationRules()}">
+            <TextInput type="text" wrapperClass="col-12" label="Title" placeholder="Title of the page"
+                inputClass="form-control" id="Title" model="$item->Title" />
+
+            <TextInput type="text" label="Link URL" placeholder="/some-link" wrapperClass="col-12"
+                inputClass="form-control" id="Link" model="$item->Link" hint="Link URL, for example:
+                    '/the-best-page'. Leave empty to have just a title without a link." />
+
+            <Dropdown options="$locations" label="Location" id="Location" name="Location" model="$item->Location" />
+
+            <CheckBox label="Published" id="Published" model="$item->Published"
+                hint="Check to make this menu item publicly available." />
+
+            <CheckBox label="Open in a new tab?" id="NewTab" model="$item->NewTab"
+                hint="Check to make the link open in a new tab." />
+
+            <TextInput type="number" label="Display order" placeholder="0" wrapperClass="col-12"
+                inputClass="form-control" id="Order" model="$item->Order" hint="Display order of the item." />
+
+            <TextInput type="number" label="Column" placeholder="0" wrapperClass="col-12" inputClass="form-control"
+                id="Column" model="$item->Column"
+                hint="Column number of the item location. Valid if you have column menu structure." />
+
+            <TextInput type="number" label="Row" placeholder="0" wrapperClass="col-12" inputClass="form-control"
+                id="Row" model="$item->Row"
+                hint="Row number of the item location. Valid if you have row menu structure." />
+
+            <TextInput type="text" label="CSS class names" placeholder="my-link" wrapperClass="col-12"
+                inputClass="form-control" id="LinkClass" model="$item->LinkClass"
+                hint="Optional. Add additional css class names to style your menu item." />
+
+            <TextInput type="text" label="Icon name" placeholder="#menu-button-wide" wrapperClass="col-12"
+                inputClass="form-control" id="Icon" model="$item->Icon"
+                hint="Optional. Prepend an icon to your menu item. Example: '#menu-button-wide'" />
+
+            <ValidationMessage #generalMessages fallback="true" wrapperClass="mb-3" />
+
+            <ActionButton text="{$createMode ? 'Create' : 'Save'}" state="$state" />
+        </ActionForm>
+    </div>
+</AdminLayout>
