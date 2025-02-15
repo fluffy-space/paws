@@ -26,6 +26,7 @@ abstract class EditPage extends BaseComponent
     public ?ValidationMessage $generalMessages = null;
 
     public string $segment = 'not-defined';
+    public ?string $apiUrl = null;
 
     public function __construct(
         public int $id,
@@ -39,9 +40,12 @@ abstract class EditPage extends BaseComponent
 
     public function init()
     {
+        if ($this->apiUrl === null) {
+            $this->apiUrl = $this->segment;
+        }
         if ($this->id > 0) {
             //edit
-            $this->http->get("/api/admin/{$this->segment}/{$this->id}")
+            $this->http->get("/api/admin/{$this->apiUrl}/{$this->id}")
                 ->then(function ($item) {
                     $this->item = $item;
                     $this->validation = $this->getValidation($item);
@@ -65,7 +69,7 @@ abstract class EditPage extends BaseComponent
         $this->state = ActionButton::STATE_PROCESSING;
         $this->http->request(
             $this->createMode ? 'post' : 'put',
-            $this->createMode ? "/api/admin/{$this->segment}" : "/api/admin/{$this->segment}/{$this->id}",
+            $this->createMode ? "/api/admin/{$this->apiUrl}" : "/api/admin/{$this->apiUrl}/{$this->id}",
             $this->item
         )
             ->then(function ($post) {
