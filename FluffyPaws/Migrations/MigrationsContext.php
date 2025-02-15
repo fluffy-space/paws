@@ -8,8 +8,10 @@ use FluffyPaws\Migrations\Content\PageMigration;
 use FluffyPaws\Migrations\Localization\LanguageMigration;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration02;
+use FluffyPaws\Migrations\Localization\LocaleEnglishMigration03;
 use FluffyPaws\Migrations\Localization\LocaleResourceMigration;
 use FluffyPaws\Migrations\Media\PictureMigration;
+use FluffyPaws\Migrations\Menu\MenuItemMigration;
 
 /** @namespaces **/
 // !Do not delete the line above!
@@ -25,6 +27,8 @@ class MigrationsContext extends BaseMigrationsContext
         $this->runMigration(LocaleEnglishMigration::class);
         $this->runMigration(PictureMigration::class);
         $this->runMigration(LocaleEnglishMigration02::class);
+        $this->runMigration(MenuItemMigration::class);
+        $this->runMigration(LocaleEnglishMigration03::class);
         /** @insert **/
         // !Do not delete the line above!
     }
