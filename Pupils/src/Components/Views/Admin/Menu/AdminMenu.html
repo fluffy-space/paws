@@ -19,20 +19,21 @@
                         <span class="menu-item-title">{$menuItem->title}</span>
                     </div>
                     <span if="{$menuItem->children}" class="me-3">
-                        <Icon name="bi-chevron-menu-down"
+                        <Icon name="bi-chevron-down"
                             classList="rotate {$menuItem->expanded ? 'rotate-180' : ''}" />
                     </span>
                 </a>
-                <ul if="{$menuItem->children}" class="nav menu-vertical sub-menu-nav collapse"
-                    class.show="{$menuItem->expanded}">
-                    <li foreach="$menuItem->children as $childMenuItem" class="nav-item">
-                        <a href="{$childMenuItem->url}" title="$childMenuItem->title"
-                            class="nav-link sub-menu-link border-start d-flex align-items-center"
-                            class.menu-link-active="{isActive($childMenuItem)}">
-                            <span class="menu-item-title ms-3">{$childMenuItem->title}</span>
-                        </a>
-                    </li>
-                </ul>
+                <ExpandTransition if="{$menuItem->children}" expanded="{$menuItem->expanded}">
+                    <ul class="nav menu-vertical sub-menu-nav collapse">
+                        <li foreach="$menuItem->children as $childMenuItem" class="nav-item">
+                            <a href="{$childMenuItem->url}" title="$childMenuItem->title"
+                                class="nav-link sub-menu-link border-start d-flex align-items-center"
+                                class.menu-link-active="{isActive($childMenuItem)}">
+                                <span class="menu-item-title ms-3">{$childMenuItem->title}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </ExpandTransition>
             </li>
         </ul>
     </div>

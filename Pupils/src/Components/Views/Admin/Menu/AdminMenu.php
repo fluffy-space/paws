@@ -27,7 +27,8 @@ class AdminMenu extends BaseComponent
             new MenuItem('Pages', '/admin/content', 'bi-grid', ['/admin/content/create'], "#^/admin/content/(.*)$#i"),
             new MenuItem('Menu items', null, 'bi-menu-button-wide', [], null, [
                 new MenuItem('Header menu', '/admin/menu/header', null, ['/admin/menu/header/create'], "#^/admin/menu/header/(.*)$#i"),
-                new MenuItem('Footer menu', '/admin/menu/footer', null, ['/admin/menu/footer/create'], "#^/admin/menu/footer/(.*)$#i")
+                new MenuItem('Footer menu', '/admin/menu/footer', null, ['/admin/menu/footer/create'], "#^/admin/menu/footer/(.*)$#i"),
+                new MenuItem('Email menu', '/admin/menu/email', null, ['/admin/menu/footer/email'], "#^/admin/menu/email/(.*)$#i")
             ]),
             new MenuItem('Blog', '/admin/blog', 'bi-pencil', ['/admin/blog/create'], "#^/admin/blog/(.*)$#i"),
             new MenuItem('Users', '/admin/user', 'bi-people-fill', ['/admin/users/create'], "#^/admin/users/(.*)$#i"),
