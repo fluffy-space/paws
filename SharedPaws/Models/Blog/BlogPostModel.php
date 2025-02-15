@@ -10,6 +10,7 @@ class BlogPostModel extends BaseModel
     public bool $IncludeInSitemap = true;
     public string $Title = '';
     public string $Slug = '';
+    public bool $AsHtml = false;
     public string $Body = '';
     public string $BodyOverview = '';
     public ?int $Author = null;
