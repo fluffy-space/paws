@@ -1,5 +1,6 @@
 <AdminLayout title="Edit blog post">
-    <EditHeader title="{$createMode ? 'Create blog post' : 'Edit blog post'}" backUrl="/admin/blog" createMode="$createMode" state="$state" (click)="onSave" />
+    <EditHeader title="{$createMode ? 'Create blog post' : 'Edit blog post'}" backUrl="/admin/blog"
+        createMode="$createMode" state="$state" (click)="onSave" />
     <div if="$item && $validation" class="card shadow-sm p-4">
         <ActionForm #actionForm (submit)="onSave" id="blog-form" action="/admin/blog" method="post"
             rules="{$validation->getValidationRules()}">
@@ -15,7 +16,26 @@
             <CheckBox label="Published" id="Published" model="$item->Published"
                 hint="Check to make this post publicly available." />
 
-            <BaseInput name="Body" label="Body">
+            <CheckBox label="Edit as HTML" id="RawHtml" model="$item->AsHtml"
+                hint="Check to edit your content as HTML" />
+
+            <div if="$item->AsHtml">
+                <label for="Body" class="col-form-label">Body</label>
+                <Tabs classList="">
+                    <Tab title="Edit" active>
+                        <BaseInput name="Body" label="Body">
+                            <RichEditor codeEditor placeholder="The body of this page" id="Body" rows="5"
+                                model="$item->Body" />
+                        </BaseInput>
+                    </Tab>
+                    <Tab title="Preview">
+                        <div class="raw-content">
+                            {{$item->Body}}
+                        </div>
+                    </Tab>
+                </Tabs>
+            </div>
+            <BaseInput else name="Body" label="Body">
                 <RichEditor placeholder="The body of this page" id="Body" rows="5" model="$item->Body" />
             </BaseInput>
 
