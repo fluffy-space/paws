@@ -22,6 +22,7 @@ class BlogPostMigration extends BaseMigration
                 'IncludeInSitemap' => CommonMap::$Boolean,
                 'Slug' => CommonMap::$VarChar400,
                 'Title' => CommonMap::$TextCaseInsensitive,
+                'AsHtml' => CommonMap::$Boolean,
                 'Body' => CommonMap::$TextCaseInsensitive,
                 'BodyOverview' => CommonMap::$TextCaseInsensitive,
                 'Author' => CommonMap::$BigIntNull,
