@@ -5,12 +5,14 @@ use FluffyPaws\Controllers\Admin\EmailTemplate\EmailTemplateController;
 use FluffyPaws\Controllers\Admin\Localization\LanguageController;
 use FluffyPaws\Controllers\Admin\Localization\LocaleResourceController;
 use FluffyPaws\Controllers\Admin\Media\MediaController;
+use FluffyPaws\Controllers\Admin\MenuItem\MenuController;
 use FluffyPaws\Controllers\Admin\Page\PageController;
 use FluffyPaws\Controllers\Admin\Users\UserController;
 use FluffyPaws\Controllers\AuthorizationController;
 use FluffyPaws\Controllers\BlogController;
 use FluffyPaws\Controllers\ContentController;
 use FluffyPaws\Controllers\LocalizationController;
+use FluffyPaws\Controllers\MiscController;
 use FluffyPaws\Controllers\SitemapController;
 use Viewi\App;
 use Viewi\Router\Router;
@@ -34,6 +36,9 @@ $router->section('/api/', function (Router $router) {
     $router->register('get', 'blog', [BlogController::class, 'GetList']);
     $router->register('get', 'blog/{seoName}', [BlogController::class, 'GetBySeoName']);
 
+    // Menu
+    $router->register('get', 'menu/{location}', [MiscController::class, 'GetMenuItems']);
+
     // Localization
     $router->register('get', 'locale-resource/{languageId}', [LocalizationController::class, 'GetResources']);
 
@@ -46,6 +51,7 @@ $router->section('/api/', function (Router $router) {
     $router->register('post', 'authorization/register', [AuthorizationController::class, 'Register']);
     $router->register('post', 'authorization/reset-password', [AuthorizationController::class, 'ResetPassword']);
     $router->register('post', 'authorization/reset-password-confirm', [AuthorizationController::class, 'ResetPasswordConfirm']);
+
 
 
     /*  ADMIN AREA */
@@ -89,6 +95,13 @@ $router->section('/api/', function (Router $router) {
 
         // Email templates
         $router->get('email-template/preview/{template}', [EmailTemplateController::class, 'GetPreview']);
+
+        // menu items
+        $router->get('menu', [MenuController::class, 'List']);
+        $router->post('menu', [MenuController::class, 'Create']);
+        $router->get('menu/{id}', [MenuController::class, 'Get']);
+        $router->put('menu/{id}', [MenuController::class, 'Update']);
+        $router->delete('menu/{id}', [MenuController::class, 'Delete']);
     });
 });
 

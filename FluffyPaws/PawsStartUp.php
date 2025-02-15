@@ -11,6 +11,7 @@ use FluffyPaws\Controllers\ControllersMark;
 use FluffyPaws\Data\Repositories\BlogPostRepository;
 use FluffyPaws\Data\Repositories\LanguageRepository;
 use FluffyPaws\Data\Repositories\LocaleResourceRepository;
+use FluffyPaws\Data\Repositories\MenuItemRepository;
 use FluffyPaws\Data\Repositories\PageRepository;
 use FluffyPaws\Data\Repositories\PictureRepository;
 use FluffyPaws\Migrations\MigrationsContext;
@@ -30,11 +31,11 @@ class PawsStartUp implements IStartUp
     public function configureServices(IServiceProvider $serviceProvider): void
     {
         $serviceProvider->addScoped(BlogPostRepository::class);
-        $serviceProvider->addScoped(BlogPostRepository::class);
         $serviceProvider->addScoped(PageRepository::class);
         $serviceProvider->addScoped(LanguageRepository::class);
         $serviceProvider->addScoped(LocaleResourceRepository::class);
         $serviceProvider->addScoped(PictureRepository::class);
+        $serviceProvider->addScoped(MenuItemRepository::class);
         $serviceProvider->addScoped(SitemapService::class);
         $serviceProvider->addScoped(EmailService::class);
         $serviceProvider->addScoped(LocalizationService::class);
