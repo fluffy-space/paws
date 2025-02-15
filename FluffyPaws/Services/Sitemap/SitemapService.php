@@ -19,8 +19,7 @@ class SitemapService
     public function __construct(
         protected CacheManager $cache,
         protected Container $container
-    ) {
-    }
+    ) {}
 
     public function resetCache()
     {
@@ -74,8 +73,26 @@ Disallow: /order";
         $sitemap .= $this->getPagesSitemap($baseUrl);
         $sitemap .= $this->getStaticSitemap($baseUrl);
         $sitemap .= $this->getBlogSitemap($baseUrl);
-
+        $sitemap .= $this->getProvidersSitemaps($baseUrl);
         $sitemap .= '</urlset>';
+        return $sitemap;
+    }
+
+    protected function getProvidersSitemaps(string $baseUrl)
+    {
+        $sitemap = '';
+        /**
+         * @var ISitemapProvider[] $providers
+         */
+        $providers = $this->container->serviceProvider->getAll(ISitemapProvider::class);
+        foreach ($providers as $provider) {
+            $urls = $provider->getUrls();
+            foreach ($urls as $url) {
+                $lastMod = $url['lastmod'] ?? gmdate('Y-m-d');
+                $url = $baseUrl . $url['url'];
+                $sitemap .= "<url><loc>$url</loc><changefreq>weekly</changefreq><lastmod>$lastMod</lastmod></url>";
+            }
+        }
         return $sitemap;
     }
 
@@ -87,7 +104,7 @@ Disallow: /order";
          */
         $pages = $this->container->serviceProvider->get(PageRepository::class);
         $where = [
-            [PageEntityMap::PROPERTY_Published, true],            
+            [PageEntityMap::PROPERTY_Published, true],
             [PageEntityMap::PROPERTY_IncludeInSitemap, true]
         ];
         /**
@@ -111,7 +128,7 @@ Disallow: /order";
          */
         $pages = $this->container->serviceProvider->get(BlogPostRepository::class);
         $where = [
-            [BlogPostEntityMap::PROPERTY_Published, true],            
+            [BlogPostEntityMap::PROPERTY_Published, true],
             [BlogPostEntityMap::PROPERTY_IncludeInSitemap, true]
         ];
         /**
@@ -131,8 +148,7 @@ Disallow: /order";
     {
         $sitemap = '';
         $pages = [
-            '/blog',
-            '/catalog'
+            '/blog'
         ];
         foreach ($pages as $page) {
             $lastMod = gmdate('Y-m-d');
