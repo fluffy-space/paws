@@ -16,7 +16,7 @@ class BlogController extends BaseController
         protected DbContext $db
     ) {}
 
-    public function GetBySeoName(string $seoName)
+    public function GetBySeoName(string $seoName, bool $next = false)
     {
         $entity = $this->db->execute(
             Query::from(BlogPostEntity::class)
@@ -31,7 +31,32 @@ class BlogController extends BaseController
          * @var BlogPostModel $model
          */
         $model = $this->mapper->map(BlogPostModel::class, $entity);
-        return $model;
+        $result = [
+            'post' => $model,
+            'next' => null,
+            'previous' => null
+        ];
+        if ($next) {
+            $previousPost = $this->db->execute(
+                Query::from(BlogPostEntity::class)
+                    ->select(['Slug', 'Title'])
+                    ->where(['Id', '>', $model->Id])
+                    ->where(['Published', '=', true])
+                    ->orderBy('Id')
+                    ->firstOrDefault()
+            );
+            $nextPost = $this->db->execute(
+                Query::from(BlogPostEntity::class)
+                    ->select(['Slug', 'Title'])
+                    ->where(['Id', '<', $model->Id])
+                    ->where(['Published', '=', true])
+                    ->orderByDescending('Id')
+                    ->firstOrDefault()
+            );
+            $result['next'] = $nextPost ? ['Slug' => $nextPost->Slug, 'Title' => $nextPost->Title ] : null;
+            $result['previous'] = $previousPost ? ['Slug' => $previousPost->Slug, 'Title' => $previousPost->Title ] : null;
+        }
+        return $result;
     }
 
     public function GetList(int $page = 1, int $size = 10)
@@ -40,12 +65,11 @@ class BlogController extends BaseController
             Query::from(BlogPostEntity::class)
                 ->include('Picture')
                 ->where(['Published', '=', true])
-                ->orderByDescending('CreatedOn')
-                ->withCount(false)
+                ->orderByDescending('Id')
                 ->page($page)
                 ->take($size)
         );
         $models = $models = array_map(fn($entity) => $this->mapper->map(BlogPostModel::class, $entity), $entities['list']);
-        return $models;
+        return ['list' => $models, 'total' => $entities['total']];
     }
 }
