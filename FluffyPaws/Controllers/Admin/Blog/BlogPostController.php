@@ -49,7 +49,7 @@ class BlogPostController extends BaseController
             }
         }
 
-        $query->orderBy('CreatedOn')
+        $query->orderByDescending('Id')
             ->include('Picture')
             ->page($page)
             ->take($size);
