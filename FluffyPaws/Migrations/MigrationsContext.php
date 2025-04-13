@@ -9,6 +9,7 @@ use FluffyPaws\Migrations\Localization\LanguageMigration;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration02;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration03;
+use FluffyPaws\Migrations\Localization\LocaleEnglishMigration04;
 use FluffyPaws\Migrations\Localization\LocaleResourceMigration;
 use FluffyPaws\Migrations\Media\PictureMigration;
 use FluffyPaws\Migrations\Menu\MenuItemMigration;
@@ -29,6 +30,7 @@ class MigrationsContext extends BaseMigrationsContext
         $this->runMigration(LocaleEnglishMigration02::class);
         $this->runMigration(MenuItemMigration::class);
         $this->runMigration(LocaleEnglishMigration03::class);
+        $this->runMigration(LocaleEnglishMigration04::class);
         /** @insert **/
         // !Do not delete the line above!
     }
