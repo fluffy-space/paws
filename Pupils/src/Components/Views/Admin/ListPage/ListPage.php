@@ -105,12 +105,12 @@ class ListPage extends BaseComponent
     private function deleteItem($item)
     {
         $this->http->delete("/api/admin/{$this->apiUrl}/{$item->Id}")->then(function () {
-            $this->messages->success("{$this->name} has been successfully deleted", null, 5000);
+            $this->messages->success("{$this->name} has been successfully deleted", 5000);
             $this->getData();
         }, function ($error) {
             // error
             echo $error;
-            $this->messages->error("{$this->name} deletion has failed", null, 5000);
+            $this->messages->error("{$this->name} deletion has failed", 5000);
         });
     }
 
@@ -163,7 +163,7 @@ class ListPage extends BaseComponent
             ->then(function (?BaseModel $model) use ($createMode) {
                 if ($model !== null) {
                     $text = $createMode ? 'created' : 'saved';
-                    $this->messages->success("{$this->name} was successfully $text.", null, 5000);
+                    $this->messages->success("{$this->name} was successfully $text.", 5000);
                 }
                 $this->cancelEdit();
                 $this->getData();
@@ -181,11 +181,11 @@ class ListPage extends BaseComponent
     {
         if ($hasError) {
             if ($response['errors']) {
-                $this->messages->error($response['errors'][0], null, 5000);
+                $this->messages->error($response['errors'][0], 5000);
             } else if ($response['message']) {
-                $this->messages->error($response['message'], null, 5000);
+                $this->messages->error($response['message'], 5000);
             } else {
-                $this->messages->error('Saving has failed', null, 5000);
+                $this->messages->error('Saving has failed', 5000);
             }
         }
     }

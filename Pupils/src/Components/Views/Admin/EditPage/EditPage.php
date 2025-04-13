@@ -76,7 +76,7 @@ abstract class EditPage extends BaseComponent
                 $this->stopLoading(ActionButton::STATE_SUCCESS);
                 if ($post !== null) {
                     $text = $this->createMode ? 'created' : 'saved';
-                    $this->messages->success("{$this->name} was successfully $text.", null, 5000);
+                    $this->messages->success("{$this->name} was successfully $text.", 5000);
                     if ($this->createMode) {
                         $this->route->navigate("/admin/{$this->segment}/{$post->Id}");
                     } else {
@@ -101,13 +101,13 @@ abstract class EditPage extends BaseComponent
         if ($hasError) {
             if ($response['errors']) {
                 $this->generalMessages->messages = $response['errors'];
-                $this->messages->error($response['errors'][0], null, 5000);
+                $this->messages->error($response['errors'][0], 5000);
             } else if ($response['message']) {
                 $this->generalMessages->messages = [$response['message']];
-                $this->messages->error($response['message'], null, 5000);
+                $this->messages->error($response['message'], 5000);
             } else {
                 $this->generalMessages->messages = ['Saving has failed'];
-                $this->messages->error('Saving has failed', null, 5000);
+                $this->messages->error('Saving has failed', 5000);
             }
             $this->generalMessages->show = true;
         }

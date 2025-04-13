@@ -48,13 +48,13 @@ class PictureUploader extends BaseComponent
                     $this->picture = $picture;
                     $this->emitEvent('uploaded', $picture);
                     if ($this->showMessages) {
-                        $this->messages->success('File has been successfully uploaded', null, 5000);
+                        $this->messages->success('File has been successfully uploaded', 5000);
                     }
                 },
                 function ($error) {
                     echo $error;
                     if ($this->showMessages) {
-                        $this->messages->error('File upload has failed', null, 5000);
+                        $this->messages->error('File upload has failed', 5000);
                     }
                 }
             );
