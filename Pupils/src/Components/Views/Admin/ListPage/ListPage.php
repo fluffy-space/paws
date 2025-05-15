@@ -63,7 +63,12 @@ class ListPage extends BaseComponent
             'columns' => $this->columns,
             'filter' => $this->filter,
             'addText' => "Add {$this->name}",
-            'editInline' => $this->editInline
+            'editInline' => $this->editInline,
+            'search' => 1,
+            'add' => 1,
+            'edit' => 1,
+            'remove' => 1,
+            'paging' => 1
         ]);
         $this->tableContext->on('search', fn($event) => $this->onSearch($event));
         $this->tableContext->on('page', fn($event) => $this->onPageChange($event));
