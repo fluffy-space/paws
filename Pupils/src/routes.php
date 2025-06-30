@@ -13,6 +13,7 @@ use Pupils\Components\Views\Admin\Page\PageList;
 use Pupils\Components\Views\Admin\Users\UserEdit;
 use Pupils\Components\Views\Admin\Users\UserList;
 use Pupils\Components\Views\Auth\Login;
+use Pupils\Components\Views\Content\ContentPage;
 use Viewi\App;
 use Viewi\Router\Router;
 
@@ -52,3 +53,6 @@ $router->lazy('admin', function (Router $router) {
         $router->get('/menu/{area}/{id}', MenuItemEdit::class);
     });
 });
+
+$router
+    ->get('*', ContentPage::class);
