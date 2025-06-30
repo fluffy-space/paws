@@ -15,6 +15,6 @@ class BaseLayout extends BaseComponent
 
     public function __construct(public LayoutService $layout, ConfigService $configService)
     {
-        $this->pirschKey = $configService->get('pirschKey');
+        $this->pirschKey = $configService->get('pirschKey') ?? '';
     }
 }
