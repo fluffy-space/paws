@@ -1,0 +1,10 @@
+<PageLayout title="$title" description="{$page?->MetaDescription}" keywords="{$page?->MetaKeywords}">
+    <div if="$page">
+        <h1 class="py-5">{$page->Title}</h1>
+
+        <div #body class="raw-content fs-5 mb-4">
+            {{$page->Body}}
+        </div>
+    </div>
+    <NotFoundBlock if="$notFound" />
+</PageLayout>
