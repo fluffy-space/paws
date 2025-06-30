@@ -1,0 +1,18 @@
+<footer class="pt-4 my-md-5 pt-md-5 border-top container">
+    <div class="row">
+        <div class="col-12 col-md">
+            <img class="mb-2" src="/logo.svg" alt="" width="24" height="24">
+            <small class="d-block mb-3 text-body-secondary">&copy; 2020–{date('Y')}</small>
+        </div>
+        <div foreach="$menuItems as $columnItems" class="col-6 col-md">
+            <ul class="list-unstyled text-small">
+                <li foreach="$columnItems as $menuItem" class="mb-1">
+                    <a if="$menuItem->Link" class="link-secondary text-decoration-none" href="{$menuItem->Link}"
+                        target="{$menuItem->NewTab ? '_blank' : null}"
+                        rel="{$menuItem->NewTab ? 'noopener noreferrer' : null}">{$menuItem->Title}</a>
+                    <h5 else>{$menuItem->Title}</h5>
+                </li>
+            </ul>
+        </div>
+    </div>
+</footer>
