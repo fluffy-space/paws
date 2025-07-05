@@ -1,0 +1,42 @@
+<?php
+
+namespace FluffyPaws\Migrations\Content;
+
+use Fluffy\Data\Repositories\MigrationRepository;
+use FluffyPaws\Data\Repositories\PageRepository;
+use Fluffy\Migrations\BaseMigration;
+use FluffyPaws\Data\Entities\Content\PageEntity;
+
+class PageContentsMigration02 extends BaseMigration
+{
+    function __construct(MigrationRepository $MigrationHistoryRepository, private PageRepository $pageRepository)
+    {
+        parent::__construct($MigrationHistoryRepository);
+    }
+
+    public function up()
+    {
+        $homePage = new PageEntity();
+        $homePage->Published = true;
+        $homePage->Slug = '404';
+        $homePage->AsHtml = true;
+        $homePage->IncludeInSitemap = false;
+        $homePage->Title = 'Page not found';
+        $homePage->Body = '<div class="row flex-lg-row-reverse align-items-center py-5 text-center">
+        <div class="col-lg-6 mb-5">
+            <img src="/viewi-paws/pupils/404-logo.svg" class="mx-lg-auto img-fluid" alt="Viewi" width="240" height="240"
+                loading="lazy">
+        </div>
+        <div class="col-lg-6 text-lg-start">
+            <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Page not found</h1>
+            <p class="lead fw-normal py-4">Oops! It looks like this page does not exist yet.</p>
+            <div class="">
+                <a href="/" type="button" class="btn btn-primary btn-lg px-4 me-md-2">Home</a>
+            </div>
+        </div>
+    </div>';
+        $this->pageRepository->create($homePage);
+    }
+
+    public function down() {}
+}

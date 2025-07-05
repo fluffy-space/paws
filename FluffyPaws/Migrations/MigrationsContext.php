@@ -4,6 +4,8 @@ namespace FluffyPaws\Migrations;
 
 use Fluffy\Migrations\BaseMigrationsContext;
 use FluffyPaws\Migrations\Blog\BlogPostMigration;
+use FluffyPaws\Migrations\Content\PageContentsMigration01;
+use FluffyPaws\Migrations\Content\PageContentsMigration02;
 use FluffyPaws\Migrations\Content\PageMigration;
 use FluffyPaws\Migrations\Localization\LanguageMigration;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration;
@@ -31,6 +33,8 @@ class MigrationsContext extends BaseMigrationsContext
         $this->runMigration(MenuItemMigration::class);
         $this->runMigration(LocaleEnglishMigration03::class);
         $this->runMigration(LocaleEnglishMigration04::class);
+        $this->runMigration(PageContentsMigration01::class);
+        $this->runMigration(PageContentsMigration02::class);
         /** @insert **/
         // !Do not delete the line above!
     }
