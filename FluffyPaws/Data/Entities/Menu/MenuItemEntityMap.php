@@ -14,6 +14,9 @@ class MenuItemEntityMap extends BaseEntityMap
     public const PROPERTY_Order = 'Order';
     public const PROPERTY_Published = 'Published';
     public const CACHE_KEY = "MenuItem-%d";
+    public const LOCATION_HEADER = 1;
+    public const LOCATION_FOOTER = 2;
+    public const LOCATION_EMAIL = 3;
 
     public static array $Indexes = [
         'IX_Location' => [
