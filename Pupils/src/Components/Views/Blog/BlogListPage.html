@@ -1,0 +1,37 @@
+<PageLayout fluid title="{t('blog.list.title')}" description="{t('blog.list.meta-description')}"
+    keywords="{t('blog.list.meta-keywords')}">
+    <div class="text-center py-5 bg-body-tertiary">
+        <h1 class="py-5">{t('blog.list.title')}</h1>
+    </div>
+    <div class="black-blue position-relative">
+        <div class="container">
+            <div class="row">
+                <div foreach="$posts as $post" class="p-3 col-12 col-md-6 col-lg-4">
+                    <div class="card border border-0 rounded-3 h-100 position-relative overflow-hidden">
+                        <!-- Image -->
+                        <div if="{$post->Picture}" class="ratio ratio-16x9"
+                            style="background-image:url($post->Picture->Path); background-position: center left; background-size: cover;">
+                        </div>
+                        <div class="border rounded-3 h-100">
+                            <h4 class="card-title px-3 mt-3">
+                                <a href="/blog/{$post->Slug}"
+                                    class="btn-link text-reset stretched-link link-underline link-underline-opacity-0">{$post->Title}</a>
+                            </h4>
+                            <div class="raw-content p-3">
+                                {{$post->BodyOverview}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-6 mb-4 p-3">
+                    <a if="{$pagination->page > 1}" href="/blog?page={$pagination->page - 1}" class="text-light fs-5">Previous page</a>
+                </div>
+                <div if="{$pagination->page < $pagination->totalPages}" class="col-12 col-md-6 mb-4 p-3 text-end">
+                    <a href="/blog?page={$pagination->page + 1}"  class="text-light fs-5">Next page</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</Layout>

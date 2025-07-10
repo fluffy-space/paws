@@ -13,6 +13,8 @@ use Pupils\Components\Views\Admin\Page\PageList;
 use Pupils\Components\Views\Admin\Users\UserEdit;
 use Pupils\Components\Views\Admin\Users\UserList;
 use Pupils\Components\Views\Auth\Login;
+use Pupils\Components\Views\Blog\BlogListPage;
+use Pupils\Components\Views\Blog\BlogPostPage;
 use Pupils\Components\Views\Content\ContentPage;
 use Viewi\App;
 use Viewi\Router\Router;
@@ -24,6 +26,10 @@ $router = $viewiApp->router();
 
 // Auth
 $router->get('/login', Login::class);
+
+// blog
+$router->get('/blog', BlogListPage::class);
+$router->get('/blog/{seoName}', BlogPostPage::class);
 
 // admin
 $router->lazy('admin', function (Router $router) {

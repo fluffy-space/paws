@@ -1,0 +1,20 @@
+<PageLayout title="$title" description="{$post?->MetaDescription}" keywords="{$post?->MetaKeywords}">
+    <div if="$post">
+        <h1 class="py-5">{$post->Title}</h1>
+
+        <div #body class="raw-content fs-5 mb-4">
+            {{$post->Body}}
+        </div>
+
+        <div class="row py-4">
+            <div class="col-12 col-md-6 mb-4 p-3 text-center text-md-start">
+                <a if="$previousPost" href="/blog/{$previousPost['Slug']}" class="fs-5">Previous:
+                    {$previousPost['Title']}</a>
+            </div>
+            <div if="$nextPost" class="col-12 col-md-6 mb-4 p-3 text-center text-md-end">
+                <a href="/blog/{$nextPost['Slug']}" class="fs-5">Next: {$nextPost['Title']}</a>
+            </div>
+        </div>
+    </div>
+    <NotFoundBlock if="$notFound" />
+</PageLayout>
