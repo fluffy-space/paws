@@ -13,8 +13,4 @@ class UserViewModel
     public bool $Active = false;
     public bool $EmailConfirmed = false;
     public bool $IsAdmin = false;
-    public bool $IsMember = false;
-    public ?int $MemberFromDate = null;
-    public ?string $RoleName = null;
-    public ?int $RoleId = null;
 }
