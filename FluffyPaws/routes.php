@@ -22,37 +22,35 @@ use Viewi\Router\Router;
  */
 $router = $viewiApp->router();
 
-$router->register('get', '/account/confirm/{code}', [AuthorizationController::class, 'ConfirmEmail']);
+$router->get('/account/confirm/{code}', [AuthorizationController::class, 'ConfirmEmail']);
 
 // Sitemap
-$router->register('get', '/sitemap.xml', [SitemapController::class, 'Sitemap']);
-$router->register('get', '/robots.txt', [SitemapController::class, 'Robots']);
+$router->get('/sitemap.xml', [SitemapController::class, 'Sitemap']);
+$router->get('/robots.txt', [SitemapController::class, 'Robots']);
 
 $router->section('/api/', function (Router $router) {
     // Content
-    $router->register('get', 'content', [ContentController::class, 'GetByPath']);
+    $router->get('content', [ContentController::class, 'GetByPath']);
 
     // Blog
-    $router->register('get', 'blog', [BlogController::class, 'GetList']);
-    $router->register('get', 'blog/{seoName}', [BlogController::class, 'GetBySeoName']);
+    $router->get('blog', [BlogController::class, 'GetList']);
+    $router->get('blog/{seoName}', [BlogController::class, 'GetBySeoName']);
 
     // Menu
-    $router->register('get', 'menu/{location}', [MiscController::class, 'GetMenuItems']);
+    $router->get('menu/{location}', [MiscController::class, 'GetMenuItems']);
 
     // Localization
-    $router->register('get', 'locale-resource/{languageId}', [LocalizationController::class, 'GetResources']);
+    $router->get('locale-resource/{languageId}', [LocalizationController::class, 'GetResources']);
 
     // Auth
-    $router->register('get', 'authorization/me', [AuthorizationController::class, 'Me']);
+    $router->get('authorization/me', [AuthorizationController::class, 'Me']);
 
-    $router->register('post', 'authorization/session', [AuthorizationController::class, 'Session']);
-    $router->register('post', 'authorization/login', [AuthorizationController::class, 'Login']);
-    $router->register('post', 'authorization/logout', [AuthorizationController::class, 'Logout']);
-    $router->register('post', 'authorization/register', [AuthorizationController::class, 'Register']);
-    $router->register('post', 'authorization/reset-password', [AuthorizationController::class, 'ResetPassword']);
-    $router->register('post', 'authorization/reset-password-confirm', [AuthorizationController::class, 'ResetPasswordConfirm']);
-
-
+    $router->post('authorization/session', [AuthorizationController::class, 'Session']);
+    $router->post('authorization/login', [AuthorizationController::class, 'Login']);
+    $router->post('authorization/logout', [AuthorizationController::class, 'Logout']);
+    $router->post('authorization/register', [AuthorizationController::class, 'Register']);
+    $router->post('authorization/reset-password', [AuthorizationController::class, 'ResetPassword']);
+    $router->post('authorization/reset-password-confirm', [AuthorizationController::class, 'ResetPasswordConfirm']);
 
     /*  ADMIN AREA */
     $router->section('admin/', function (Router $router) {

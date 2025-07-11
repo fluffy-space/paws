@@ -12,7 +12,11 @@ use Pupils\Components\Views\Admin\Page\PageEdit;
 use Pupils\Components\Views\Admin\Page\PageList;
 use Pupils\Components\Views\Admin\Users\UserEdit;
 use Pupils\Components\Views\Admin\Users\UserList;
+use Pupils\Components\Views\Auth\EmailVerificationPage;
 use Pupils\Components\Views\Auth\Login;
+use Pupils\Components\Views\Auth\Register;
+use Pupils\Components\Views\Auth\ResetPassword;
+use Pupils\Components\Views\Auth\ResetPasswordRequest;
 use Pupils\Components\Views\Blog\BlogListPage;
 use Pupils\Components\Views\Blog\BlogPostPage;
 use Pupils\Components\Views\Content\ContentPage;
@@ -26,6 +30,10 @@ $router = $viewiApp->router();
 
 // Auth
 $router->get('/login', Login::class);
+$router->get('/register', Register::class);
+$router->get('/reset-password', ResetPasswordRequest::class);
+$router->get('/account/verified/{failed?}', EmailVerificationPage::class);
+$router->get('/password/reset/{code}', ResetPassword::class);
 
 // blog
 $router->get('/blog', BlogListPage::class);
