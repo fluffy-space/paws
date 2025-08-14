@@ -11,3 +11,15 @@
         z-index: 2
     }
 }
+
+.logo-holder>svg,
+.logo-holder>img {
+    height: 46px;
+    width: 46px;
+}
+
+.small-logo-holder>svg,
+.small-logo-holder>img {
+    height: 46px;
+    width: 46px;
+}

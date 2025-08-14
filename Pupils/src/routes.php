@@ -70,4 +70,4 @@ $router->lazy('admin', function (Router $router) {
 
 $router
     ->get('*', ContentPage::class)
-    ->priority(-1);
+    ->priority(-100);
