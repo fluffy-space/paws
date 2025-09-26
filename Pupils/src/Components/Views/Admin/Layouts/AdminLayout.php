@@ -8,7 +8,7 @@ use Viewi\Components\Config\ConfigService;
 
 class AdminLayout extends BaseComponent
 {
-    public string $title = 'Viewi';
+    public string $title = 'Fluffy';
     public string $assetsUrl = '/';
     public bool $menuActive = false;
     public string $currentPath = '/';
