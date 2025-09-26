@@ -1,12 +1,12 @@
 <title>
-    $title | Fluffy Paws
+    { $meta->title } | { t('layout.title') }
 </title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta if="$description" name="description" content="$description">
-<meta else name="description" content="$title">
-<meta if="$keywords" name="keywords" content="$keywords">
+<meta if="{ $meta->description }" name="description" content="{ $meta->description }">
+<meta else name="description" content="{ $meta->title }">
+<meta if="{ $meta->keywords }" name="keywords" content="{ $meta->keywords }">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -14,3 +14,15 @@
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 <meta name="msapplication-TileColor" content="#da532c">
 <meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-title" content="{ t('layout.title') }">
+<meta name="application-name" content="{ t('layout.title') }">
+<meta if="{ $meta->image }" name="twitter:image:src" content="{ $baseUrl . $meta->image }">
+<meta if="{ $meta->description }" name="description" content="{ $meta->description }">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="{ $meta->title }">
+<meta if="{ $meta->description }" property="og:description" content="{ $meta->description }">
+<meta if="{ $meta->image }" property="og:image" content="{ $baseUrl . $meta->image }">
+<meta if="{ $meta->image }" property="og:image:secure_url" content="{ $baseUrl . $meta->image }">
+<meta name="twitter:title" content="{ $meta->title }">
+<meta if="{ $meta->description }" name="twitter:description" content="{ $meta->description }">
+<meta if="{ $meta->image }" name="twitter:image" content="{ $baseUrl . $meta->image }">

@@ -6,5 +6,5 @@ use Viewi\Components\BaseComponent;
 
 class BoxLayout extends BaseComponent
 {
-    public string $title = '';
+    use HasMetaTags;
 }

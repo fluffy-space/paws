@@ -2,11 +2,18 @@
 
 namespace Pupils\Components\Views\Layouts\Head;
 
+use Pupils\Components\Services\Layouts\PageMetaService;
 use Viewi\Components\BaseComponent;
+use Viewi\Components\Config\ConfigService;
 
 class BaseMetaHead extends BaseComponent
 {
-    public string $title = 'Viewi';
-    public ?string $description = null;
-    public ?string $keywords = null;
+    public string $baseUrl = '/';
+
+    public function __construct(
+        public PageMetaService $meta,
+        ConfigService $configService
+    ) {
+        $this->baseUrl = $configService->get('baseUrl');
+    }
 }

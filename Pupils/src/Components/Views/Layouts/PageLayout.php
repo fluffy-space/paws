@@ -6,9 +6,8 @@ use Viewi\Components\BaseComponent;
 
 class PageLayout extends BaseComponent
 {
-    public string $title = '';
-    public ?string $description = null;
-    public ?string $keywords = null;
+    use HasMetaTags;
+
     public bool $fluid = false;
 
     public function mounting()
