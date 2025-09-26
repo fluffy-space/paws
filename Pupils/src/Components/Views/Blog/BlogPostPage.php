@@ -42,6 +42,7 @@ class BlogPostPage extends BaseComponent
                 $this->title = $this->post->MetaTitle ? $this->post->MetaTitle : $this->post->Title;
                 $this->nextPost = $data['next'];
                 $this->previousPost = $data['previous'];
+                $this->onBlogSet($data);
             }, function (Response $response) {
                 if ($response && $response->status) {
                     if ($response->status === 404) {
@@ -57,5 +58,10 @@ class BlogPostPage extends BaseComponent
     {
         $seconds = $milliseconds / 1000000;
         return gmdate('d.m.Y', (int)$seconds); //  H:i:s
+    }
+
+    public function onBlogSet($response)
+    {
+        /** open to overrides */
     }
 }
