@@ -12,6 +12,7 @@ use FluffyPaws\Migrations\Localization\LocaleEnglishMigration;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration02;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration03;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration04;
+use FluffyPaws\Migrations\Localization\LocaleEnglishMigration05;
 use FluffyPaws\Migrations\Localization\LocaleResourceMigration;
 use FluffyPaws\Migrations\Media\PictureMigration;
 use FluffyPaws\Migrations\Menu\MenuItemMigration;
@@ -39,6 +40,7 @@ class MigrationsContext extends BaseMigrationsContext
         $this->runMigration(PageContentsMigration02::class);
         $this->runMigration(MenuItemsMigration01::class);
         $this->runMigration(MenuItemsMigration02::class);
+        $this->runMigration(LocaleEnglishMigration05::class);
         /** @insert **/
         // !Do not delete the line above!
     }
