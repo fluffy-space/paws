@@ -1,5 +1,5 @@
 <PageLayout title="$title" description="{$post?->MetaDescription}" keywords="{$post?->MetaKeywords}"
-    image="{$post?->Picture?->Path}">
+    image="{$post?->Picture?->Path}" metaType="article">
     <div if="$post">
         <h1 class="py-5">{$post->Title}</h1>
 
