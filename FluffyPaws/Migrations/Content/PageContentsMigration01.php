@@ -16,16 +16,16 @@ class PageContentsMigration01 extends BaseMigration
 
     public function up()
     {
-        $homePage = new PageEntity();
-        $homePage->Published = true;
-        $homePage->Slug = '';
-        $homePage->IncludeInSitemap = false;
-        $homePage->Title = 'Welcome to Fluffy Paws';
-        $homePage->Body = 'Welcome to Fluffy Paws';
-        $this->pageRepository->create($homePage);
+        if (!$this->pageRepository->find('Slug', '')) {
+            $homePage = new PageEntity();
+            $homePage->Published = true;
+            $homePage->Slug = '';
+            $homePage->IncludeInSitemap = false;
+            $homePage->Title = 'Welcome to Fluffy Paws';
+            $homePage->Body = 'Welcome to Fluffy Paws';
+            $this->pageRepository->create($homePage);
+        }
     }
 
-    public function down()
-    {
-    }
+    public function down() {}
 }
