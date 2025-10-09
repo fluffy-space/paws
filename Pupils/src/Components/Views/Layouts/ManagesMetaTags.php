@@ -13,7 +13,25 @@ trait ManagesMetaTags
     #[Inject(Scope::SINGLETON)]
     public PageMetaService $meta;
 
+    public function resetMeta()
+    {
+        foreach ($this->tags as $name) {
+            $this->{$name} = '';
+            $this->meta->setValue($name, $this->{$name});
+        }
+    }
+
     public function mountMetaTags()
+    {
+        foreach ($this->tags as $name) {
+            if ($this->{$name}) {
+                $this->meta->setValue($name, $this->{$name});
+            }
+        }
+    }
+
+    // for top root component only
+    public function watchMeta()
     {
         $callback = function ($name) {
             return function () use ($name) {
@@ -21,7 +39,6 @@ trait ManagesMetaTags
             };
         };
         foreach ($this->tags as $name) {
-            $this->meta->setValue($name, $this->{$name});
             $this->watch($name, ($callback)($name));
         }
     }
