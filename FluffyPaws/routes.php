@@ -15,6 +15,7 @@ use FluffyPaws\Controllers\LocalizationController;
 use FluffyPaws\Controllers\MiscController;
 use FluffyPaws\Controllers\SitemapController;
 use Viewi\App;
+use Viewi\Components\Http\Message\Response;
 use Viewi\Router\Router;
 
 /**
@@ -101,6 +102,10 @@ $router->section('/api/', function (Router $router) {
         $router->put('menu/{id}', [MenuController::class, 'Update']);
         $router->delete('menu/{id}', [MenuController::class, 'Delete']);
     });
+
+    $router->register('*', '*', function () {
+        return new Response('', 404, 'Not Found', [], 'Not Found');
+    })->priority(-100);
 });
 
 // Viewi application
