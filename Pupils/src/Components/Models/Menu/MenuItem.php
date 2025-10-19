@@ -9,6 +9,7 @@ class MenuItem
 
     public function __construct(
         public string $title,
+        public int $order = 0,
         public ?string $url = null,
         public ?string $icon = null,
         public array $alternatives = [],
