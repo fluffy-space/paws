@@ -3,6 +3,7 @@
 namespace Pupils\Components\Views\Admin\Menu;
 
 use Pupils\Components\Models\Menu\MenuItem;
+use Pupils\Components\Services\Dashboard\AdminMenuService;
 use Pupils\Components\Services\Layouts\LayoutService;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Callbacks\Subscription;
@@ -14,7 +15,11 @@ class AdminMenu extends BaseComponent
     private Subscription $pathSubscription;
     public array $menuItems = [];
 
-    public function __construct(private ClientRoute $route, private LayoutService $layout) {}
+    public function __construct(
+        private ClientRoute $route,
+        private LayoutService $layout,
+        private AdminMenuService $menuService
+    ) {}
 
     public function init()
     {
@@ -22,25 +27,7 @@ class AdminMenu extends BaseComponent
             $this->activeLink = $urlPath;
             $this->layout->showMobileMenu = false;
         });
-        $this->menuItems = [
-            new MenuItem('Dashboard', '/admin', 'bi-speedometer2'),
-            new MenuItem('Pages', '/admin/content', 'bi-grid', ['/admin/content/create'], "#^/admin/content/(.*)$#i"),
-            new MenuItem('Menu items', null, 'bi-menu-button-wide', [], null, [
-                new MenuItem('Header menu', '/admin/menu/header', null, ['/admin/menu/header/create'], "#^/admin/menu/header/(.*)$#i"),
-                new MenuItem('Footer menu', '/admin/menu/footer', null, ['/admin/menu/footer/create'], "#^/admin/menu/footer/(.*)$#i"),
-                new MenuItem('Email menu', '/admin/menu/email', null, ['/admin/menu/footer/email'], "#^/admin/menu/email/(.*)$#i")
-            ]),
-            new MenuItem('Blog', '/admin/blog', 'bi-pencil', ['/admin/blog/create'], "#^/admin/blog/(.*)$#i"),
-            new MenuItem('Users', '/admin/user', 'bi-people-fill', ['/admin/users/create'], "#^/admin/users/(.*)$#i"),
-            new MenuItem('Email templates', '/admin/email-templates', 'bi-envelope-paper', ['/admin/email-templates/create'], "#^/admin/email-templates/(.*)$#i"),
-            new MenuItem('Localization', '/admin/language', 'bi-translate', ['/admin/language/create'], "#^/admin/language/(.*)$#i"),
-
-
-            // Products #grid
-            // Customers #people-circle
-            // Home #home
-            new MenuItem('Home', '/', 'bi-house-door'),
-        ];
+        $this->menuItems = $this->menuService->getItems();
     }
 
     public function destroy()
