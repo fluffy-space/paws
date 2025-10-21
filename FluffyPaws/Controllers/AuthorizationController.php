@@ -9,7 +9,7 @@ use Fluffy\Data\Mapper\IMapper;
 use Fluffy\Data\Repositories\UserRepository;
 use Fluffy\Domain\Message\HttpContext;
 use Fluffy\Services\Auth\AuthorizationService;
-use Fluffy\Swoole\RateLimit\RateLimitService;
+use Fluffy\Swoole\RateLimit\IRateLimitService;
 use FluffyPaws\Services\Emails\EmailService;
 use FluffyPaws\Services\Localization\LocalizationService;
 use SharedPaws\Models\Auth\LoginModel;
@@ -53,7 +53,7 @@ class AuthorizationController extends BaseController
         return ['success' => true];
     }
 
-    public function Login(LoginModel $loginModel, LocalizationService $localization, RateLimitService $rateLimit, HttpContext $httpContext)
+    public function Login(LoginModel $loginModel, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext)
     {
         if (!$this->auth->authorizeCSRF()) {
             return $this->Forbidden('Invalid CSRF-token.');
@@ -88,7 +88,7 @@ class AuthorizationController extends BaseController
         return ['success' => true];
     }
 
-    public function Register(RegisterModel $registerModel, LocalizationService $localization, RateLimitService $rateLimit, HttpContext $httpContext)
+    public function Register(RegisterModel $registerModel, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext)
     {
         if (!$this->auth->authorizeCSRF()) {
             return $this->Forbidden('Invalid CSRF-token.');
@@ -150,7 +150,7 @@ class AuthorizationController extends BaseController
         return $this->Redirect('/account/verified/failed');
     }
 
-    public function ResetPassword(string $Email, UserRepository $users, LocalizationService $localization, RateLimitService $rateLimit, HttpContext $httpContext)
+    public function ResetPassword(string $Email, UserRepository $users, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext)
     {
         if (!$this->auth->authorizeCSRF()) {
             return $this->Forbidden('Invalid CSRF-token.');
