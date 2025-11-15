@@ -13,6 +13,11 @@ class ValidationRules
         return new ValidationRules($target);
     }
 
+    public function setTarget($target)
+    {
+        $this->target = $target;
+    }
+
     public function required($prop, $error = null)
     {
         $this->ensure($prop);
@@ -42,7 +47,7 @@ class ValidationRules
             $domain = $parts[2];
         }
         // validate domain
-        $domainParts = explode('.', $domain);
+        $domainParts = explode('.', explode('?', $domain, 2)[0]);
         $domainTotal = count($domainParts);
         $valid = $domainTotal > 1;
         $valid = $valid && mb_strlen($domainParts[$domainTotal - 1]) > 1 && ctype_alnum($domainParts[$domainTotal - 1]);
