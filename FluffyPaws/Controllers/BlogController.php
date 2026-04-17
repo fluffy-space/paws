@@ -53,7 +53,7 @@ class BlogController extends BaseController
                 from(BlogPostEntity::class)
                     ->select(['Slug', 'Title'])
                     ->where(x(c('Id'), '<', $model->Id)
-                    ->and(c('Published'), '=', true)
+                    ->and(c('Published'), '=', true))
                     ->orderByDescending('Id')
                     ->firstOrDefault()
             );
