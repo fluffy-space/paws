@@ -16,6 +16,10 @@ use SharedPaws\Models\Blog\BlogPostModel;
 use SharedPaws\Models\Blog\BlogValidation;
 use SharedPaws\Models\Media\PictureModel;
 
+use function Fluffy\Data\Query\c;
+use function Fluffy\Data\Query\from;
+use function Fluffy\Data\Query\x;
+
 class BlogPostController extends BaseController
 {
     function __construct(
@@ -33,20 +37,24 @@ class BlogPostController extends BaseController
             return $this->Forbidden();
         }
 
-        $query = Query::from(BlogPostEntity::class);
+        $query = from(BlogPostEntity::class);
 
         $search = trim($search ?? '');
 
         if ($search) {
             $search = strtolower($search);
             $parts = explode(' ', $search);
+            $searchExpression = null;
             foreach ($parts as $part) {
                 if (trim($part)) {
-                    $query->where(Query::or([
-                        ['Title', 'like', "%$part%"]
-                    ]));
+                    if ($searchExpression) {
+                        $searchExpression->or(c('Title'), 'LIKE', "%$part%");
+                    } else {
+                        $searchExpression = x(c('Title'), 'LIKE', "%$part%");
+                    }
                 }
             }
+            $query->where($searchExpression);
         }
 
         $query->orderByDescending('Id')
@@ -66,9 +74,9 @@ class BlogPostController extends BaseController
             return $this->Forbidden();
         }
         $entity = $this->db->execute(
-            Query::from(BlogPostEntity::class)
+            from(BlogPostEntity::class)
                 ->include('Picture')
-                ->where(['Id', '=', $id])
+                ->where(x(c('Id'), '=', $id))
                 ->firstOrDefault()
         );
         if (!$entity) {

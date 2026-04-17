@@ -9,6 +9,10 @@ use Fluffy\Data\Query\Query;
 use FluffyPaws\Data\Entities\Blog\BlogPostEntity;
 use SharedPaws\Models\Blog\BlogPostModel;
 
+use function Fluffy\Data\Query\c;
+use function Fluffy\Data\Query\from;
+use function Fluffy\Data\Query\x;
+
 class BlogController extends BaseController
 {
     public function __construct(
@@ -19,9 +23,9 @@ class BlogController extends BaseController
     public function GetBySeoName(string $seoName, bool $next = false)
     {
         $entity = $this->db->execute(
-            Query::from(BlogPostEntity::class)
+            from(BlogPostEntity::class)
                 ->include('Picture')
-                ->where(['Slug', '=', $seoName])
+                ->where(x(c('Slug'), '=', $seoName))
                 ->firstOrDefault()
         );
         if ($entity === null || !$entity->Published) {
@@ -38,23 +42,23 @@ class BlogController extends BaseController
         ];
         if ($next) {
             $previousPost = $this->db->execute(
-                Query::from(BlogPostEntity::class)
+                from(BlogPostEntity::class)
                     ->select(['Slug', 'Title'])
-                    ->where(['Id', '>', $model->Id])
-                    ->where(['Published', '=', true])
+                    ->where(x(c('Id'), '>', $model->Id)
+                    ->and(c('Published'), '=', true))
                     ->orderBy('Id')
                     ->firstOrDefault()
             );
             $nextPost = $this->db->execute(
-                Query::from(BlogPostEntity::class)
+                from(BlogPostEntity::class)
                     ->select(['Slug', 'Title'])
-                    ->where(['Id', '<', $model->Id])
-                    ->where(['Published', '=', true])
+                    ->where(x(c('Id'), '<', $model->Id)
+                    ->and(c('Published'), '=', true)
                     ->orderByDescending('Id')
                     ->firstOrDefault()
             );
-            $result['next'] = $nextPost ? ['Slug' => $nextPost->Slug, 'Title' => $nextPost->Title ] : null;
-            $result['previous'] = $previousPost ? ['Slug' => $previousPost->Slug, 'Title' => $previousPost->Title ] : null;
+            $result['next'] = $nextPost ? ['Slug' => $nextPost->Slug, 'Title' => $nextPost->Title] : null;
+            $result['previous'] = $previousPost ? ['Slug' => $previousPost->Slug, 'Title' => $previousPost->Title] : null;
         }
         return $result;
     }
@@ -62,9 +66,9 @@ class BlogController extends BaseController
     public function GetList(int $page = 1, int $size = 10)
     {
         $entities = $this->db->execute(
-            Query::from(BlogPostEntity::class)
+            from(BlogPostEntity::class)
                 ->include('Picture')
-                ->where(['Published', '=', true])
+                ->where(x(c('Published'), '=', true))
                 ->orderByDescending('Id')
                 ->page($page)
                 ->take($size)

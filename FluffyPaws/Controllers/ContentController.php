@@ -9,6 +9,10 @@ use Fluffy\Data\Query\Query;
 use FluffyPaws\Data\Entities\Content\PageEntity;
 use SharedPaws\Models\Content\PageModel;
 
+use function Fluffy\Data\Query\c;
+use function Fluffy\Data\Query\from;
+use function Fluffy\Data\Query\x;
+
 class ContentController extends BaseController
 {
     public function __construct(
@@ -23,12 +27,11 @@ class ContentController extends BaseController
          * @var PageEntity|null $entity
          */
         $entity = $this->db->execute(
-            Query::from(PageEntity::class)
+            from(PageEntity::class)
                 ->include('Picture')
-                ->where(['Slug', '=', $path])
+                ->where(x(c('Slug'), '=', $path))
                 ->firstOrDefault()
         );
-
         if ($entity === null || !$entity->Published) {
             return $this->NotFound();
         }
