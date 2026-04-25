@@ -377,6 +377,10 @@
     background-color: var(--icon-color);
     width: 42px;
     height: 42px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .dashboard-icon svg {
