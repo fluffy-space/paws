@@ -13,6 +13,7 @@ class NotFoundBlock extends BaseComponent
     public ?PageModel $page = null;
     public bool $ready = false;
     public string $assetsBaseUrl = '';
+    public string $url = "/";
 
     public function __construct(
         private HttpClient $http,
