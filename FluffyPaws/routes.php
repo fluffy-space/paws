@@ -72,6 +72,7 @@ $router->section('/api/', function (Router $router) {
         // users
         $router->get('user', [UserController::class, 'List']);
         $router->post('user', [UserController::class, 'Create']);
+        $router->get('user/roles', [UserController::class, 'Roles']);
         $router->get('user/{id}', [UserController::class, 'Get']);
         $router->put('user/{id}', [UserController::class, 'Update']);
         $router->delete('user/{id}', [UserController::class, 'Delete']);

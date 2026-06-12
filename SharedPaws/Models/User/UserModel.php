@@ -18,4 +18,6 @@ class UserModel extends BaseModel
     public ?string $ConfirmPassword = null;
     public bool $Active = false;
     public bool $EmailConfirmed = false;
+    /** @var RoleOptionModel[] assignable roles with their selected state */
+    public array $Roles = [];
 }

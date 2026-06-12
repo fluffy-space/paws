@@ -7,7 +7,12 @@ use Fluffy\Data\Entities\Auth\UserEntity;
 use Fluffy\Data\Entities\Auth\UserEntityMap;
 use Fluffy\Data\Mapper\IMapper;
 use Fluffy\Data\Repositories\UserRepository;
+use Fluffy\Security\Capability;
+use Fluffy\Security\Permissions;
+use Fluffy\Security\PermissionRegistry;
+use Fluffy\Security\Role;
 use Fluffy\Services\Auth\AuthorizationService;
+use SharedPaws\Models\User\RoleOptionModel;
 use SharedPaws\Models\User\UserModel;
 use SharedPaws\Models\User\UserValidation;
 
@@ -56,7 +61,70 @@ class UserController extends BaseController
          * @var UserModel $model
          */
         $model = $this->mapper->map(UserModel::class, $entity);
+        $model->Roles = $this->roleOptions($entity->Permissions);
         return $model;
+    }
+
+    /** Role catalog for the create form (all unselected). */
+    public function Roles()
+    {
+        if (!$this->auth->authorizeAdminRequest()) {
+            return $this->Forbidden();
+        }
+        return $this->roleOptions(0);
+    }
+
+    /**
+     * Build the assignable-role catalog (core + app), marking which are set in $permissions.
+     * @return RoleOptionModel[]
+     */
+    private function roleOptions(int $permissions): array
+    {
+        $options = [];
+        foreach (PermissionRegistry::roleLabels() as $bit => $label) {
+            $option = new RoleOptionModel();
+            $option->Bit = $bit;
+            $option->Label = $label;
+            $option->Selected = Permissions::hasRole($permissions, $bit);
+            $options[] = $option;
+        }
+        return $options;
+    }
+
+    /**
+     * Apply the submitted role selection onto $entity->Permissions, server-side.
+     *
+     * - Requires the editor to have ManageRoles; otherwise role changes are ignored.
+     * - Only a SuperAdmin may set/clear the SuperAdmin role (anti-escalation).
+     * - Preserves any direct capability bits (above the role region).
+     * - Reads each option defensively (stdClass from the request body, or array).
+     */
+    private function applyRoles(UserEntity $entity, UserModel $user): void
+    {
+        if (!$this->auth->can(Capability::ManageRoles)) {
+            return;
+        }
+        $editorIsSuperAdmin = Permissions::hasRole($this->auth->permissions(), Role::SuperAdmin);
+        $catalog = PermissionRegistry::roleLabels();
+        $selected = 0;
+        foreach ($user->Roles as $role) {
+            $bit = (int) (is_array($role) ? ($role['Bit'] ?? 0) : ($role->Bit ?? 0));
+            $isSelected = (bool) (is_array($role) ? ($role['Selected'] ?? false) : ($role->Selected ?? false));
+            if (!isset($catalog[$bit])) {
+                continue; // unknown / non-role bit
+            }
+            if ($bit === Role::SuperAdmin && !$editorIsSuperAdmin) {
+                // Cannot grant or revoke SuperAdmin; preserve the user's existing state.
+                if (Permissions::hasRole($entity->Permissions, Role::SuperAdmin)) {
+                    $selected |= Role::SuperAdmin;
+                }
+                continue;
+            }
+            if ($isSelected) {
+                $selected |= $bit;
+            }
+        }
+        $entity->Permissions = ($entity->Permissions & ~Permissions::ROLE_MASK) | $selected;
     }
 
     public function Update(int $id, UserModel $user)
@@ -86,6 +154,7 @@ class UserController extends BaseController
          * @var UserEntity $entity
          */
         $entity = $this->mapper->map(UserEntity::class, $user, $entity);
+        $this->applyRoles($entity, $user);
         $entity->Email = $entity->Email ? strtolower($entity->Email) : null;
         $entity->Phone = $entity->Phone ? strtolower($entity->Phone) : null;
         $entity->UserName = $entity->Email ? $entity->Email : $entity->Phone;
@@ -112,7 +181,12 @@ class UserController extends BaseController
         }
 
         $success = $this->users->update($entity);
-        return $success ? $this->mapper->map(UserModel::class, $entity) : null;
+        if (!$success) {
+            return null;
+        }
+        $result = $this->mapper->map(UserModel::class, $entity);
+        $result->Roles = $this->roleOptions($entity->Permissions);
+        return $result;
     }
 
     public function Delete(int $id)
@@ -150,6 +224,7 @@ class UserController extends BaseController
          * @var UserEntity $entity
          */
         $entity = $this->mapper->map(UserEntity::class, $user);
+        $this->applyRoles($entity, $user);
         $entity->Email = $entity->Email ? strtolower($entity->Email) : null;
         $entity->Phone = $entity->Phone ? strtolower($entity->Phone) : null;
         $entity->UserName = $entity->Email ? $entity->Email : $entity->Phone;
@@ -175,6 +250,11 @@ class UserController extends BaseController
             $entity->Password = $this->auth->hashPassword($user->NewPassword);
         }
         $success = $this->users->create($entity);
-        return $success ? $this->mapper->map(UserModel::class, $entity) : null;
+        if (!$success) {
+            return null;
+        }
+        $result = $this->mapper->map(UserModel::class, $entity);
+        $result->Roles = $this->roleOptions($entity->Permissions);
+        return $result;
     }
 }

@@ -21,6 +21,13 @@
             <CheckBox label="EmailConfirmed" id="EmailConfirmed" model="$item->EmailConfirmed"
                 hint="Indicates that use has confirmed the email address." />
 
+            <div class="mb-3">
+                <label class="form-label">Roles</label>
+                <div foreach="$item->Roles as $role">
+                    <CheckBox label="$role->Label" id="role-{$role->Bit}" model="$role->Selected" />
+                </div>
+            </div>
+
             <div if="{!$createMode}" class="mb-3">
                 <button type="button" class="btn btn-danger" (click)="togglePasswordChange">Change password</button>
             </div>
