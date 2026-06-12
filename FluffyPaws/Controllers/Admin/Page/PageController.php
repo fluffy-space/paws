@@ -6,6 +6,7 @@ namespace FluffyPaws\Controllers\Admin\Page;
 use Fluffy\Controllers\BaseController;
 use Fluffy\Data\Mapper\IMapper;
 use Fluffy\Services\Auth\AuthorizationService;
+use FluffyPaws\Security\PawsCapability;
 use FluffyPaws\Data\Entities\Content\PageEntity;
 use FluffyPaws\Data\Entities\Content\PageEntityMap;
 use FluffyPaws\Data\Repositories\PageRepository;
@@ -29,7 +30,7 @@ class PageController extends BaseController
 
     public function List(int $page = 1, int $size = 10, ?string $search = null)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManagePages)) {
             return $this->Forbidden();
         }
         $search = trim($search ?? '');
@@ -65,7 +66,7 @@ class PageController extends BaseController
 
     public function Update(int $id, PageModel $page)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManagePages)) {
             return $this->Forbidden();
         }
         $validationMessages = [];
@@ -127,7 +128,7 @@ class PageController extends BaseController
 
     public function Delete(int $id)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManagePages)) {
             return $this->Forbidden();
         }
         $pageEntity = $this->pages->getById($id);
@@ -141,7 +142,7 @@ class PageController extends BaseController
 
     public function Create(PageModel $page)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManagePages)) {
             return $this->Forbidden();
         }
         $validationMessages = [];

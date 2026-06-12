@@ -5,6 +5,7 @@ namespace FluffyPaws\Controllers\Admin\MenuItem;
 use Fluffy\Controllers\BaseController;
 use Fluffy\Data\Mapper\IMapper;
 use Fluffy\Services\Auth\AuthorizationService;
+use FluffyPaws\Security\PawsCapability;
 use Fluffy\Swoole\Cache\CacheManager;
 use FluffyPaws\Data\Entities\Menu\MenuItemEntity;
 use FluffyPaws\Data\Entities\Menu\MenuItemEntityMap;
@@ -23,7 +24,7 @@ class MenuController extends BaseController
 
     public function List(int $page = 1, int $size = 10, ?int $location = null, ?string $search = null)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageMenu)) {
             return $this->Forbidden();
         }
         $search = trim($search ?? '');
@@ -38,7 +39,7 @@ class MenuController extends BaseController
 
     public function Get(int $id)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageMenu)) {
             return $this->Forbidden();
         }
         $entity = $this->menuItems->getById($id);
@@ -54,7 +55,7 @@ class MenuController extends BaseController
 
     public function Update(int $id, MenuItemModel $item)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageMenu)) {
             return $this->Forbidden();
         }
         $validationMessages = [];
@@ -87,7 +88,7 @@ class MenuController extends BaseController
 
     public function Delete(int $id)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageMenu)) {
             return $this->Forbidden();
         }
         /**
@@ -105,7 +106,7 @@ class MenuController extends BaseController
 
     public function Create(MenuItemModel $item)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageMenu)) {
             return $this->Forbidden();
         }
         $validationMessages = [];

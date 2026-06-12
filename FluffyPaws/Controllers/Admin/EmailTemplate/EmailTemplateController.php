@@ -4,6 +4,7 @@ namespace FluffyPaws\Controllers\Admin\EmailTemplate;
 
 use Fluffy\Controllers\BaseController;
 use Fluffy\Services\Auth\AuthorizationService;
+use FluffyPaws\Security\PawsCapability;
 use Fluffy\Services\UtilsService;
 use FluffyPaws\Services\Emails\EmailService;
 use SharedPaws\Models\Auth\UserViewModel;
@@ -17,7 +18,7 @@ class EmailTemplateController extends BaseController
 
     public function GetPreview(string $template)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageEmailTemplates)) {
             return $this->Forbidden();
         }
 

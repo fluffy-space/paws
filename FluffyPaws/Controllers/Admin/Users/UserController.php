@@ -7,11 +7,11 @@ use Fluffy\Data\Entities\Auth\UserEntity;
 use Fluffy\Data\Entities\Auth\UserEntityMap;
 use Fluffy\Data\Mapper\IMapper;
 use Fluffy\Data\Repositories\UserRepository;
-use Fluffy\Security\Capability;
 use Fluffy\Security\Permissions;
 use Fluffy\Security\PermissionRegistry;
 use Fluffy\Security\Role;
 use Fluffy\Services\Auth\AuthorizationService;
+use FluffyPaws\Security\PawsCapability;
 use SharedPaws\Models\User\RoleOptionModel;
 use SharedPaws\Models\User\UserModel;
 use SharedPaws\Models\User\UserValidation;
@@ -26,7 +26,7 @@ class UserController extends BaseController
 
     public function List(int $page = 1, int $size = 10, ?string $search = null)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageUsers)) {
             return $this->Forbidden();
         }
         $search = trim($search ?? '');
@@ -53,6 +53,9 @@ class UserController extends BaseController
 
     public function Get(int $id)
     {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageUsers)) {
+            return $this->Forbidden();
+        }
         $entity = $this->users->getById($id);
         if (!$entity) {
             return $this->NotFound();
@@ -68,7 +71,7 @@ class UserController extends BaseController
     /** Role catalog for the create form (all unselected). */
     public function Roles()
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageUsers)) {
             return $this->Forbidden();
         }
         return $this->roleOptions(0);
@@ -101,7 +104,7 @@ class UserController extends BaseController
      */
     private function applyRoles(UserEntity $entity, UserModel $user): void
     {
-        if (!$this->auth->can(Capability::ManageRoles)) {
+        if (!$this->auth->can(PawsCapability::ManageRoles)) {
             return;
         }
         $editorIsSuperAdmin = Permissions::hasRole($this->auth->permissions(), Role::SuperAdmin);
@@ -129,7 +132,7 @@ class UserController extends BaseController
 
     public function Update(int $id, UserModel $user)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageUsers)) {
             return $this->Forbidden();
         }
         $validationMessages = [];
@@ -191,7 +194,7 @@ class UserController extends BaseController
 
     public function Delete(int $id)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageUsers)) {
             return $this->Forbidden();
         }
         $entity = $this->users->getById($id);
@@ -204,7 +207,7 @@ class UserController extends BaseController
 
     public function Create(UserModel $user)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageUsers)) {
             return $this->Forbidden();
         }
         $validationMessages = [];

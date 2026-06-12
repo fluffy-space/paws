@@ -8,6 +8,7 @@ use FluffyPaws\Data\Repositories\LanguageRepository;
 use Fluffy\Controllers\BaseController;
 use Fluffy\Data\Mapper\IMapper;
 use Fluffy\Services\Auth\AuthorizationService;
+use FluffyPaws\Security\PawsCapability;
 use SharedPaws\Models\Localization\LanguageModel;
 use SharedPaws\Models\Localization\LanguageValidation;
 
@@ -21,7 +22,7 @@ class LanguageController extends BaseController
 
     public function List(int $page = 1, int $size = 10, ?string $search = null)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageLocalization)) {
             return $this->Forbidden();
         }
         $search = trim($search ?? '');
@@ -49,7 +50,7 @@ class LanguageController extends BaseController
 
     public function Update(int $id, LanguageModel $language)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageLocalization)) {
             return $this->Forbidden();
         }
         $validationMessages = [];
@@ -84,7 +85,7 @@ class LanguageController extends BaseController
 
     public function Delete(int $id)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageLocalization)) {
             return $this->Forbidden();
         }
         $LanguageEntity = $this->languages->getById($id);
@@ -97,7 +98,7 @@ class LanguageController extends BaseController
 
     public function Create(LanguageModel $language)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageLocalization)) {
             return $this->Forbidden();
         }
         $validationMessages = [];

@@ -16,6 +16,7 @@ use FluffyPaws\Data\Repositories\PageRepository;
 use FluffyPaws\Data\Repositories\PictureRepository;
 use FluffyPaws\Migrations\MigrationsContext;
 use FluffyPaws\Migrations\MigrationsMark;
+use FluffyPaws\Security\PawsPermissions;
 use FluffyPaws\Services\Emails\EmailConnector;
 use FluffyPaws\Services\Emails\EmailService;
 use FluffyPaws\Services\Localization\LocalizationService;
@@ -30,6 +31,8 @@ class PawsStartUp implements IStartUp
 
     public function configureServices(IServiceProvider $serviceProvider): void
     {
+        // Register the Paws layer's capabilities (after core, before the app).
+        PawsPermissions::register();
         $serviceProvider->addScoped(BlogPostRepository::class);
         $serviceProvider->addScoped(PageRepository::class);
         $serviceProvider->addScoped(LanguageRepository::class);

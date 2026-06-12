@@ -7,6 +7,7 @@ use Fluffy\Data\Context\DbContext;
 use Fluffy\Data\Mapper\IMapper;
 use Fluffy\Data\Query\Query;
 use Fluffy\Services\Auth\AuthorizationService;
+use FluffyPaws\Security\PawsCapability;
 use FluffyPaws\Data\Entities\Blog\BlogPostEntity;
 use FluffyPaws\Data\Repositories\BlogPostRepository;
 use FluffyPaws\Data\Repositories\PictureRepository;
@@ -33,7 +34,7 @@ class BlogPostController extends BaseController
 
     public function List(int $page = 1, int $size = 10, ?string $search = null)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageBlog)) {
             return $this->Forbidden();
         }
 
@@ -70,7 +71,7 @@ class BlogPostController extends BaseController
 
     public function Get(int $id)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageBlog)) {
             return $this->Forbidden();
         }
         $entity = $this->db->execute(
@@ -91,7 +92,7 @@ class BlogPostController extends BaseController
 
     public function Update(int $id, BlogPostModel $blogPost)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageBlog)) {
             return $this->Forbidden();
         }
         $validationMessages = [];
@@ -149,7 +150,7 @@ class BlogPostController extends BaseController
 
     public function Delete(int $id)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageBlog)) {
             return $this->Forbidden();
         }
         $entity = $this->blogs->getById($id);
@@ -163,7 +164,7 @@ class BlogPostController extends BaseController
 
     public function Create(BlogPostModel $blogPost)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageBlog)) {
             return $this->Forbidden();
         }
         $validationMessages = [];

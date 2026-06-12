@@ -8,6 +8,7 @@ use FluffyPaws\Data\Repositories\LocaleResourceRepository;
 use Fluffy\Controllers\BaseController;
 use Fluffy\Data\Mapper\IMapper;
 use Fluffy\Services\Auth\AuthorizationService;
+use FluffyPaws\Security\PawsCapability;
 use Fluffy\Swoole\Cache\CacheManager;
 use SharedPaws\Models\Localization\LocaleResourceModel;
 use SharedPaws\Models\Localization\LocaleResourceValidation;
@@ -23,7 +24,7 @@ class LocaleResourceController extends BaseController
 
     public function List(int $page = 1, int $size = 10, ?string $search = null, ?int $languageId = null)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageLocalization)) {
             return $this->Forbidden();
         }
         $search = trim($search ?? '');
@@ -63,7 +64,7 @@ class LocaleResourceController extends BaseController
 
     public function Update(int $id, LocaleResourceModel $resource)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageLocalization)) {
             return $this->Forbidden();
         }
         $validationMessages = [];
@@ -103,7 +104,7 @@ class LocaleResourceController extends BaseController
 
     public function Delete(int $id)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageLocalization)) {
             return $this->Forbidden();
         }
         /**
@@ -121,7 +122,7 @@ class LocaleResourceController extends BaseController
 
     public function Create(LocaleResourceModel $resource)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageLocalization)) {
             return $this->Forbidden();
         }
         $validationMessages = [];

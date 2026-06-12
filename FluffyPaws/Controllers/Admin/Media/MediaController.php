@@ -8,6 +8,7 @@ use Fluffy\Controllers\BaseController;
 use Fluffy\Data\Mapper\IMapper;
 use Fluffy\Domain\Configuration\Config;
 use Fluffy\Services\Auth\AuthorizationService;
+use FluffyPaws\Security\PawsCapability;
 use SharedPaws\Models\Media\PictureModel;
 use Swoole\Coroutine\System;
 
@@ -23,7 +24,7 @@ class MediaController extends BaseController
 
     public function Upload(string $fileName, string $type, string $data)
     {
-        if (!$this->auth->authorizeAdminRequest()) {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageMedia)) {
             return $this->Forbidden();
         }
         $targetDirectory = $this->config->values['publicDir'] . '/images';
