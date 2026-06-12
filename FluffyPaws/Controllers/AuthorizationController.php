@@ -39,6 +39,8 @@ class AuthorizationController extends BaseController
         if ($user !== null) {
             $response->user = $this->mapper->map(UserViewModel::class, $user);
             $response->user->CanAccessAdmin = Permissions::can($user->Permissions, Capability::AccessAdmin);
+            $response->roles = Permissions::roleNames($user->Permissions);
+            $response->capabilities = Permissions::capabilityNames($user->Permissions);
             $response->isAuthenticated = true;
         }
         return $response;
