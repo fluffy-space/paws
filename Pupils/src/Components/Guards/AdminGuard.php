@@ -17,7 +17,7 @@ class AdminGuard implements IMIddleware
     public function run(IMIddlewareContext $c)
     {
         $this->auth->getUserSession(function (UserAuthSessionModel $session) use ($c) {
-            if ($session->user?->IsAdmin) {
+            if ($session->user?->CanAccessAdmin) {
                 $c->next();
             } else {
                 $c->next(false); // cancel

@@ -8,6 +8,8 @@ use Fluffy\Data\Entities\Auth\UserEntityMap;
 use Fluffy\Data\Mapper\IMapper;
 use Fluffy\Data\Repositories\UserRepository;
 use Fluffy\Domain\Message\HttpContext;
+use Fluffy\Security\Capability;
+use Fluffy\Security\Permissions;
 use Fluffy\Services\Auth\AuthorizationService;
 use Fluffy\Swoole\RateLimit\IRateLimitService;
 use FluffyPaws\Services\Emails\EmailService;
@@ -36,6 +38,7 @@ class AuthorizationController extends BaseController
         $response = new UserAuthSessionModel();
         if ($user !== null) {
             $response->user = $this->mapper->map(UserViewModel::class, $user);
+            $response->user->CanAccessAdmin = Permissions::can($user->Permissions, Capability::AccessAdmin);
             $response->isAuthenticated = true;
         }
         return $response;

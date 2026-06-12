@@ -18,5 +18,4 @@ class UserModel extends BaseModel
     public ?string $ConfirmPassword = null;
     public bool $Active = false;
     public bool $EmailConfirmed = false;
-    public bool $IsAdmin = false;
 }

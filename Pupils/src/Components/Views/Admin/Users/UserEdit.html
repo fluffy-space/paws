@@ -21,9 +21,6 @@
             <CheckBox label="EmailConfirmed" id="EmailConfirmed" model="$item->EmailConfirmed"
                 hint="Indicates that use has confirmed the email address." />
 
-            <CheckBox label="Admin rights" id="IsAdmin" model="$item->IsAdmin"
-                hint="Check to make this user an admin." />
-
             <div if="{!$createMode}" class="mb-3">
                 <button type="button" class="btn btn-danger" (click)="togglePasswordChange">Change password</button>
             </div>

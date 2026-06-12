@@ -12,5 +12,6 @@ class UserViewModel
     public ?string $Phone = null;
     public bool $Active = false;
     public bool $EmailConfirmed = false;
-    public bool $IsAdmin = false;
+    /** Derived server-side from Permissions (Capability::AccessAdmin); used by guards/redirects. */
+    public bool $CanAccessAdmin = false;
 }

@@ -83,7 +83,7 @@ class Login extends BaseComponent
                 $this->route->navigate($redirectTo);
             } else {
                 $this->auth->getUserSession(function (?UserAuthSessionModel $userSession) {
-                    if ($userSession !== null && $userSession->user?->IsAdmin) {
+                    if ($userSession !== null && $userSession->user?->CanAccessAdmin) {
                         $this->route->navigate('/admin');
                     } else {
                         $this->route->navigate('/');
