@@ -2,14 +2,14 @@
 
 namespace Pupils\Components\Views\Admin\MenuItems;
 
-use Pupils\Components\Guards\AdminGuard;
+use Pupils\Components\Guards\ManageMenuGuard;
 use SharedPaws\Models\MenuItem\MenuItemLocation;
 use SharedPaws\Models\MenuItem\MenuItemModel;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Attributes\Middleware;
 use Viewi\UI\Components\Tables\TableColumn;
 
-#[Middleware([AdminGuard::class])]
+#[Middleware([ManageMenuGuard::class])]
 class MenuItemList extends BaseComponent
 {
     public array $columns = [];

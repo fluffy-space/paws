@@ -2,13 +2,13 @@
 
 namespace Pupils\Components\Views\Admin\Blog;
 
-use Pupils\Components\Guards\AdminGuard;
+use Pupils\Components\Guards\ManageBlogGuard;
 use SharedPaws\Models\Blog\BlogPostModel;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Attributes\Middleware;
 use Viewi\UI\Components\Tables\TableColumn;
 
-#[Middleware([AdminGuard::class])]
+#[Middleware([ManageBlogGuard::class])]
 class BlogList extends BaseComponent
 {
     public array $columns = [];

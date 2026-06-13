@@ -2,11 +2,11 @@
 
 namespace Pupils\Components\Views\Admin\EmailTemplates;
 
-use Pupils\Components\Guards\AdminGuard;
+use Pupils\Components\Guards\ManageEmailTemplatesGuard;
 use Viewi\Components\Attributes\Middleware;
 use Viewi\Components\BaseComponent;
 
-#[Middleware([AdminGuard::class])]
+#[Middleware([ManageEmailTemplatesGuard::class])]
 class PreviewEmailPage extends BaseComponent
 {
     public array $templates = [

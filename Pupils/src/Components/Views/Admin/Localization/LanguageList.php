@@ -2,13 +2,13 @@
 
 namespace Pupils\Components\Views\Admin\Localization;
 
-use Pupils\Components\Guards\AdminGuard;
+use Pupils\Components\Guards\ManageLocalizationGuard;
 use SharedPaws\Models\Localization\LanguageModel;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Attributes\Middleware;
 use Viewi\UI\Components\Tables\TableColumn;
 
-#[Middleware([AdminGuard::class])]
+#[Middleware([ManageLocalizationGuard::class])]
 class LanguageList extends BaseComponent
 {
     public array $columns = [];

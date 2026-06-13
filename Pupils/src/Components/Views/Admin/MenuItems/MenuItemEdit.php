@@ -2,7 +2,7 @@
 
 namespace Pupils\Components\Views\Admin\MenuItems;
 
-use Pupils\Components\Guards\AdminGuard;
+use Pupils\Components\Guards\ManageMenuGuard;
 use Pupils\Components\Views\Admin\EditPage\EditPage;
 use SharedPaws\Models\BaseModel;
 use SharedPaws\Models\MenuItem\MenuItemLocation;
@@ -19,7 +19,7 @@ use Viewi\UI\Components\Alerts\AlertService;
  * @package Pupils\Components\Views\Admin\MenuItems
  * @property MenuItemModel $item
  */
-#[Middleware([AdminGuard::class])]
+#[Middleware([ManageMenuGuard::class])]
 class MenuItemEdit extends EditPage
 {
     public string $segment = 'menu';

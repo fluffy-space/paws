@@ -2,7 +2,7 @@
 
 namespace Pupils\Components\Views\Admin\Users;
 
-use Pupils\Components\Guards\AdminGuard;
+use Pupils\Components\Guards\ManageUsersGuard;
 use Pupils\Components\Views\Admin\EditPage\EditPage;
 use SharedPaws\Models\BaseModel;
 use SharedPaws\Models\User\UserModel;
@@ -18,7 +18,7 @@ use Viewi\UI\Components\Alerts\AlertService;
  * @package Pupils\Components\Views\Admin\Users
  * @property UserModel $item
  */
-#[Middleware([AdminGuard::class])]
+#[Middleware([ManageUsersGuard::class])]
 class UserEdit extends EditPage
 {
     public string $segment = 'user';
