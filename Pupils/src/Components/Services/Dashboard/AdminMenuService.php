@@ -22,7 +22,7 @@ class AdminMenuService
                 new MenuItem('Email menu', 6, '/admin/menu/email', null, ['/admin/menu/footer/email'], "#^/admin/menu/email/(.*)$#i")
             ]),
             new MenuItem('Blog', 7, '/admin/blog', 'bi-pencil', ['/admin/blog/create'], "#^/admin/blog/(.*)$#i"),
-            new MenuItem('Users', 8, '/admin/user', 'bi-people-fill', ['/admin/users/create'], "#^/admin/users/(.*)$#i"),
+            new MenuItem('Users', 8, '/admin/user', 'bi-people-fill', ['/admin/user/create'], "#^/admin/user/(.*)$#i"),
             new MenuItem('Email templates', 9, '/admin/email-templates', 'bi-envelope-paper', ['/admin/email-templates/create'], "#^/admin/email-templates/(.*)$#i"),
             new MenuItem('Localization', 10, '/admin/language', 'bi-translate', ['/admin/language/create'], "#^/admin/language/(.*)$#i"),
 
