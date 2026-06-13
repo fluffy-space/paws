@@ -2,13 +2,13 @@
 
 namespace Pupils\Components\Views\Admin\Users;
 
-use Pupils\Components\Guards\ManageUsersGuard;
+use Pupils\Components\Guards\HasCapability;
 use SharedPaws\Models\User\UserModel;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Attributes\Middleware;
 use Viewi\UI\Components\Tables\TableColumn;
 
-#[Middleware([ManageUsersGuard::class])]
+#[Middleware([[HasCapability::class, 'ManageUsers']])]
 class UserList extends BaseComponent
 {
     public array $columns = [];

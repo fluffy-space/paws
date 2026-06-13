@@ -2,7 +2,7 @@
 
 namespace Pupils\Components\Views\Admin\Localization;
 
-use Pupils\Components\Guards\ManageLocalizationGuard;
+use Pupils\Components\Guards\HasCapability;
 use Viewi\Components\Attributes\Middleware;
 use Pupils\Components\Views\Admin\EditPage\EditPage;
 use SharedPaws\Models\BaseModel;
@@ -15,7 +15,7 @@ use SharedPaws\Validation\IValidationRules;
  * @package Pupils\Components\Views\Admin\Localization
  * @property LanguageModel $item
  */
-#[Middleware([ManageLocalizationGuard::class])]
+#[Middleware([[HasCapability::class, 'ManageLocalization']])]
 class LanguageEdit extends EditPage
 {
     public string $segment = 'language';

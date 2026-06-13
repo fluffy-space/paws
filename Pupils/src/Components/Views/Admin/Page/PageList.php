@@ -2,13 +2,13 @@
 
 namespace Pupils\Components\Views\Admin\Page;
 
-use Pupils\Components\Guards\ManagePagesGuard;
+use Pupils\Components\Guards\HasCapability;
 use SharedPaws\Models\Content\PageModel;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Attributes\Middleware;
 use Viewi\UI\Components\Tables\TableColumn;
 
-#[Middleware([ManagePagesGuard::class])]
+#[Middleware([[HasCapability::class, 'ManagePages']])]
 class PageList extends BaseComponent
 {
     public array $columns = [];

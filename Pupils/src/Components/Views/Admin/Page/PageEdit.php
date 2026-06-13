@@ -2,7 +2,7 @@
 
 namespace Pupils\Components\Views\Admin\Page;
 
-use Pupils\Components\Guards\ManagePagesGuard;
+use Pupils\Components\Guards\HasCapability;
 use Pupils\Components\Views\Admin\EditPage\EditPage;
 use SharedPaws\Models\BaseModel;
 use SharedPaws\Models\Content\PageModel;
@@ -10,7 +10,7 @@ use SharedPaws\Models\Content\PageValidation;
 use SharedPaws\Validation\IValidationRules;
 use Viewi\Components\Attributes\Middleware;
 
-#[Middleware([ManagePagesGuard::class])]
+#[Middleware([[HasCapability::class, 'ManagePages']])]
 class PageEdit extends EditPage
 {
     public string $segment = 'content';

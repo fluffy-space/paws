@@ -2,7 +2,7 @@
 
 namespace Pupils\Components\Views\Admin\Blog;
 
-use Pupils\Components\Guards\ManageBlogGuard;
+use Pupils\Components\Guards\HasCapability;
 use Pupils\Components\Views\Admin\EditPage\EditPage;
 use SharedPaws\Models\BaseModel;
 use SharedPaws\Models\Blog\BlogPostModel;
@@ -10,7 +10,7 @@ use SharedPaws\Models\Blog\BlogValidation;
 use SharedPaws\Validation\IValidationRules;
 use Viewi\Components\Attributes\Middleware;
 
-#[Middleware([ManageBlogGuard::class])]
+#[Middleware([[HasCapability::class, 'ManageBlog']])]
 class BlogEdit extends EditPage
 {
     public string $segment = 'blog';

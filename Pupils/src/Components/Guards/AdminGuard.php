@@ -13,7 +13,8 @@ use Viewi\DI\Singleton;
  * Base admin-area guard: the user must be able to reach the admin area
  * (the AccessAdmin capability, surfaced server-side as User::$CanAccessAdmin).
  *
- * Feature pages should use a CapabilityGuard subclass, which keeps this gate
+ * Feature pages should use HasCapability via the Middleware attribute, e.g.
+ * #[Middleware([[HasCapability::class, 'ManageBlog']])], which keeps this gate
  * and additionally requires a specific capability.
  */
 #[Singleton]
