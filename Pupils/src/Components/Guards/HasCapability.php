@@ -4,6 +4,7 @@ namespace Pupils\Components\Guards;
 
 use Pupils\Components\Services\Auth\AuthService;
 use SharedPaws\Models\Auth\UserAuthSessionModel;
+use Viewi\Components\Middleware\IMIddlewareContext;
 use Viewi\Components\Routing\ClientRoute;
 
 /**
@@ -35,5 +36,32 @@ class HasCapability extends AdminGuard
     {
         return parent::authorize($session)
             && in_array($this->capability, $session->capabilities, true);
+    }
+
+    /**
+     * Three-way redirect, unlike AdminGuard's single /login fallback:
+     *  - capability granted        -> proceed
+     *  - admin access, but missing the capability -> stay inside the admin
+     *    area on an "insufficient permissions" page (the user is signed in and
+     *    allowed here, they just can't see this feature)
+     *  - no admin access at all     -> /login
+     */
+    public function run(IMIddlewareContext $c)
+    {
+        $this->auth->getUserSession(function (UserAuthSessionModel $session) use ($c) {
+            if ($this->authorize($session)) {
+                $c->next();
+            } else {
+                $c->next(false); // cancel
+                // Inline the admin-access check rather than calling
+                // parent::authorize() here: the transpiler turns parent:: into
+                // JS `super`, which is illegal inside this nested callback.
+                if ($session->user?->CanAccessAdmin === true) {
+                    $this->route->navigate('/admin/access-denied');
+                } else {
+                    $this->route->navigate('/login');
+                }
+            }
+        });
     }
 }

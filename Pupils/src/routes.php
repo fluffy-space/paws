@@ -1,5 +1,6 @@
 <?php
 
+use Pupils\Components\Views\Admin\AccessDenied\AccessDenied;
 use Pupils\Components\Views\Admin\Blog\BlogEdit;
 use Pupils\Components\Views\Admin\Blog\BlogList;
 use Pupils\Components\Views\Admin\Dashboard\Dashboard;
@@ -43,6 +44,7 @@ $router->get('/blog/{seoName}', BlogPostPage::class);
 $router->lazy('admin', function (Router $router) {
     $router->section('admin', function (Router $router) {
         $router->get('/', Dashboard::class);
+        $router->get('/access-denied', AccessDenied::class);
         $router->get('/content', PageList::class);
         $router->get('/content/create', PageEdit::class);
         $router->get('/content/{id}', PageEdit::class);
