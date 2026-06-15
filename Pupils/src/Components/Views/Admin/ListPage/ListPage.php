@@ -19,6 +19,8 @@ class ListPage extends BaseComponent
 {
     public ?string $title = null;
     public string $urlSegment = 'not-provided';
+    /** API base prefix the CRUD calls are issued against; override for non-admin (e.g. member) areas. */
+    public string $apiBase = '/api/admin/';
     public ?string $apiUrl = null;
     public string $name = 'Entity';
     public array $items = [];
@@ -86,7 +88,7 @@ class ListPage extends BaseComponent
         foreach ($this->query as $name => $value) {
             $query .= "&{$name}={$value}";
         }
-        $this->http->get("/api/admin/{$this->apiUrl}?page={$this->filter->paging->page}&size={$this->filter->paging->size}&search={$searchEncoded}{$query}")
+        $this->http->get("{$this->apiBase}{$this->apiUrl}?page={$this->filter->paging->page}&size={$this->filter->paging->size}&search={$searchEncoded}{$query}")
             ->then(function ($items) {
                 $this->items = $items['list'];
                 $this->cancelEdit();
@@ -109,7 +111,7 @@ class ListPage extends BaseComponent
 
     private function deleteItem($item)
     {
-        $this->http->delete("/api/admin/{$this->apiUrl}/{$item->Id}")->then(function () {
+        $this->http->delete("{$this->apiBase}{$this->apiUrl}/{$item->Id}")->then(function () {
             $this->messages->success("{$this->name} has been successfully deleted", 5000);
             $this->getData();
         }, function ($error) {
@@ -162,7 +164,7 @@ class ListPage extends BaseComponent
         $createMode = $item->Id === 0;
         $this->http->request(
             $createMode ? 'post' : 'put',
-            $createMode ? "/api/admin/{$this->apiUrl}" : "/api/admin/{$this->apiUrl}/{$item->Id}",
+            $createMode ? "{$this->apiBase}{$this->apiUrl}" : "{$this->apiBase}{$this->apiUrl}/{$item->Id}",
             $item
         )
             ->then(function (?BaseModel $model) use ($createMode) {
