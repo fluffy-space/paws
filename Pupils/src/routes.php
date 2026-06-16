@@ -4,6 +4,8 @@ use Pupils\Components\Views\Admin\AccessDenied\AccessDenied;
 use Pupils\Components\Views\Admin\Blog\BlogEdit;
 use Pupils\Components\Views\Admin\Blog\BlogList;
 use Pupils\Components\Views\Admin\Dashboard\Dashboard;
+use Pupils\Components\Views\Admin\EmailLogs\EmailLogList;
+use Pupils\Components\Views\Admin\EmailLogs\EmailLogView;
 use Pupils\Components\Views\Admin\EmailTemplates\PreviewEmailPage;
 use Pupils\Components\Views\Admin\Localization\LanguageEdit;
 use Pupils\Components\Views\Admin\Localization\LanguageList;
@@ -62,6 +64,9 @@ $router->lazy('admin', function (Router $router) {
         $router->get('/language/{id}', LanguageEdit::class);
 
         $router->get('/email-templates', PreviewEmailPage::class);
+
+        $router->get('/email-log', EmailLogList::class);
+        $router->get('/email-log/{id}', EmailLogView::class);
 
         // menu items
         $router->get('/menu/{area}', MenuItemList::class);

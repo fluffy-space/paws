@@ -7,6 +7,8 @@ use FluffyPaws\Data\Entities\Blog\BlogPostEntity;
 use FluffyPaws\Data\Entities\Blog\BlogPostEntityMap;
 use FluffyPaws\Data\Entities\Content\PageEntity;
 use FluffyPaws\Data\Entities\Content\PageEntityMap;
+use FluffyPaws\Data\Entities\Emails\EmailLogEntity;
+use FluffyPaws\Data\Entities\Emails\EmailLogEntityMap;
 use FluffyPaws\Data\Entities\Media\PictureEntity;
 use FluffyPaws\Data\Entities\Media\PictureEntityMap;
 
@@ -20,6 +22,7 @@ class DbContextSetUp
         DbContext::registerEntity(BlogPostEntity::class, BlogPostEntityMap::class);
         DbContext::registerEntity(PageEntity::class, PageEntityMap::class);
         DbContext::registerEntity(PictureEntity::class, PictureEntityMap::class);
+        DbContext::registerEntity(EmailLogEntity::class, EmailLogEntityMap::class);
         /** @insert **/
         // !Do not delete the line above!
     }

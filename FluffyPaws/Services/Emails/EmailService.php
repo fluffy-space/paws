@@ -13,7 +13,7 @@ use Viewi\App;
 
 class EmailService
 {
-    public function __construct(private TaskManager $tasks, private App $viewiApp, private EmailConnector $connector, private LocalizationService $localization)
+    public function __construct(private TaskManager $tasks, private App $viewiApp, private EmailLogService $emailLog, private LocalizationService $localization)
     {
     }
 
@@ -26,7 +26,7 @@ class EmailService
     public function sendUserActivateEmail(UserViewModel $user, $verificationCode)
     {
         $html = $this->getUserActivateEmail($user, $verificationCode);
-        $this->connector->send($user->Email, $this->localization->localize('email.activate.title'), $html->body, "{$user->FirstName} {$user->LastName}", $this->localization->localize('email.activate.title'));
+        $this->emailLog->send('confirm-email', $user->Email, $this->localization->localize('email.activate.title'), $html->body, "{$user->FirstName} {$user->LastName}", $this->localization->localize('email.activate.title'));
     }
 
     public function getUserActivateEmail(UserViewModel $user, $verificationCode)
@@ -44,7 +44,7 @@ class EmailService
     public function sendPasswordResetEmail(UserViewModel $user, $verificationCode)
     {
         $html = $this->getSendPasswordResetEmail($user, $verificationCode);
-        $this->connector->send($user->Email, $this->localization->localize('email.reset-password.title'), $html->body, "{$user->FirstName} {$user->LastName}", $this->localization->localize('email.reset-password.title'));
+        $this->emailLog->send('reset-password', $user->Email, $this->localization->localize('email.reset-password.title'), $html->body, "{$user->FirstName} {$user->LastName}", $this->localization->localize('email.reset-password.title'));
     }
 
     public function getSendPasswordResetEmail(UserViewModel $user, $verificationCode)

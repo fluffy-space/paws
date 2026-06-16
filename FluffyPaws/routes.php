@@ -1,6 +1,7 @@
 <?php
 
 use FluffyPaws\Controllers\Admin\Blog\BlogPostController;
+use FluffyPaws\Controllers\Admin\EmailLog\EmailLogController;
 use FluffyPaws\Controllers\Admin\EmailTemplate\EmailTemplateController;
 use FluffyPaws\Controllers\Admin\Localization\LanguageController;
 use FluffyPaws\Controllers\Admin\Localization\LocaleResourceController;
@@ -96,6 +97,12 @@ $router->section('/api/', function (Router $router) {
         // Email templates
         $router->get('email-template/templates', [EmailTemplateController::class, 'Templates']);
         $router->get('email-template/preview/{template}', [EmailTemplateController::class, 'GetPreview']);
+
+        // Email logs (read-only + delete; reuses ManageEmailTemplates capability)
+        $router->get('email-log', [EmailLogController::class, 'List']);
+        $router->get('email-log/{id}/body', [EmailLogController::class, 'GetBody']);
+        $router->get('email-log/{id}', [EmailLogController::class, 'Get']);
+        $router->delete('email-log/{id}', [EmailLogController::class, 'Delete']);
 
         // menu items
         $router->get('menu', [MenuController::class, 'List']);
