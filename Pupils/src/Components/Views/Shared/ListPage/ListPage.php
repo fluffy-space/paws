@@ -29,6 +29,7 @@ class ListPage extends BaseComponent
     public $deleteMessage = null;
     public bool $embedded = false;
     public bool $editInline = false;
+    public bool $add = true;
     /**
      * 
      * @var callable($item): IValidationRules
@@ -67,7 +68,7 @@ class ListPage extends BaseComponent
             'addText' => "Add {$this->name}",
             'editInline' => $this->editInline,
             'search' => 1,
-            'add' => 1,
+            'add' => $this->add,
             'edit' => 1,
             'remove' => 1,
             'paging' => 1
