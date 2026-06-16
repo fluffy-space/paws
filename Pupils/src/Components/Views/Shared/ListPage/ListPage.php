@@ -1,6 +1,6 @@
 <?php
 
-namespace Pupils\Components\Views\Admin\ListPage;
+namespace Pupils\Components\Views\Shared\ListPage;
 
 use SharedPaws\Models\BaseModel;
 use SharedPaws\Validation\IValidationRules;
