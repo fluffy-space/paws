@@ -94,6 +94,7 @@ $router->section('/api/', function (Router $router) {
         $router->post('picture/upload', [MediaController::class, 'Upload']);
 
         // Email templates
+        $router->get('email-template/templates', [EmailTemplateController::class, 'Templates']);
         $router->get('email-template/preview/{template}', [EmailTemplateController::class, 'GetPreview']);
 
         // menu items

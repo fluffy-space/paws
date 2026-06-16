@@ -18,6 +18,8 @@ use FluffyPaws\Migrations\MigrationsContext;
 use FluffyPaws\Migrations\MigrationsMark;
 use FluffyPaws\Security\PawsPermissions;
 use FluffyPaws\Services\Emails\EmailConnector;
+use FluffyPaws\Services\Emails\EmailPreviewContext;
+use FluffyPaws\Services\Emails\EmailPreviewRegistry;
 use FluffyPaws\Services\Emails\EmailService;
 use FluffyPaws\Services\Localization\LocalizationService;
 use FluffyPaws\Services\Sitemap\SitemapService;
@@ -43,6 +45,7 @@ class PawsStartUp implements IStartUp
         $serviceProvider->addScoped(EmailService::class);
         $serviceProvider->addScoped(LocalizationService::class);
         $serviceProvider->addSingleton(EmailConnector::class);
+        $serviceProvider->addSingleton(EmailPreviewRegistry::class);
         /** @insert **/
         // !Do not delete the line above!
 
@@ -64,6 +67,19 @@ class PawsStartUp implements IStartUp
         $viewiConfig->use(FluffyPupils::class);
         $viewiConfig->noJsNamespace[] = 'Pupils\\Components\\Emails\\';
         include_once __DIR__ . '/routes.php';
+
+        // Built-in previewable email templates (apps add their own the same way).
+        $emailPreview = $serviceProvider->get(EmailPreviewRegistry::class);
+        $emailPreview->register(
+            'reset-password',
+            'Reset password',
+            fn(EmailPreviewContext $ctx) => $ctx->emailService->getSendPasswordResetEmail($ctx->demoUser(), $ctx->demoCode())
+        );
+        $emailPreview->register(
+            'confirm-email',
+            'Confirm email',
+            fn(EmailPreviewContext $ctx) => $ctx->emailService->getUserActivateEmail($ctx->demoUser(), $ctx->demoCode())
+        );
     }
 
     public function configureMigrations(IServiceProvider $serviceProvider): void
