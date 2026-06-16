@@ -14,9 +14,7 @@ use Throwable;
 
 class EmailConnector // extends ConnectionPool // ?? can it be http connection pool
 {
-    public function __construct(private Config $config)
-    {
-    }
+    public function __construct(private Config $config) {}
 
     /**
      * 
@@ -32,6 +30,17 @@ class EmailConnector // extends ConnectionPool // ?? can it be http connection p
     {
         $mail = new PHPMailer(true);
         $mailConfig = $this->config->values['email'];
+        if ($mailConfig['log_console'] ?? false) {
+            print_r([
+                "Outgoing Email:",
+                $emailTo,
+                $subject,
+                $body,
+                $emailName,
+                $altBody,
+
+            ]);
+        }
         try {
             // Server settings
             $from = $mailConfig['from'];
@@ -75,6 +84,7 @@ class EmailConnector // extends ConnectionPool // ?? can it be http connection p
             echo "[Email] $time Email has been sent." . PHP_EOL;
             return ['success' => true];
         } catch (Throwable $t) {
+            $time = date('Y-m-d H:i:s', time());
             echo "[Email] $time Email send error." . PHP_EOL;
             echo $mail->ErrorInfo . PHP_EOL;
             echo $t->__toString() . PHP_EOL;
