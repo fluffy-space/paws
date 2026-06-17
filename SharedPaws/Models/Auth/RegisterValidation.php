@@ -6,21 +6,22 @@ use SharedPaws\Validation\ValidationRules;
 
 class RegisterValidation
 {
-    public function __construct(private RegisterModel $model, private $localize)
-    {
-    }
+    public function __construct(private RegisterModel $model, private $localize) {}
 
-    public function getValidationRules()
+    public function getValidationRules($requireEmail = true)
     {
-        return ValidationRules::rules($this->model)
+        $rules = ValidationRules::rules($this->model)
             ->required('FirstName', ($this->localize)('register.validation.first-name-required'))
             ->required('LastName', ($this->localize)('register.validation.last-name-required'))
-            ->required('Email', ($this->localize)('login.validation.email-required'))
-            ->email('Email', ($this->localize)('register.validation.wrong-email'))
             //->phone('Phone', ($this->localize)('register.validation.wrong-phone'))
             ->required('Password', ($this->localize)('login.validation.password-required'))
             ->required('PasswordConfirmation', ($this->localize)('register.validation.password-confirmation-required'))
-            ->match('PasswordConfirmation', 'Password', ($this->localize)('register.validation.password-confirmation-match'))
-            ->toList();
+            ->match('PasswordConfirmation', 'Password', ($this->localize)('register.validation.password-confirmation-match'));
+        if ($requireEmail) {
+            $rules = $rules
+                ->required('Email', ($this->localize)('login.validation.email-required'))
+                ->email('Email', ($this->localize)('register.validation.wrong-email'));
+        }
+        return $rules->toList();
     }
 }
