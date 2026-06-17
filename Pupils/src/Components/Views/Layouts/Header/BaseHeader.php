@@ -2,7 +2,9 @@
 
 namespace Pupils\Components\Views\Layouts\Header;
 
+use Pupils\Components\Services\Auth\AuthService;
 use Pupils\Components\Services\Layouts\LayoutService;
+use SharedPaws\Models\Auth\UserAuthSessionModel;
 use SharedPaws\Models\MenuItem\MenuItemLocation;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Callbacks\Subscription;
@@ -18,14 +20,17 @@ class BaseHeader extends BaseComponent
 
     public bool $showMenu = false;
     private Subscription $pathSubscription;
+    private Subscription $sessionSubscription;
     public ?HtmlNode $area = null;
     public $onDocumentClick = null;
+    public bool $isLoggedIn = false;
 
     public function __construct(
         private HttpClient $http,
         private ClientRoute $route,
         private DomHelper $dom,
-        public LayoutService $layout
+        public LayoutService $layout,
+        private AuthService $auth
     ) {}
 
     public function init()
@@ -40,6 +45,14 @@ class BaseHeader extends BaseComponent
         }, function () {
             // error
         });
+
+        $this->sessionSubscription = $this->auth->subscribe(function (?UserAuthSessionModel $userSession) {
+            $this->isLoggedIn = $userSession !== null && $userSession->isAuthenticated;
+            <<<'javascript'
+            console.log(userSession);
+            javascript;
+        });
+
         <<<'javascript'
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             $this.layout.dark = true;
@@ -79,5 +92,14 @@ class BaseHeader extends BaseComponent
     {
         $this->pathSubscription->unsubscribe();
         $this->dom->getDocument()?->removeEventListener('click', $this->onDocumentClick);
+    }
+
+    public function logout()
+    {
+        $this->http->post("/api/authorization/logout")->then(function () {
+            $this->auth->reset();
+        }, function () {
+            // error
+        });
     }
 }

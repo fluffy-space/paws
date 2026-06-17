@@ -16,6 +16,14 @@
                     <Icon if="{$menuItem->Icon}" name="{$menuItem->Icon}" />
                     {$menuItem->Title}
                 </a>
+                <a if="!$isLoggedIn" title="{t('login')}" href="/login" class="btn btn-rounded btn-rounded-primary ms-2"
+                    type="button">
+                    <Icon name="bi-person-circle" />
+                </a>
+                <button if="$isLoggedIn" title="{t('logout')}" class="btn btn-rounded btn-rounded-primary ms-2"
+                    type="button" (click)="logout">
+                   <Icon name="bi-power" />
+                </button>
                 <span class="py-2 py-md-0">
                     <button class="btn ms-md-3 p-0 icon-btn" class.btn-outline-dark="{!$layout->dark}"
                         class.btn-outline-light="{$layout->dark}" (click)="$layout->dark = !$layout->dark">
