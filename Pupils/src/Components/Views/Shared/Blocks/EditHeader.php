@@ -1,6 +1,6 @@
 <?php
 
-namespace Pupils\Components\Views\Admin\Blocks;
+namespace Pupils\Components\Views\Shared\Blocks;
 
 use Viewi\Components\BaseComponent;
 use Viewi\Components\DOM\DomEvent;

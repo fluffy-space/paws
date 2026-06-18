@@ -27,6 +27,10 @@ abstract class EditPage extends BaseComponent
 
     public string $segment = 'not-defined';
     public ?string $apiUrl = null;
+    /** API base prefix the get/save calls are issued against; override for non-admin (e.g. member) areas. */
+    public string $apiBase = '/api/admin/';
+    /** Client-route base the post-create navigation targets; override for non-admin (e.g. member) areas. */
+    public string $routeBase = '/admin/';
 
     public function __construct(
         public int $id,
@@ -45,7 +49,7 @@ abstract class EditPage extends BaseComponent
         }
         if ($this->id > 0) {
             //edit
-            $this->http->get("/api/admin/{$this->apiUrl}/{$this->id}")
+            $this->http->get("{$this->apiBase}{$this->apiUrl}/{$this->id}")
                 ->then(function ($item) {
                     $this->item = $item;
                     $this->validation = $this->getValidation($item);
@@ -69,7 +73,7 @@ abstract class EditPage extends BaseComponent
         $this->state = ActionButton::STATE_PROCESSING;
         $this->http->request(
             $this->createMode ? 'post' : 'put',
-            $this->createMode ? "/api/admin/{$this->apiUrl}" : "/api/admin/{$this->apiUrl}/{$this->id}",
+            $this->createMode ? "{$this->apiBase}{$this->apiUrl}" : "{$this->apiBase}{$this->apiUrl}/{$this->id}",
             $this->item
         )
             ->then(function ($post) {
@@ -78,7 +82,7 @@ abstract class EditPage extends BaseComponent
                     $text = $this->createMode ? 'created' : 'saved';
                     $this->messages->success("{$this->name} was successfully $text.", 5000);
                     if ($this->createMode) {
-                        $this->route->navigate("/admin/{$this->segment}/{$post->Id}");
+                        $this->route->navigate("{$this->routeBase}{$this->segment}/{$post->Id}");
                     } else {
                         $this->item = $post;
                         $this->validation = $this->getValidation($this->item);

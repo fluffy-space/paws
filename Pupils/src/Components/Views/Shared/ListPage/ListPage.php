@@ -21,6 +21,8 @@ class ListPage extends BaseComponent
     public string $urlSegment = 'not-provided';
     /** API base prefix the CRUD calls are issued against; override for non-admin (e.g. member) areas. */
     public string $apiBase = '/api/admin/';
+    /** Client-route base the create/edit navigation targets; override for non-admin (e.g. member) areas. */
+    public string $routeBase = '/admin/';
     public ?string $apiUrl = null;
     public string $name = 'Entity';
     public array $items = [];
@@ -133,7 +135,7 @@ class ListPage extends BaseComponent
     {
         if ($this->editInline) {
         } else {
-            $this->route->navigate("/admin/{$this->urlSegment}/{$item->Id}");
+            $this->route->navigate("{$this->routeBase}{$this->urlSegment}/{$item->Id}");
         }
     }
 
@@ -151,7 +153,7 @@ class ListPage extends BaseComponent
                 ]);
             }
         } else {
-            $this->route->navigate("/admin/{$this->urlSegment}/create");
+            $this->route->navigate("{$this->routeBase}{$this->urlSegment}/create");
         }
     }
 

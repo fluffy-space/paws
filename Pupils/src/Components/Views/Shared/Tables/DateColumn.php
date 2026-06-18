@@ -1,6 +1,6 @@
 <?php
 
-namespace Pupils\Components\Views\Admin\Tables;
+namespace Pupils\Components\Views\Shared\Tables;
 
 use Viewi\Components\Attributes\IncludeAlways;
 use Viewi\Components\BaseComponent;
