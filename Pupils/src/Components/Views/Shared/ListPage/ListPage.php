@@ -32,6 +32,8 @@ class ListPage extends BaseComponent
     public bool $embedded = false;
     public bool $editInline = false;
     public bool $add = true;
+    public ?string $addLink = null;
+    public ?string $addText = null;
     /**
      * 
      * @var callable($item): IValidationRules
@@ -67,10 +69,11 @@ class ListPage extends BaseComponent
             'items' => $this->items,
             'columns' => $this->columns,
             'filter' => $this->filter,
-            'addText' => "Add {$this->name}",
             'editInline' => $this->editInline,
             'search' => 1,
             'add' => $this->add,
+            'addLink' => $this->addLink,
+            'addText' => $this->addText ?? "Add {$this->name}",
             'edit' => 1,
             'remove' => 1,
             'paging' => 1
@@ -141,7 +144,9 @@ class ListPage extends BaseComponent
 
     public function onCreate()
     {
-        if ($this->editInline) {
+        if ($this->addLink) {
+            $this->route->navigate($this->addLink);
+        } elseif ($this->editInline) {
             if ($this->newFactory !== null) {
                 $newItem = ($this->newFactory)();
                 array_unshift($this->items, $newItem);
