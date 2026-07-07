@@ -9,6 +9,24 @@
                     <div>{$item->Type}</div>
                 </td>
             </slotContent>
+            <slotContent name="edit_Key" data="$item">
+                <td>
+                    <div if="{$item->Id === 0}">
+                        <input type="text" class="form-control form-control-sm mb-1" placeholder="key e.g. app.featureX"
+                            model="$item->Key" />
+                        <select class="form-select form-select-sm mb-1" model="$item->Type">
+                            <option foreach="$types as $t" value="{$t}">{$t}</option>
+                        </select>
+                        <input type="text" class="form-control form-control-sm" placeholder="group (optional)"
+                            model="$item->Group" />
+                    </div>
+                    <div if="{$item->Id !== 0}">
+                        <code>{$item->Key}</code>
+                        <div>{$item->Group}</div>
+                        <div>{$item->Type}</div>
+                    </div>
+                </td>
+            </slotContent>
             <slotContent name="edit_Value" data="$item">
                 <td>
                     <TextInput textarea type="text" inset="true" wrapperClass="col-12" placeholder="Value"
