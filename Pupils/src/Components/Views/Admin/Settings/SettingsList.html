@@ -1,0 +1,20 @@
+<AdminLayout title="Settings">
+    <ListPage title="Settings" deleteMessage="{deleteMessage()}" columns="$columns" urlSegment="setting" name="Setting"
+        newFactory="{getNewItem()}" validationFactory="{getValidation()}" editInline>
+        <DataTable>
+            <slotContent name="column_Key" data="$item">
+                <td>
+                    <code if="{$item->Id !== 0}">{$item->Key}</code>
+                    <div>{$item->Group}</div>
+                    <div>{$item->Type}</div>
+                </td>
+            </slotContent>
+            <slotContent name="edit_Value" data="$item">
+                <td>
+                    <TextInput textarea type="text" inset="true" wrapperClass="col-12" placeholder="Value"
+                        inputClass="form-control" id="Value" model="$item->Value" />
+                </td>
+            </slotContent>
+        </DataTable>
+    </ListPage>
+</AdminLayout>

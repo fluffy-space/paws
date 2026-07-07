@@ -28,6 +28,8 @@ class AdminMenuService
             new MenuItem('Localization', 11, '/admin/language', 'bi-translate', ['/admin/language/create'], "#^/admin/language/(.*)$#i"),
 
 
+            new MenuItem('Settings', 12, '/admin/settings', 'bi-gear', [], "#^/admin/settings(.*)$#i"),
+
             // Products #grid
             // Customers #people-circle
             // Home #home

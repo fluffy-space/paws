@@ -27,4 +27,5 @@ final class PawsCapability
     public const ManagePages          = 1 << 23; // CMS pages admin
     public const ManageLocalization   = 1 << 24; // languages + locale resources admin
     public const ManageEmailTemplates = 1 << 25; // email templates admin
+    public const ManageSettings       = 1 << 26; // runtime settings store admin
 }

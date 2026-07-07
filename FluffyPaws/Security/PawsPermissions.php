@@ -37,5 +37,9 @@ final class PawsPermissions
         PermissionRegistry::defineCapability(PawsCapability::ManagePages, 'ManagePages');
         PermissionRegistry::defineCapability(PawsCapability::ManageLocalization, 'ManageLocalization');
         PermissionRegistry::defineCapability(PawsCapability::ManageEmailTemplates, 'ManageEmailTemplates');
+        // ManageSettings is intentionally NOT granted to the Admin role — the runtime settings store
+        // can hold sensitive config (API keys), so it stays SuperAdmin-only (god short-circuit). The
+        // name is still registered so the client capability guard resolves for SuperAdmin.
+        PermissionRegistry::defineCapability(PawsCapability::ManageSettings, 'ManageSettings');
     }
 }

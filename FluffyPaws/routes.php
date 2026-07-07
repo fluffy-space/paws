@@ -8,6 +8,7 @@ use FluffyPaws\Controllers\Admin\Localization\LocaleResourceController;
 use FluffyPaws\Controllers\Admin\Media\MediaController;
 use FluffyPaws\Controllers\Admin\MenuItem\MenuController;
 use FluffyPaws\Controllers\Admin\Page\PageController;
+use FluffyPaws\Controllers\Admin\Settings\SettingController;
 use FluffyPaws\Controllers\Admin\Users\UserController;
 use FluffyPaws\Controllers\AuthorizationController;
 use FluffyPaws\Controllers\BlogController;
@@ -103,6 +104,13 @@ $router->section('/api/', function (Router $router) {
         $router->get('email-log/{id}/body', [EmailLogController::class, 'GetBody']);
         $router->get('email-log/{id}', [EmailLogController::class, 'Get']);
         $router->delete('email-log/{id}', [EmailLogController::class, 'Delete']);
+
+        // settings (runtime settings store; ManageSettings / SuperAdmin only)
+        $router->get('setting', [SettingController::class, 'List']);
+        $router->post('setting', [SettingController::class, 'Create']);
+        $router->get('setting/{id}', [SettingController::class, 'Get']);
+        $router->put('setting/{id}', [SettingController::class, 'Update']);
+        $router->delete('setting/{id}', [SettingController::class, 'Delete']);
 
         // menu items
         $router->get('menu', [MenuController::class, 'List']);

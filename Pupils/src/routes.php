@@ -13,6 +13,7 @@ use Pupils\Components\Views\Admin\MenuItems\MenuItemEdit;
 use Pupils\Components\Views\Admin\MenuItems\MenuItemList;
 use Pupils\Components\Views\Admin\Page\PageEdit;
 use Pupils\Components\Views\Admin\Page\PageList;
+use Pupils\Components\Views\Admin\Settings\SettingsList;
 use Pupils\Components\Views\Admin\Users\UserEdit;
 use Pupils\Components\Views\Admin\Users\UserList;
 use Pupils\Components\Views\Auth\EmailVerificationPage;
@@ -72,6 +73,9 @@ $router->lazy('admin', function (Router $router) {
         $router->get('/menu/{area}', MenuItemList::class);
         $router->get('/menu/{area}/create', MenuItemEdit::class);
         $router->get('/menu/{area}/{id}', MenuItemEdit::class);
+
+        // settings (runtime settings store; ManageSettings / SuperAdmin only)
+        $router->get('/settings', SettingsList::class);
     });
 });
 
