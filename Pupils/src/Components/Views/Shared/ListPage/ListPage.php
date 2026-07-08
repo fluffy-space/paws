@@ -32,6 +32,9 @@ class ListPage extends BaseComponent
     public bool $embedded = false;
     public bool $editInline = false;
     public bool $add = true;
+    /** Show the per-row edit and delete actions. Set false for a read-only list. */
+    public bool $edit = true;
+    public bool $remove = true;
     public ?string $addLink = null;
     public ?string $addText = null;
     /**
@@ -74,8 +77,8 @@ class ListPage extends BaseComponent
             'add' => $this->add,
             'addLink' => $this->addLink,
             'addText' => $this->addText ?? "Add {$this->name}",
-            'edit' => 1,
-            'remove' => 1,
+            'edit' => $this->edit,
+            'remove' => $this->remove,
             'paging' => 1
         ]);
         $this->tableContext->on('search', fn($event) => $this->onSearch($event));
