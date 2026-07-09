@@ -88,6 +88,12 @@ class ListPage extends BaseComponent
         $this->tableContext->on('delete', fn($event) => $this->onDelete($event));
         $this->tableContext->on('save', fn($event) => $this->onSave($event));
         $this->tableContext->on('cancel', fn() => $this->getData());
+        // Re-fetch when a parent changes the extra filter params (e.g. a status filter).
+        // Reset to the first page so a filter change never leaves you on an empty page.
+        $this->watch('query', function () {
+            $this->filter->paging->page = 1;
+            $this->getData();
+        });
     }
 
     private function getData()
