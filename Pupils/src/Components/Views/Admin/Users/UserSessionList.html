@@ -1,0 +1,11 @@
+<ListPage title="Sessions" deleteMessage="{deleteMessage()}" columns="$columns" urlSegment="user-session"
+    name="Session" query="{['userId' => $user]}" add="{false}" edit="{false}" embedded>
+    <DataTable>
+        <slotContent name="column_Expire" data="$item">
+            <td>{expireText($item->Expire)}</td>
+        </slotContent>
+        <slotContent name="column_TokenHash" data="$item">
+            <td class="small text-muted"><code>{shortHash($item->TokenHash)}</code></td>
+        </slotContent>
+    </DataTable>
+</ListPage>

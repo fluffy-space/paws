@@ -10,6 +10,7 @@ use FluffyPaws\Controllers\Admin\MenuItem\MenuController;
 use FluffyPaws\Controllers\Admin\Page\PageController;
 use FluffyPaws\Controllers\Admin\Settings\SettingController;
 use FluffyPaws\Controllers\Admin\Users\UserController;
+use FluffyPaws\Controllers\Admin\Users\UserSessionController;
 use FluffyPaws\Controllers\AuthorizationController;
 use FluffyPaws\Controllers\BlogController;
 use FluffyPaws\Controllers\ContentController;
@@ -78,6 +79,12 @@ $router->section('/api/', function (Router $router) {
         $router->get('user/{id}', [UserController::class, 'Get']);
         $router->put('user/{id}', [UserController::class, 'Update']);
         $router->delete('user/{id}', [UserController::class, 'Delete']);
+
+        // user login sessions (AUTH tokens) — managed from the user edit "Sessions"
+        // tab (scoped by ?userId=); terminate = delete. Distinct 'user-session'
+        // segment, so it does not collide with 'user/{id}'.
+        $router->get('user-session', [UserSessionController::class, 'List']);
+        $router->delete('user-session/{id}', [UserSessionController::class, 'Delete']);
 
         // localization
         $router->get('language', [LanguageController::class, 'List']);
