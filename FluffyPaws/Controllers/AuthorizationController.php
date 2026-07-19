@@ -86,6 +86,9 @@ class AuthorizationController extends BaseController
             return $this->BadRequest($validationMessages);
         }
         $result = $this->auth->authorizeBasic($loginModel->Email, $loginModel->Password);
+        if ($result->Disabled) {
+            return $this->Forbidden('This account has been disabled.');
+        }
         if (!$result->Success) {
             return $this->Unauthorized($localization->localize('login.validation.wrong-username-or-password'));
         }
