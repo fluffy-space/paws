@@ -28,6 +28,7 @@ use FluffyPaws\Services\Emails\EmailService;
 use FluffyPaws\Services\Localization\LocalizationService;
 use FluffyPaws\Services\Sitemap\SitemapService;
 use FluffyPaws\Tasks\EmailLogCleanupTask;
+use FluffyPaws\Tasks\CleanupExpiredSessionsTask;
 use Pupils\FluffyPupils;
 
 /** @namespaces **/
@@ -51,6 +52,7 @@ class PawsStartUp implements IStartUp
         $serviceProvider->addScoped(EmailService::class);
         $serviceProvider->addScoped(EmailLogService::class);
         $serviceProvider->addScoped(EmailLogCleanupTask::class);
+        $serviceProvider->addScoped(CleanupExpiredSessionsTask::class);
         $serviceProvider->addScoped(LocalizationService::class);
         $serviceProvider->addSingleton(EmailConnector::class);
         $serviceProvider->addScoped(EmailPreviewRegistry::class);
@@ -79,6 +81,9 @@ class PawsStartUp implements IStartUp
 
         // Framework-level scheduled tasks: prune old email logs daily at midnight.
         CronTab::schedule([EmailLogCleanupTask::class, 'execute'], '0 0 0 * * *');
+        // Reclaim expired login sessions (UserToken rows past Expire) daily at 03:30.
+        // Row hygiene only — the auth check already rejects expired tokens.
+        CronTab::schedule([CleanupExpiredSessionsTask::class, 'execute'], '0 30 3 * * *');
     }
 
     public function configureMigrations(IServiceProvider $serviceProvider): void
