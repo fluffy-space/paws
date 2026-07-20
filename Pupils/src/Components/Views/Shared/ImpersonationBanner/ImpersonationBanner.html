@@ -1,0 +1,5 @@
+<div if="$impersonating" class="d-flex flex-wrap align-items-center justify-content-center gap-2 py-2 px-3 bg-warning text-dark small"
+    style="position:sticky;top:0;z-index:1080">
+    <span><i class="bi bi-eye-fill"></i> You are viewing the app as <strong>{$targetName}</strong> — impersonated by {$impersonatorName}</span>
+    <button type="button" class="btn btn-sm btn-dark py-0" (click)="exitImpersonation">Exit</button>
+</div>
