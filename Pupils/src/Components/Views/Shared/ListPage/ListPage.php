@@ -192,7 +192,8 @@ class ListPage extends BaseComponent
                 $this->cancelEdit();
                 $this->getData();
             }, function ($response) {
-                $this->handleResponse(true, $response);
+                // Reject arg is a Response object; handleResponse reads errors off the BODY.
+                $this->handleResponse(true, $response->body);
             });
     }
 

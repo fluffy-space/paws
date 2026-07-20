@@ -90,7 +90,9 @@ abstract class EditPage extends BaseComponent
                 }
             }, function ($response) {
                 $this->stopLoading(ActionButton::STATE_ERROR);
-                $this->handleResponse(true, $response);
+                // Reject arg is a Response object; handleResponse reads errors off the BODY
+                // (same convention as the Auth pages: handleResponse(true, $response->body)).
+                $this->handleResponse(true, $response->body);
             });
     }
 
