@@ -1,6 +1,11 @@
 <AdminLayout title="Edit user">
     <EditHeader title="{$createMode ? 'Create user' : 'Edit user'}" backUrl="/admin/user" createMode="$createMode"
         state="$state" (click)="onSave" />
+    <div if="$canImpersonate" class="mb-2">
+        <button type="button" class="btn btn-outline-warning btn-sm" (click)="impersonate">
+            <i class="bi bi-person-badge"></i> Impersonate this user
+        </button>
+    </div>
     <div class="card shadow-sm p-2">
         <Tabs>
             <Tab title="Details" active>
