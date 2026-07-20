@@ -42,6 +42,14 @@ class AuthorizationController extends BaseController
             $response->roles = Permissions::roleNames($user->Permissions);
             $response->capabilities = Permissions::capabilityNames($user->Permissions);
             $response->isAuthenticated = true;
+            // Impersonation overlay: $user is the effective (target) user; surface
+            // the acting admin so the client can render the "viewing as" banner.
+            if ($this->auth->isImpersonating()) {
+                $response->impersonating = true;
+                $real = $this->auth->getRealUser();
+                $name = $real ? trim(($real->FirstName ?? '') . ' ' . ($real->LastName ?? '')) : '';
+                $response->impersonatorName = $name !== '' ? $name : ($real?->UserName ?? null);
+            }
         }
         return $response;
     }

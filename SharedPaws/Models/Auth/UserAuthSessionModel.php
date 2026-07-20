@@ -20,4 +20,10 @@ class UserAuthSessionModel
      * @var string[]
      */
     public array $capabilities = [];
+
+    /** True when this session is running under an admin "view as user" overlay. */
+    public bool $impersonating = false;
+
+    /** Display name of the acting admin while impersonating (drives the banner). */
+    public ?string $impersonatorName = null;
 }

@@ -11,6 +11,7 @@ use FluffyPaws\Controllers\Admin\Page\PageController;
 use FluffyPaws\Controllers\Admin\Settings\SettingController;
 use FluffyPaws\Controllers\Admin\Users\UserController;
 use FluffyPaws\Controllers\Admin\Users\UserSessionController;
+use FluffyPaws\Controllers\Admin\Users\ImpersonationController;
 use FluffyPaws\Controllers\AuthorizationController;
 use FluffyPaws\Controllers\BlogController;
 use FluffyPaws\Controllers\ContentController;
@@ -52,6 +53,10 @@ $router->section('/api/', function (Router $router) {
     $router->post('authorization/session', [AuthorizationController::class, 'Session']);
     $router->post('authorization/login', [AuthorizationController::class, 'Login']);
     $router->post('authorization/logout', [AuthorizationController::class, 'Logout']);
+
+    // Exit impersonation — authorized by the IMP overlay itself (the effective
+    // user isn't an admin), so it sits outside the admin block.
+    $router->post('impersonation/exit', [ImpersonationController::class, 'Exit']);
     $router->post('authorization/register', [AuthorizationController::class, 'Register']);
     $router->post('authorization/reset-password', [AuthorizationController::class, 'ResetPassword']);
     $router->post('authorization/reset-password-confirm', [AuthorizationController::class, 'ResetPasswordConfirm']);
@@ -85,6 +90,10 @@ $router->section('/api/', function (Router $router) {
         // segment, so it does not collide with 'user/{id}'.
         $router->get('user-session', [UserSessionController::class, 'List']);
         $router->delete('user-session/{id}', [UserSessionController::class, 'Delete']);
+
+        // impersonation start ("view as user") — SuperAdmin/ImpersonateUsers. Exit
+        // lives outside the admin block (the effective user isn't an admin then).
+        $router->post('user/{id}/impersonate', [ImpersonationController::class, 'Start']);
 
         // localization
         $router->get('language', [LanguageController::class, 'List']);
