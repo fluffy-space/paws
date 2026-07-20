@@ -179,13 +179,19 @@ class UserController extends BaseController
                 "User with such email or phone already exists."
             ]);
         }
+        $passwordChanged = false;
         if ($user->NewPassword && $user->ConfirmPassword === $user->NewPassword) {
             $entity->Password = $this->auth->hashPassword($user->NewPassword);
+            $passwordChanged = true;
         }
 
         $success = $this->users->update($entity);
         if (!$success) {
             return null;
+        }
+        if ($passwordChanged) {
+            // Admin reset this user's password — force re-login on all their devices.
+            $this->auth->revokeSessions($entity->Id);
         }
         $result = $this->mapper->map(UserModel::class, $entity);
         $result->Roles = $this->roleOptions($entity->Permissions);
