@@ -53,8 +53,20 @@ class EmailConnector // extends ConnectionPool // ?? can it be http connection p
             $mail->SMTPSecure = $mailConfig['SMTPSecure'];
             $mail->Port       = $mailConfig['port'];
             $mail->CharSet = PHPMailer::CHARSET_UTF8;
+            // The domain PHPMailer uses for EHLO and the Message-ID. Left unset it falls back to
+            // the machine's hostname — "DESKTOP-G4NJ8FT" on a dev box, the bare host on a server.
+            // That is a non-FQDN HELO and a Message-ID whose domain doesn't match the sender, and
+            // filters score both. Derive it from the From address so it always matches.
+            $atPos = strrpos($from, '@');
+            if ($atPos !== false) {
+                $mail->Hostname = substr($from, $atPos + 1);
+            }
+            // Drop the "Using PHPMailer x.y.z" X-Mailer header: it names the library and exact
+            // version in every message, and it reads as bulk mail. A single space disables it —
+            // an empty string would restore the default.
+            $mail->XMailer = ' ';
             // Recipients
-            $mail->setFrom($from, 'Manager');
+            $mail->setFrom($from, $mailConfig['from_name'] ?? 'Notifications');
             $mail->addAddress($emailTo, $emailName);
             if (isset($mailConfig['copyTo'])) {
                 $mail->addBCC($mailConfig['copyTo']);
