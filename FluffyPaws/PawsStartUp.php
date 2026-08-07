@@ -14,6 +14,7 @@ use FluffyPaws\Data\Repositories\LanguageRepository;
 use FluffyPaws\Data\Repositories\LocaleResourceRepository;
 use FluffyPaws\Data\Repositories\MenuItemRepository;
 use FluffyPaws\Data\Repositories\EmailLogRepository;
+use FluffyPaws\Data\Repositories\EmailSuppressionRepository;
 use FluffyPaws\Data\Repositories\PageRepository;
 use FluffyPaws\Data\Repositories\PictureRepository;
 use FluffyPaws\Migrations\MigrationsContext;
@@ -21,6 +22,10 @@ use FluffyPaws\Migrations\MigrationsMark;
 use FluffyPaws\Security\PawsPermissions;
 use FluffyPaws\Services\Emails\EmailConnector;
 use FluffyPaws\Services\Emails\EmailLogService;
+use FluffyPaws\Services\Emails\EmailSuppressionService;
+use FluffyPaws\Services\Emails\MailSettings;
+use FluffyPaws\Services\Emails\SesNotificationService;
+use FluffyPaws\Services\Emails\SnsMessageVerifier;
 use FluffyPaws\Services\Emails\EmailPreviewRegistry;
 use FluffyPaws\Services\Emails\IEmailPreviewProvider;
 use FluffyPaws\Services\Emails\PawsEmailPreviewProvider;
@@ -41,6 +46,8 @@ class PawsStartUp implements IStartUp
     {
         // Register the Paws layer's capabilities (after core, before the app).
         PawsPermissions::register();
+        // Mail deliverability knobs (SNS topic allowlist, signature verification).
+        MailSettings::register();
         $serviceProvider->addScoped(BlogPostRepository::class);
         $serviceProvider->addScoped(PageRepository::class);
         $serviceProvider->addScoped(LanguageRepository::class);
@@ -48,9 +55,14 @@ class PawsStartUp implements IStartUp
         $serviceProvider->addScoped(PictureRepository::class);
         $serviceProvider->addScoped(MenuItemRepository::class);
         $serviceProvider->addScoped(EmailLogRepository::class);
+        $serviceProvider->addScoped(EmailSuppressionRepository::class);
         $serviceProvider->addScoped(SitemapService::class);
         $serviceProvider->addScoped(EmailService::class);
+        $serviceProvider->addScoped(EmailSuppressionService::class);
         $serviceProvider->addScoped(EmailLogService::class);
+        $serviceProvider->addScoped(SesNotificationService::class);
+        // Singleton: it caches the SNS signing certificate per worker.
+        $serviceProvider->addSingleton(SnsMessageVerifier::class);
         $serviceProvider->addScoped(EmailLogCleanupTask::class);
         $serviceProvider->addScoped(CleanupExpiredSessionsTask::class);
         $serviceProvider->addScoped(LocalizationService::class);

@@ -8,6 +8,7 @@ use FluffyPaws\Migrations\Content\PageContentsMigration01;
 use FluffyPaws\Migrations\Content\PageContentsMigration02;
 use FluffyPaws\Migrations\Content\PageMigration;
 use FluffyPaws\Migrations\Emails\EmailLogMigration;
+use FluffyPaws\Migrations\Emails\EmailSuppressionMigration;
 use FluffyPaws\Migrations\Localization\LanguageMigration;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration02;
@@ -43,6 +44,7 @@ class MigrationsContext extends BaseMigrationsContext
         $this->runMigration(MenuItemsMigration02::class);
         $this->runMigration(LocaleEnglishMigration05::class);
         $this->runMigration(EmailLogMigration::class);
+        $this->runMigration(EmailSuppressionMigration::class);
         /** @insert **/
         // !Do not delete the line above!
     }

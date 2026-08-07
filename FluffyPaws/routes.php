@@ -2,6 +2,8 @@
 
 use FluffyPaws\Controllers\Admin\Blog\BlogPostController;
 use FluffyPaws\Controllers\Admin\EmailLog\EmailLogController;
+use FluffyPaws\Controllers\Admin\EmailLog\EmailSuppressionController;
+use FluffyPaws\Controllers\SesNotificationController;
 use FluffyPaws\Controllers\Admin\EmailTemplate\EmailTemplateController;
 use FluffyPaws\Controllers\Admin\Localization\LanguageController;
 use FluffyPaws\Controllers\Admin\Localization\LocaleResourceController;
@@ -60,6 +62,11 @@ $router->section('/api/', function (Router $router) {
     $router->post('authorization/register', [AuthorizationController::class, 'Register']);
     $router->post('authorization/reset-password', [AuthorizationController::class, 'ResetPassword']);
     $router->post('authorization/reset-password-confirm', [AuthorizationController::class, 'ResetPasswordConfirm']);
+
+    // SES bounce/complaint notifications over SNS — public + unauthenticated
+    // (SNS-signature-verified and topic-allowlisted inside), so it sits outside
+    // every auth block, like the payment webhooks.
+    $router->post('webhook/ses', [SesNotificationController::class, 'Handle']);
 
     /*  ADMIN AREA */
     $router->section('admin/', function (Router $router) {
@@ -120,6 +127,11 @@ $router->section('/api/', function (Router $router) {
         $router->get('email-log/{id}/body', [EmailLogController::class, 'GetBody']);
         $router->get('email-log/{id}', [EmailLogController::class, 'Get']);
         $router->delete('email-log/{id}', [EmailLogController::class, 'Delete']);
+
+        // Suppression list (addresses we stopped sending to; same capability)
+        $router->get('email-suppression', [EmailSuppressionController::class, 'List']);
+        $router->post('email-suppression', [EmailSuppressionController::class, 'Create']);
+        $router->delete('email-suppression/{id}', [EmailSuppressionController::class, 'Delete']);
 
         // settings (runtime settings store; ManageSettings / SuperAdmin only)
         $router->get('setting', [SettingController::class, 'List']);

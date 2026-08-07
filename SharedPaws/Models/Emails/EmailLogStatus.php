@@ -14,4 +14,6 @@ final class EmailLogStatus
     public const Sent = 'sent';
     /** EmailConnector reported a transport error (see Error). */
     public const Failed = 'failed';
+    /** Never handed to the transport — the recipient is on the suppression list (see Error). */
+    public const Suppressed = 'suppressed';
 }

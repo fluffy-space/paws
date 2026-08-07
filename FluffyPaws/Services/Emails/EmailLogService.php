@@ -21,6 +21,10 @@ use Throwable;
  * The rendered HTML body is stored only when email.store_body is enabled — true
  * in dev/local (where SMTP is usually unconfigured and nothing is delivered, so
  * the admin preview is the only way to see the email), false in prod (no PII/bloat).
+ *
+ * Being the one chokepoint is also why the suppression check lives here: an
+ * address the provider told us is dead must not be offered again from ANY mailer,
+ * and a gate in each mailer is a gate the next mailer forgets.
  */
 class EmailLogService
 {
@@ -28,6 +32,7 @@ class EmailLogService
         private EmailConnector $connector,
         private EmailLogRepository $repository,
         private Config $config,
+        private EmailSuppressionService $suppressions,
     ) {
     }
 
@@ -49,6 +54,18 @@ class EmailLogService
         $entity->Body = $storeBody ? $body : null;
         $entity->Error = null;
         $entity->SentOn = null;
+
+        // Suppressed recipients never reach the transport. Logged as a row rather
+        // than dropped silently, so "why did they not get the invite" has an answer.
+        $suppression = $this->suppressions->find($emailTo);
+        if ($suppression !== null) {
+            $reason = $suppression->Reason . ($suppression->Detail ? " ({$suppression->Detail})" : '');
+            $entity->Status = EmailLogStatus::Suppressed;
+            $entity->Error = "Recipient is on the suppression list: {$reason}";
+            $entity->SentOn = EmailLogRepository::getTime();
+            $this->tryCreate($entity);
+            return ['success' => false, 'message' => $entity->Error, 'suppressed' => true];
+        }
 
         // Record the attempt up front so a crash mid-send still leaves a 'sending' row.
         $logged = $this->tryCreate($entity);
