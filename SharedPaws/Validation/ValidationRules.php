@@ -68,6 +68,16 @@ class ValidationRules
         return ctype_digit($phone);
     }
 
+    /**
+     * URL-path-safe token: ASCII letters, digits, '-' and '_'. Hand-rolled rather than a
+     * regex because the JS preg_match polyfill returns a bool, not PHP's int match count,
+     * so a `=== 1` rule silently fails open in the browser.
+     */
+    public function validateSlug($value): bool
+    {
+        return ctype_alnum(str_replace(['-', '_'], '', $value));
+    }
+
     public function requiredAny($prop, $prop2, $error = null)
     {
         $this->ensure($prop);
@@ -94,6 +104,20 @@ class ValidationRules
         $this->list[$prop]['httpUrl'] = function () use ($prop, $errorMessage) {
             if ($this->target->{$prop}) {
                 return $this->validateHttpUrl($this->target->{$prop}) ? true : ($errorMessage ?? 'Wrong URL format.');
+            }
+            // no value
+            return true;
+        };
+        return $this;
+    }
+
+    /** No value passes — pair with required() when the field is mandatory. */
+    public function slug($prop, $errorMessage = null)
+    {
+        $this->ensure($prop);
+        $this->list[$prop]['slug'] = function () use ($prop, $errorMessage) {
+            if ($this->target->{$prop}) {
+                return $this->validateSlug($this->target->{$prop}) ? true : ($errorMessage ?? 'Only letters, digits, dashes and underscores are allowed.');
             }
             // no value
             return true;
@@ -137,10 +161,10 @@ class ValidationRules
         return $this;
     }
 
-    public function maxLength($prop, $maxLength)
+    public function maxLength($prop, $maxLength, $errorMessage = null)
     {
         $this->ensure($prop);
-        $this->list[$prop]['maxlength'] = fn() => (!$this->target->{$prop} || mb_strlen($this->target->{$prop}, 'UTF-8') <= $maxLength) ? true : "$prop should not exceed $maxLength characters in length";
+        $this->list[$prop]['maxlength'] = fn() => (!$this->target->{$prop} || mb_strlen($this->target->{$prop}, 'UTF-8') <= $maxLength) ? true : ($errorMessage ?? "$prop should not exceed $maxLength characters in length");
         return $this;
     }
 
