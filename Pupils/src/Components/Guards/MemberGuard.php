@@ -17,7 +17,16 @@ class MemberGuard implements IMIddleware
     public function run(IMIddlewareContext $c)
     {
         $this->auth->getUserSession(function (UserAuthSessionModel $session) use ($c) {
-            if ($session->user?->Active) {
+            // Active alone would lock out every new signup: registration creates the user
+            // Active=false, and only email confirmation flips it. Login already admits those
+            // users ("mid-signup, not deactivated" — AuthorizationService::isDeactivated), so
+            // gating the app on Active sent them round a silent loop: sign in, get bounced
+            // back to /login, with nothing on screen saying why. Mirror the login rule here —
+            // an unconfirmed account gets in and is nagged by VerifyEmailNotice, while the
+            // actions that matter stay blocked server-side (ResolvesTeam).
+            $user = $session->user;
+            $deactivated = $user !== null && !$user->Active && $user->EmailConfirmed;
+            if ($user !== null && !$deactivated) {
                 $c->next();
             } else {
                 $c->next(false); // cancel
