@@ -8,58 +8,73 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <CssBundle links="{['/pupils/mail.css']}" minify purge combine inline />
 </head>
 
-<body>
+<!--
+    Email styling is inline style attributes ONLY — there is deliberately no <style> block and no
+    classes. Gmail discards <html>/<head>/<body>, re-parents the body's children into its own div,
+    and strips every class attribute; inline style attributes are the only thing that survives
+    intact (verified against Gmail's delivered source, 2026-08-11). A <style> block therefore
+    cannot be relied on, and keeping one only makes the email render DIFFERENTLY in the clients
+    that do honour it. One mechanism, one result everywhere. Do not reintroduce classes here.
+-->
+
+<body
+    style="margin:0;padding:0;background-color:#faf5fc;font-family:Arial,Helvetica,sans-serif;color:#666666;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0"
         style="border-spacing:0;background-color:#faf5fc; width:100%!important;table-layout:fixed;border-collapse:collapse;">
         <tbody>
             <tr>
-                <td align="center">
+                <td align="center" style="padding:30px 10px;">
 
-                    <div
-                        style="border-radius: 20px; width: 500px; background-color:#ffffff; min-width: 318px; padding: 30px 0px; margin: 30px 0;">
-                        <table width="500" style="border-spacing:0;">
-                            <tbody>
-                                <tr>
-                                    <td align="center">
-                                        <h1>
-                                            <a href="{$baseUrl}" class="uk-link-reset logo-link logo-icon">
-                                                <EmailLogo />
-                                            </a>
-                                        </h1>
-                                        <hr class="uk-divider-icon">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0 20px;">
-                                        <h1
-                                            class="text-h3 text-center text-md-left font-weight-bold text-h4 text-sm-h4 mt-xl-4">
-                                            {t('email.layout.title')}
-                                        </h1>
-                                        <h2 class="text-h6 text-sm-h5 mt-4">
-                                            {t('email.layout.hero')}
-                                        </h2>
-                                        <slot></slot>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <hr class="uk-divider-icon">
-                                        <div class="light-navbar no-border text-center">
-                                            <ul class="inline-list">
-                                                <li><a href="{$baseUrl}/blog">{t('blog.list.title')}</a></li>
-                                            </ul>
-                                        </div>
-                                        <p class="text-center">&copy; {t('email.layout.title')} {date('Y')} -
-                                            {t('email.layout.all-rights-reserved')}
-                                        </p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <table width="500" cellpadding="0" cellspacing="0" border="0"
+                        style="width:500px;max-width:500px;min-width:300px;border-spacing:0;border-collapse:collapse;background-color:#ffffff;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.5;color:#666666;">
+                        <tbody>
+                            <tr>
+                                <td align="center" style="padding:30px 20px 20px 20px;">
+                                    <a href="{$baseUrl}"
+                                        style="color:inherit;text-decoration:none;">
+                                        <EmailLogo />
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0;font-size:0;line-height:0;border-top:1px solid #e5e5e5;">&nbsp;
+                                </td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding:20px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.5;color:#666666;">
+                                    <h1 style="margin:0 0 16px 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;line-height:1.25;font-weight:normal;color:#333333;">
+                                        {t('email.layout.title')}
+                                    </h1>
+                                    <h2 style="margin:0 0 20px 0;font-family:Arial,Helvetica,sans-serif;font-size:19px;line-height:1.35;font-weight:normal;color:#333333;">
+                                        {t('email.layout.hero')}
+                                    </h2>
+                                    <slot></slot>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0;font-size:0;line-height:0;border-top:1px solid #e5e5e5;">&nbsp;
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="padding:16px 20px 24px 20px;">
+                                    <div if="$hasFooterLinks"
+                                        style="text-align:center;">
+                                        <a foreach="$footerLinks as $footerLink" href="{$footerLink->Link}"
+                                            target="_blank" rel="noopener noreferrer"
+                                            style="display:inline-block;padding:4px 10px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#999999;text-decoration:none;text-transform:uppercase;">{$footerLink->Title}</a>
+                                    </div>
+                                    <p
+                                        style="margin:12px 0 0 0;text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;color:#999999;">
+                                        &copy; {t('email.layout.title')} {date('Y')} -
+                                        {t('email.layout.all-rights-reserved')}
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
 
                 </td>
             </tr>
