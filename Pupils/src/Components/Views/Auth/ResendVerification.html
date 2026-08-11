@@ -1,0 +1,8 @@
+<span class="d-inline-block">
+    <span if="$sent" class="text-success">{t('verify-email.resent')}</span>
+    <button else type="button" class="$linkClass" disabled="$sending" (click)="resend">
+        <span if="$sending">{t('verify-email.resending')}</span>
+        <span else>{t('verify-email.resend')}</span>
+    </button>
+    <span if="{$error !== ''}" class="d-block text-danger small mt-1">$error</span>
+</span>

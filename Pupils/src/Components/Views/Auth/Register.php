@@ -95,10 +95,14 @@ class Register extends BaseComponent
             $this->auth->reset();
             $redirectTo = $this->browserSession->getItem('redirectTo');
             if ($redirectTo !== null) {
+                // An interrupted intent (buying a plan, claiming a link) wins: it is why they
+                // signed up, and the "confirm your email" notice follows them into the app.
                 $this->browserSession->removeItem('redirectTo');
                 $this->route->navigate($redirectTo);
             } else {
-                $this->route->navigate('/');
+                // Not the home page: registration just sent an activation email, and landing on
+                // marketing copy says nothing about it. /welcome names the address and moves on.
+                $this->route->navigate('/welcome');
             }
         }
     }

@@ -60,6 +60,8 @@ $router->section('/api/', function (Router $router) {
     // user isn't an admin), so it sits outside the admin block.
     $router->post('impersonation/exit', [ImpersonationController::class, 'Exit']);
     $router->post('authorization/register', [AuthorizationController::class, 'Register']);
+    // resend the activation email to the signed-in user's own address (rate-limited inside)
+    $router->post('authorization/resend-verification', [AuthorizationController::class, 'ResendVerification']);
     $router->post('authorization/reset-password', [AuthorizationController::class, 'ResetPassword']);
     $router->post('authorization/reset-password-confirm', [AuthorizationController::class, 'ResetPasswordConfirm']);
 

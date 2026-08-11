@@ -1,0 +1,18 @@
+<BoxLayout title="{t('welcome.title')}">
+    <h3 class="h4 mb-3">{t('welcome.header')}</h3>
+
+    <div if="$confirmed">
+        <p>{t('welcome.already-confirmed')}</p>
+    </div>
+    <div else>
+        <p if="{$email !== ''}">{t('welcome.sent-to', ['email' => $email])}</p>
+        <p else>{t('welcome.sent-generic')}</p>
+        <p class="text-body-secondary small">{t('welcome.spam-hint')}</p>
+        <p class="mb-0">
+            <span class="me-1">{t('welcome.no-email')}</span>
+            <ResendVerification />
+        </p>
+    </div>
+
+    <a href="$continueTo" class="btn btn-primary w-100 mt-4">{t('welcome.continue')}</a>
+</BoxLayout>

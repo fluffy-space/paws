@@ -153,6 +153,50 @@ class AuthorizationController extends BaseController
         return ['success' => true];
     }
 
+    /**
+     * Send the activation email again to the signed-in user's own address.
+     *
+     * The activation code lives 3 days and the mail can land in spam, so without this the
+     * only way out of an unconfirmed account is a support ticket. Deliberately scoped to the
+     * session user — no address is accepted from the request, so this cannot be used to mail
+     * a stranger. Idempotent: an already-confirmed account returns success and sends nothing.
+     */
+    public function ResendVerification(LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext)
+    {
+        if (!$this->auth->authorizeCSRF()) {
+            return $this->Forbidden('Invalid CSRF-token.');
+        }
+
+        $user = $this->auth->getAuthorizedUser();
+        if ($user === null) {
+            return $this->Unauthorized('Please sign in first.');
+        }
+
+        // An admin viewing as someone else must not be able to fire mail at that person.
+        if ($this->auth->isImpersonating()) {
+            return $this->Forbidden('Not available while impersonating.');
+        }
+
+        if ($user->EmailConfirmed) {
+            return ['success' => true];
+        }
+
+        // Two buckets: one per account (the real limit — a mailbox nobody can drain by
+        // switching IP) and one per IP (a signup farm resending across many fresh accounts).
+        // Both keys are prefixed so they do not share the login/register bucket, which is
+        // keyed by the bare IP.
+        if (
+            !$rateLimit->limit("resend-verification:user:{$user->Id}", 3, 15 * 60)
+            || !$rateLimit->limit('resend-verification:ip:' . $httpContext->request->getIp(), 10, 15 * 60)
+        ) {
+            return $this->TooManyRequests($localization->localize('rate-limit.too-many-requests'));
+        }
+
+        $verificationCode = $this->auth->createVerificationCode($user->Id);
+        $this->emailService->dispatchUserActivateEmail($this->mapper->map(UserViewModel::class, $user), $verificationCode->Code);
+        return ['success' => true];
+    }
+
     public function ConfirmEmail(string $code)
     {
         $userCode = $this->auth->verifyCode($code);

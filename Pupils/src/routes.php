@@ -21,6 +21,7 @@ use Pupils\Components\Views\Auth\Login;
 use Pupils\Components\Views\Auth\Register;
 use Pupils\Components\Views\Auth\ResetPassword;
 use Pupils\Components\Views\Auth\ResetPasswordRequest;
+use Pupils\Components\Views\Auth\WelcomePage;
 use Pupils\Components\Views\Blog\BlogListPage;
 use Pupils\Components\Views\Blog\BlogPostPage;
 use Pupils\Components\Views\Content\ContentPage;
@@ -35,6 +36,8 @@ $router = $viewiApp->router();
 // Auth
 $router->get('/login', Login::class);
 $router->get('/register', Register::class);
+// where Register lands after signing the new user in — says what was emailed and where to go next
+$router->get('/welcome', WelcomePage::class);
 $router->get('/reset-password', ResetPasswordRequest::class);
 $router->get('/account/verified/{failed?}', EmailVerificationPage::class);
 $router->get('/password/reset/{code}', ResetPassword::class);
