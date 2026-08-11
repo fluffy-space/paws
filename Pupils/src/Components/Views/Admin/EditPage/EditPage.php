@@ -82,6 +82,7 @@ abstract class EditPage extends BaseComponent
                     $text = $this->createMode ? 'created' : 'saved';
                     $this->messages->success("{$this->name} was successfully $text.", 5000);
                     if ($this->createMode) {
+                        $this->afterCreate($post);
                         $this->route->navigate("{$this->routeBase}{$this->segment}/{$post->Id}");
                     } else {
                         $this->item = $post;
@@ -95,6 +96,14 @@ abstract class EditPage extends BaseComponent
                 $this->handleResponse(true, $response->body);
             });
     }
+
+    /**
+     * Hook: a create just succeeded, before the navigate to the saved record. No-op by default —
+     * subclasses override it for side effects that only make sense on creation (analytics events,
+     * one-time onboarding nudges). Deliberately not a hook for *edits*: nothing has needed one, and
+     * an empty method nobody calls is worse than no method.
+     */
+    public function afterCreate($post) {}
 
     public function stopLoading(int $state)
     {

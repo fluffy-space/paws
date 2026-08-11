@@ -4,6 +4,7 @@ namespace Pupils\Components\Views\Auth;
 
 use SharedPaws\Models\Auth\RegisterModel;
 use SharedPaws\Models\Auth\RegisterValidation;
+use Pupils\Components\Services\Analytics\AnalyticsService;
 use Pupils\Components\Services\Auth\AuthService;
 use Viewi\Components\Browser\BrowserSession;
 use Pupils\Components\Services\Localization\HasLocalization;
@@ -25,8 +26,9 @@ class Register extends BaseComponent
     private ?ActionForm $registerForm = null;
     public ?RegisterValidation $validation = null;
     public bool $isPayment = false;
+    public bool $trackedView = false;
 
-    public function __construct(private HttpClient $http, private ClientRoute $route, private AuthService $auth, private BrowserSession $browserSession) {}
+    public function __construct(private HttpClient $http, private ClientRoute $route, private AuthService $auth, private BrowserSession $browserSession, private AnalyticsService $analytics) {}
 
     public function init()
     {
@@ -36,6 +38,18 @@ class Register extends BaseComponent
         if ($productId !== null) {
             $productId = (int)$productId;
             $this->isPayment = true;
+        }
+    }
+
+    /**
+     * Client-only hook: `init` also runs during SSR, where the analytics call is a no-op, and
+     * hydration does not re-run it — an event fired from `init` never reaches the browser at all.
+     */
+    public function rendered()
+    {
+        if (!$this->trackedView) {
+            $this->trackedView = true;
+            $this->analytics->track('signup_started');
         }
     }
 
@@ -55,9 +69,6 @@ class Register extends BaseComponent
             ->then(
                 function ($response) {
                     $this->handleResponse(false, $response);
-                    <<<'javascript'
-                    console.log(response);
-                    javascript;
                 },
                 function (Response $response) {
                     $this->handleResponse(true, $response->body);
@@ -78,6 +89,9 @@ class Register extends BaseComponent
             }
             $this->generalMessages->show = true;
         } elseif ($response['success']) {
+            // The conversion. No URL of its own — the next thing that happens is a navigate — so
+            // page-view tracking cannot see it.
+            $this->analytics->track('signup_completed');
             $this->auth->reset();
             $redirectTo = $this->browserSession->getItem('redirectTo');
             if ($redirectTo !== null) {
