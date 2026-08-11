@@ -1,4 +1,13 @@
 <BoxLayout title="{t('email-verification.title')}">
-    <h4 if="$hasFailed" class="error-text">{t('email-verification.failed')}</h4>
-    <h4 else>{t('email-verification.success')}</h4>
+    <div if="$hasFailed">
+        <h4 class="error-text">{t('email-verification.failed')}</h4>
+        <p class="mt-3 mb-0">
+            <ResendVerification />
+        </p>
+        <a href="/login" class="btn btn-primary w-100 mt-4">{t('login.title')}</a>
+    </div>
+    <div else>
+        <h4>{t('email-verification.success')}</h4>
+        <a href="/" class="btn btn-primary w-100 mt-4">{t('welcome.continue')}</a>
+    </div>
 </BoxLayout>
