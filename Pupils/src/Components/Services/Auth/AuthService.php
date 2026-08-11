@@ -34,6 +34,25 @@ class AuthService
         return $this->userSubscriber->subscribe($callback);
     }
 
+    /**
+     * May this session use the member app at all?
+     *
+     * False only for a genuinely deactivated account — one an admin switched off, which reads as
+     * `!Active && EmailConfirmed`. An unconfirmed signup is `Active=false` too (registration
+     * creates it that way; only confirmation flips it), but it is mid-signup, not disabled, and
+     * must be let in: the actions that matter are gated server-side instead.
+     *
+     * Lives here so every page guard shares one definition. Two of them had their own copy of
+     * `!$user->Active`, and each one silently locked new signups out of whatever it protected.
+     */
+    public function canUseApp(?UserAuthSessionModel $session): bool
+    {
+        if ($session === null || $session->user === null) {
+            return false;
+        }
+        return $session->user->Active || !$session->user->EmailConfirmed;
+    }
+
     public function isAuthorized(callable $callback)
     {
         $this->fetchUser();
