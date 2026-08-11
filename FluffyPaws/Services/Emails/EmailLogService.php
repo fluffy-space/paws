@@ -78,6 +78,13 @@ class EmailLogService
         } else {
             $entity->Status = EmailLogStatus::Failed;
             $entity->Error = $result['message'] ?? 'Unknown error';
+            // The connector logs how it failed but not WHAT failed — it is handed a subject and a
+            // body, and knows nothing about 'team-invitation' vs 'reset-password'. This line is the
+            // one to grep for in journald ("[Email] FAILED"), and it names the type, so a systematic
+            // failure of one kind of email is visible without correlating timestamps.
+            echo '[Email] FAILED type=' . $type . ' to=' . $emailTo
+                . ($logged ? '' : ' (and the EmailLog row could not be written)')
+                . ' error=' . $entity->Error . PHP_EOL;
         }
         $entity->SentOn = EmailLogRepository::getTime();
 
