@@ -120,6 +120,12 @@ class EmailConnector // extends ConnectionPool // ?? can it be http connection p
             $mail->Password   = $mailConfig['password'];
             $mail->SMTPSecure = $mailConfig['SMTPSecure'];
             $mail->Port       = $mailConfig['port'];
+            // PHPMailer defaults this to 300 SECONDS, and uses it for the connect as well as for
+            // reads. A mail host that is unreachable — a provider that blocks outbound SMTP, a
+            // firewall dropping the packets — therefore pins the Swoole task worker running this
+            // send for five minutes, and a handful of queued emails takes the whole task pool with
+            // it. Nothing about a submission connection legitimately takes 20s.
+            $mail->Timeout = (int) ($mailConfig['timeout'] ?? 20);
             $mail->CharSet = PHPMailer::CHARSET_UTF8;
             // The domain PHPMailer uses for EHLO and the Message-ID. Left unset it falls back to
             // the machine's hostname — "DESKTOP-G4NJ8FT" on a dev box, the bare host on a server.
