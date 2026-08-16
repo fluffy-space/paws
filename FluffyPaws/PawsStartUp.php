@@ -21,6 +21,7 @@ use FluffyPaws\Migrations\MigrationsContext;
 use FluffyPaws\Migrations\MigrationsMark;
 use FluffyPaws\Security\PawsPermissions;
 use FluffyPaws\Services\Emails\EmailConnector;
+use FluffyPaws\Services\Emails\EmailRenderer;
 use FluffyPaws\Services\Emails\EmailLogService;
 use FluffyPaws\Services\Emails\EmailSuppressionService;
 use FluffyPaws\Services\Emails\MailSettings;
@@ -57,6 +58,7 @@ class PawsStartUp implements IStartUp
         $serviceProvider->addScoped(EmailLogRepository::class);
         $serviceProvider->addScoped(EmailSuppressionRepository::class);
         $serviceProvider->addScoped(SitemapService::class);
+        $serviceProvider->addScoped(EmailRenderer::class);
         $serviceProvider->addScoped(EmailService::class);
         $serviceProvider->addScoped(EmailSuppressionService::class);
         $serviceProvider->addScoped(EmailLogService::class);

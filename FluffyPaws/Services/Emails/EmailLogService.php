@@ -39,9 +39,11 @@ class EmailLogService
     /**
      * @param string $type logical email kind, e.g. 'confirm-email', 'reset-password', 'team-invitation'
      * @param null|EmailAttachment[] $attachments
+     * @param null|array<string, string> $headers extra headers, name => value. Exists for
+     *        List-Unsubscribe; nothing sets it yet, see EmailConnector::send().
      * @return array EmailConnector::send result (['success' => bool, 'message' => ?string])
      */
-    public function send(string $type, string $emailTo, string $subject, string $body, string $emailName = '', string $altBody = '', ?array $attachments = null): array
+    public function send(string $type, string $emailTo, string $subject, string $body, string $emailName = '', string $altBody = '', ?array $attachments = null, ?array $headers = null): array
     {
         $storeBody = $this->config->values['email']['store_body'] ?? false;
 
@@ -70,7 +72,7 @@ class EmailLogService
         // Record the attempt up front so a crash mid-send still leaves a 'sending' row.
         $logged = $this->tryCreate($entity);
 
-        $result = $this->connector->send($emailTo, $subject, $body, $emailName, $altBody, $attachments);
+        $result = $this->connector->send($emailTo, $subject, $body, $emailName, $altBody, $attachments, $headers);
 
         if (($result['success'] ?? false) === true) {
             $entity->Status = EmailLogStatus::Sent;

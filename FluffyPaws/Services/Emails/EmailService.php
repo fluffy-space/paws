@@ -13,7 +13,7 @@ use Viewi\App;
 
 class EmailService
 {
-    public function __construct(private TaskManager $tasks, private App $viewiApp, private EmailLogService $emailLog, private LocalizationService $localization)
+    public function __construct(private TaskManager $tasks, private App $viewiApp, private EmailLogService $emailLog, private LocalizationService $localization, private EmailRenderer $renderer)
     {
     }
 
@@ -25,14 +25,16 @@ class EmailService
 
     public function sendUserActivateEmail(UserViewModel $user, $verificationCode)
     {
-        $html = $this->getUserActivateEmail($user, $verificationCode);
-        $this->emailLog->send('confirm-email', $user->Email, $this->localization->localize('email.activate.title'), $html->body, "{$user->FirstName} {$user->LastName}", $this->localization->localize('email.activate.title'));
+        $email = $this->getUserActivateEmail($user, $verificationCode);
+        // The text part comes from the component's own text(), not from the subject line — sending
+        // the subject as the text body is what used to leave this email with no confirmation link
+        // in its text/plain alternative at all.
+        $this->emailLog->send('confirm-email', $user->Email, $this->localization->localize('email.activate.title'), $email->html, "{$user->FirstName} {$user->LastName}", $email->text);
     }
 
-    public function getUserActivateEmail(UserViewModel $user, $verificationCode)
+    public function getUserActivateEmail(UserViewModel $user, $verificationCode): RenderedEmail
     {
-        $html = $this->viewiApp->engine()->render(ActivateUserEmail::class, ['user' => $user, 'verificationCode' => $verificationCode]);
-        return $html;
+        return $this->renderer->render(ActivateUserEmail::class, ['user' => $user, 'verificationCode' => $verificationCode]);
     }
 
     // ResetPasswordEmail
@@ -43,12 +45,13 @@ class EmailService
 
     public function sendPasswordResetEmail(UserViewModel $user, $verificationCode)
     {
-        $html = $this->getSendPasswordResetEmail($user, $verificationCode);
-        $this->emailLog->send('reset-password', $user->Email, $this->localization->localize('email.reset-password.title'), $html->body, "{$user->FirstName} {$user->LastName}", $this->localization->localize('email.reset-password.title'));
+        $email = $this->getSendPasswordResetEmail($user, $verificationCode);
+        // As above — the reset link has to survive into the text part.
+        $this->emailLog->send('reset-password', $user->Email, $this->localization->localize('email.reset-password.title'), $email->html, "{$user->FirstName} {$user->LastName}", $email->text);
     }
 
-    public function getSendPasswordResetEmail(UserViewModel $user, $verificationCode)
+    public function getSendPasswordResetEmail(UserViewModel $user, $verificationCode): RenderedEmail
     {
-        return $this->viewiApp->engine()->render(ResetPasswordEmail::class, ['user' => $user, 'verificationCode' => $verificationCode]);
+        return $this->renderer->render(ResetPasswordEmail::class, ['user' => $user, 'verificationCode' => $verificationCode]);
     }
 }

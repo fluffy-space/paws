@@ -30,6 +30,57 @@ class EmailConnector // extends ConnectionPool // ?? can it be http connection p
     public function __construct(private Config $config) {}
 
     /**
+     * A readable text/plain part for an HTML email.
+     *
+     * Every message is multipart/alternative, and filters compare the two parts: an HTML body with
+     * a stub text part (or one that is merely the subject line repeated, which is what the activate
+     * and reset emails used to send) is the shape of phishing, and mail-tester scores the resulting
+     * text ratio directly. PHPMailer's own html2text is not usable here because it DROPS href
+     * targets — the text part would say "click here to activate your account" and contain no link
+     * at all, which is worse than none.
+     *
+     * So links are unwrapped first, as `label: url`, and the URL is omitted when the label already
+     * IS the url (the visible-link fallback lines in the email templates) to avoid printing it twice.
+     */
+    public static function htmlToPlainText(string $html): string
+    {
+        // Anything non-textual, contents included — <style>/<script> bodies would otherwise survive
+        // tag-stripping as a wall of CSS.
+        $text = preg_replace('#<(style|script|head|title)\b[^>]*>.*?</\1>#is', '', $html) ?? $html;
+        // Links become "label: url". Both are needed: the label carries the intent, the URL is what
+        // a text-only reader has to be able to act on.
+        $text = preg_replace_callback(
+            '#<a\b[^>]*href\s*=\s*["\']([^"\']*)["\'][^>]*>(.*?)</a>#is',
+            static function (array $m): string {
+                $href = trim(html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                $label = trim(preg_replace('#\s+#', ' ', strip_tags($m[2])) ?? '');
+                // Padded, because adjacent inline anchors (the footer link row is exactly that)
+                // would otherwise concatenate into "…/privacyTERMS: …". The whitespace collapse
+                // below removes the surplus.
+                if ($href === '' || $href === '#' || str_starts_with($href, 'mailto:')) {
+                    return " $label ";
+                }
+                // The template's own "here is the raw URL" fallback line — one copy is enough.
+                if ($label === '' || $label === $href) {
+                    return " $href ";
+                }
+                return " $label: $href ";
+            },
+            $text
+        ) ?? $text;
+        // Block-level ends become line breaks before the tags go, or every paragraph runs together.
+        $text = preg_replace('#<(br|/p|/div|/tr|/h[1-6]|/li)\b[^>]*>#i', "\n", $text) ?? $text;
+        $text = strip_tags($text);
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        // Collapse the whitespace the table layout leaves behind: runs of spaces (NBSP included,
+        // which the layout uses as spacer-cell filler) and runs of blank lines.
+        $text = preg_replace('#[ \t\x{00A0}]+#u', ' ', $text) ?? $text;
+        $text = preg_replace('#\s*\n\s*#', "\n", $text) ?? $text;
+        $text = preg_replace('#\n{3,}#', "\n\n", $text) ?? $text;
+        return trim($text);
+    }
+
+    /**
      * Which mail settings are unusable, as human-readable reasons — empty array when mail is
      * configured.
      *
@@ -73,11 +124,21 @@ class EmailConnector // extends ConnectionPool // ?? can it be http connection p
      * @param string $subject 
      * @param string $body 
      * @param string $emailName 
-     * @param string $altBody 
-     * @param null|EmailAttachment[] $attachments 
-     * @return true[]|(false|string)[]|void 
+     * @param string $altBody
+     * @param null|EmailAttachment[] $attachments
+     * @param null|array<string, string> $headers Extra headers, name => value.
+     *
+     *        Present for List-Unsubscribe, which NOTHING sets yet, deliberately. That header is a
+     *        promise: receivers surface a one-click "unsubscribe" button from it, and Gmail expects
+     *        the request to actually stop the mail. We have no unsubscribe endpoint and no
+     *        notification preference to honour, so publishing one would advertise a control that
+     *        does nothing — worse than omitting it. Gmail's bulk-sender requirement exempts
+     *        transactional mail, which is all we currently send. Wire it when notification
+     *        preferences exist, and never onto confirm-email or reset-password: there is no such
+     *        thing as unsubscribing from a password reset you requested.
+     * @return true[]|(false|string)[]|void
      */
-    public function send(string $emailTo, string $subject, string $body, string $emailName = '', string $altBody = '', ?array $attachments = null)
+    public function send(string $emailTo, string $subject, string $body, string $emailName = '', string $altBody = '', ?array $attachments = null, ?array $headers = null)
     {
         $mail = new PHPMailer(true);
         $mailConfig = $this->config->values['email'] ?? [];
@@ -149,7 +210,19 @@ class EmailConnector // extends ConnectionPool // ?? can it be http connection p
             $mail->isHTML(true);
             $mail->Subject = $subject;
             $mail->Body    = $body;
-            $mail->AltBody = $altBody;
+            // A caller that supplied no text part, or supplied the subject line as one, gets a real
+            // one derived from the HTML. Repeating the subject is treated as absent deliberately:
+            // it was the shipped behaviour for confirm-email and reset-password, and a text part
+            // that duplicates the Subject and carries no link is exactly what it means to have none.
+            $trimmedAlt = trim($altBody);
+            $mail->AltBody = ($trimmedAlt === '' || $trimmedAlt === trim($subject))
+                ? self::htmlToPlainText($body)
+                : $altBody;
+            if ($headers !== null) {
+                foreach ($headers as $headerName => $headerValue) {
+                    $mail->addCustomHeader($headerName, $headerValue);
+                }
+            }
             if ($attachments !== null) {
                 foreach ($attachments as $attachment) {
                     $mail->addStringAttachment($attachment->Data, $attachment->FileName, PHPMailer::ENCODING_BASE64, $attachment->MimeType);

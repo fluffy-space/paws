@@ -13,12 +13,14 @@ class PawsEmailPreviewProvider implements IEmailPreviewProvider
             new EmailPreviewTemplate(
                 'reset-password',
                 'Reset password',
-                fn(EmailPreviewContext $ctx) => $ctx->emailService->getSendPasswordResetEmail($ctx->demoUser(), $ctx->demoCode())
+                // ->html: these now render to a RenderedEmail (HTML + authored text/plain), and the
+                // preview page shows the HTML one.
+                fn(EmailPreviewContext $ctx) => $ctx->emailService->getSendPasswordResetEmail($ctx->demoUser(), $ctx->demoCode())->html
             ),
             new EmailPreviewTemplate(
                 'confirm-email',
                 'Confirm email',
-                fn(EmailPreviewContext $ctx) => $ctx->emailService->getUserActivateEmail($ctx->demoUser(), $ctx->demoCode())
+                fn(EmailPreviewContext $ctx) => $ctx->emailService->getUserActivateEmail($ctx->demoUser(), $ctx->demoCode())->html
             ),
         ];
     }
