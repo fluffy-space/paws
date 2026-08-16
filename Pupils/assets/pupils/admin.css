@@ -392,3 +392,46 @@
 .nav-tabs .nav-item.show .nav-link {
     color: var(--menu-item-color) !important;
 }
+
+/* Phones: centre the blocks that hold buttons.
+   The admin and member shells are laid out desktop-first, so rows of actions
+   are pinned to an edge (justify-content-between, ms-auto, text-end). Once
+   every column has collapsed to full width that reads as broken. These two
+   helpers put such a row back in the middle. They are applied per call site
+   rather than blanket-overriding the Bootstrap utilities, which would also
+   re-align table cells and form text. */
+@media (max-width: 575.98px) {
+
+    /* A row split across two edges becomes a centred stack. Only does anything
+       on an element that is already d-flex. */
+    .stack-sm {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center;
+        gap: 0.5rem;
+    }
+
+    /* A toolbar that keeps wrapping, but centred, with any trailing group
+       un-pinned from the right edge. Forced to flex because some of these are
+       plain text-end blocks whose buttons would otherwise wrap as inline boxes
+       and sit flush against each other. */
+    .center-sm {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    .center-sm>.ms-auto {
+        margin-left: 0 !important;
+    }
+
+    /* Pagination is its own flex row, so the container's text-align cannot
+       reach it, and ten page links do not fit across a phone. */
+    .center-sm .pagination {
+        justify-content: center !important;
+        flex-wrap: wrap;
+    }
+}
