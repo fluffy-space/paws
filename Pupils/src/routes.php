@@ -16,6 +16,7 @@ use Pupils\Components\Views\Admin\Page\PageList;
 use Pupils\Components\Views\Admin\Settings\SettingsList;
 use Pupils\Components\Views\Admin\Users\UserEdit;
 use Pupils\Components\Views\Admin\Users\UserList;
+use Pupils\Components\Views\Auth\ConfirmEmailPage;
 use Pupils\Components\Views\Auth\EmailVerificationPage;
 use Pupils\Components\Views\Auth\Login;
 use Pupils\Components\Views\Auth\Register;
@@ -39,6 +40,8 @@ $router->get('/register', Register::class);
 // where Register lands after signing the new user in — says what was emailed and where to go next
 $router->get('/welcome', WelcomePage::class);
 $router->get('/reset-password', ResetPasswordRequest::class);
+// where the activation email points: a page with a button, not a side-effecting GET
+$router->get('/account/confirm/{code}', ConfirmEmailPage::class);
 $router->get('/account/verified/{failed?}', EmailVerificationPage::class);
 $router->get('/password/reset/{code}', ResetPassword::class);
 

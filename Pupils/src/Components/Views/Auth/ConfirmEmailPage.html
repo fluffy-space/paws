@@ -1,0 +1,13 @@
+<BoxLayout title="{t('confirm-email.title')}">
+    <h2 class="h4 mb-3">{t('confirm-email.header')}</h2>
+    <p class="mb-4">{t('confirm-email.intro')}</p>
+
+    <button type="button" class="btn btn-primary w-100" disabled="$confirming" (click)="confirm">
+        <span if="$confirming">{t('confirm-email.confirming')}</span>
+        <span else>{t('confirm-email.button')}</span>
+    </button>
+
+    <div if="{$error !== ''}" class="text-danger small mt-3">{$error}</div>
+
+    <div class="form-text mt-4">{t('confirm-email.hint')}</div>
+</BoxLayout>

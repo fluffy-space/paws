@@ -29,7 +29,9 @@ use Viewi\Router\Router;
  */
 $router = $viewiApp->router();
 
-$router->get('/account/confirm/{code}', [AuthorizationController::class, 'ConfirmEmail']);
+// /account/confirm/{code} is NOT handled here — it is a Viewi page (ConfirmEmailPage, in
+// Pupils/src/routes.php) that asks for a click. Confirming on GET let mailbox link-scanners
+// activate accounts on delivery; see AuthorizationController::ConfirmEmail.
 
 // Sitemap
 $router->get('/sitemap.xml', [SitemapController::class, 'Sitemap']);
@@ -62,6 +64,8 @@ $router->section('/api/', function (Router $router) {
     $router->post('authorization/register', [AuthorizationController::class, 'Register']);
     // resend the activation email to the signed-in user's own address (rate-limited inside)
     $router->post('authorization/resend-verification', [AuthorizationController::class, 'ResendVerification']);
+    // what the confirmation page's button posts; a POST on purpose, so link scanners can't confirm
+    $router->post('authorization/confirm-email', [AuthorizationController::class, 'ConfirmEmail']);
     $router->post('authorization/reset-password', [AuthorizationController::class, 'ResetPassword']);
     $router->post('authorization/reset-password-confirm', [AuthorizationController::class, 'ResetPasswordConfirm']);
 

@@ -14,6 +14,7 @@ use Fluffy\Services\Auth\AuthorizationService;
 use Fluffy\Swoole\RateLimit\IRateLimitService;
 use FluffyPaws\Services\Emails\EmailService;
 use FluffyPaws\Services\Localization\LocalizationService;
+use SharedPaws\Models\Auth\ConfirmEmailModel;
 use SharedPaws\Models\Auth\LoginModel;
 use SharedPaws\Models\Auth\LoginValidation;
 use SharedPaws\Models\Auth\RegisterModel;
@@ -197,17 +198,38 @@ class AuthorizationController extends BaseController
         return ['success' => true];
     }
 
-    public function ConfirmEmail(string $code)
+    /**
+     * Confirm an email address from the code in the activation mail.
+     *
+     * POST, and deliberately so. This used to be the GET the emailed link pointed at, which
+     * meant anything that fetches links in transit confirmed the address before the human
+     * ever saw the mail — Microsoft Defender (Safe Links) scans every URL in inbound mail on
+     * delivery, so Outlook/Hotmail signups landed already confirmed with the one-shot code
+     * burnt, and the real click then hit the failure page. The link now opens a page
+     * (ConfirmEmailPage) whose button posts here: scanners issue GETs, they do not submit.
+     *
+     * Still code-only, no session required — the mail is often opened on another device.
+     */
+    public function ConfirmEmail(ConfirmEmailModel $confirmModel, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext)
     {
-        $userCode = $this->auth->verifyCode($code);
-        if ($userCode !== null) {
-            $this->auth->activateUser($userCode->UserId);
-            $this->auth->invalidateCode($userCode);
-            // redirect to success
-            return $this->Redirect('/account/verified');
+        if (!$this->auth->authorizeCSRF()) {
+            return $this->Forbidden('Invalid CSRF-token.');
         }
-        // redirect to failed
-        return $this->Redirect('/account/verified/failed');
+
+        // Prefixed so it does not share the bare-IP login/register bucket. The code is 32
+        // random chars, so this is not what stops guessing — it caps a client hammering the
+        // endpoint, and it is loose enough that a page reload or two never trips it.
+        if (!$rateLimit->limit('confirm-email:ip:' . $httpContext->request->getIp(), 20, 5 * 60)) {
+            return $this->TooManyRequests($localization->localize('rate-limit.too-many-requests'));
+        }
+
+        $userCode = $confirmModel->Code ? $this->auth->verifyCode($confirmModel->Code) : null;
+        if ($userCode === null) {
+            return $this->BadRequest([$localization->localize('confirm-email.failed')]);
+        }
+        $this->auth->activateUser($userCode->UserId);
+        $this->auth->invalidateCode($userCode);
+        return ['success' => true];
     }
 
     public function ResetPassword(string $Email, UserRepository $users, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext)
