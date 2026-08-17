@@ -26,6 +26,22 @@ class SitemapService
         $this->cache->delete(self::CACHE_SITEMAP_KEY);
     }
 
+    /**
+     * The framework defaults cover exactly the routes Paws itself ships (Pupils routes.php):
+     * the admin section, the auth pages, and the two token-bearing /account and /password/reset
+     * links that arrive by email. An app adds its own private areas through IRobotsProvider
+     * rather than by editing this list, which is only correct for what the framework owns.
+     */
+    private array $defaultDisallow = [
+        '/admin',
+        '/login',
+        '/register',
+        '/welcome',
+        '/reset-password',
+        '/account',
+        '/password/reset',
+    ];
+
     public function getRobotsTxt()
     {
         /**
@@ -33,16 +49,26 @@ class SitemapService
          */
         $config = $this->container->serviceProvider->get(Config::class);
         $baseUrl = $config->values['baseUrl'];
-        return "User-agent: *
-Sitemap: $baseUrl/sitemap.xml
-Host: $baseUrl/
-Disallow: /admin
-Disallow: /login
-Disallow: /register
-Disallow: /reset-password
-Disallow: /account
-Disallow: /password/reset
-Disallow: /order";
+
+        $disallow = $this->defaultDisallow;
+        /**
+         * @var IRobotsProvider[] $providers
+         */
+        $providers = $this->container->serviceProvider->getAll(IRobotsProvider::class);
+        foreach ($providers as $provider) {
+            foreach ($provider->getDisallow() as $path) {
+                $disallow[] = $path;
+            }
+        }
+
+        // No `Host:` line. Yandex was the only consumer and it dropped support in 2018, and the
+        // value emitted here was a full URL with a trailing slash, which the directive never
+        // accepted anyway (it takes a bare hostname).
+        $robots = "User-agent: *\nSitemap: $baseUrl/sitemap.xml";
+        foreach (array_unique($disallow) as $path) {
+            $robots .= "\nDisallow: $path";
+        }
+        return $robots;
     }
 
     public function getSitemap()
