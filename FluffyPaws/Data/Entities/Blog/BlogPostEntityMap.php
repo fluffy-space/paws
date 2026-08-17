@@ -14,6 +14,10 @@ class BlogPostEntityMap extends BaseEntityMap
     public const PROPERTY_Title = 'Title';
     public const PROPERTY_Published = 'Published';
     public const PROPERTY_IncludeInSitemap = 'IncludeInSitemap';
+    // The body columns had no constants, which left a targeted update (a copy fix over live posts,
+    // rather than a reseed) naming its column with a bare string.
+    public const PROPERTY_Body = 'Body';
+    public const PROPERTY_BodyOverview = 'BodyOverview';
 
     public static array $Indexes = [
         'UX_Slug' => [
