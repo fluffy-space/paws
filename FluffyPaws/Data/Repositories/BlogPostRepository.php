@@ -7,6 +7,7 @@ use FluffyPaws\Data\Entities\Blog\BlogPostEntityMap;
 use DotDi\Attributes\Inject;
 use Fluffy\Data\Repositories\BasePostgresqlRepository;
 
+/** @extends BasePostgresqlRepository<BlogPostEntity> */
 #[Inject(['entityType' => BlogPostEntity::class, 'entityMap' => BlogPostEntityMap::class])]
 class BlogPostRepository extends BasePostgresqlRepository
 {

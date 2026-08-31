@@ -7,6 +7,7 @@ use FluffyPaws\Data\Entities\Emails\EmailLogEntityMap;
 use DotDi\Attributes\Inject;
 use Fluffy\Data\Repositories\BasePostgresqlRepository;
 
+/** @extends BasePostgresqlRepository<EmailLogEntity> */
 #[Inject(['entityType' => EmailLogEntity::class, 'entityMap' => EmailLogEntityMap::class])]
 class EmailLogRepository extends BasePostgresqlRepository
 {

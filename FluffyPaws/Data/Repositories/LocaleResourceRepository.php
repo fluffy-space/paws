@@ -7,6 +7,7 @@ use FluffyPaws\Data\Entities\Localization\LocaleResourceEntityMap;
 use DotDi\Attributes\Inject;
 use Fluffy\Data\Repositories\BasePostgresqlRepository;
 
+/** @extends BasePostgresqlRepository<LocaleResourceEntity> */
 #[Inject(['entityType' => LocaleResourceEntity::class, 'entityMap' => LocaleResourceEntityMap::class])]
 class LocaleResourceRepository extends BasePostgresqlRepository
 {

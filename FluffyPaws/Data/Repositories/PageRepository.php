@@ -7,6 +7,7 @@ use FluffyPaws\Data\Entities\Content\PageEntityMap;
 use DotDi\Attributes\Inject;
 use Fluffy\Data\Repositories\BasePostgresqlRepository;
 
+/** @extends BasePostgresqlRepository<PageEntity> */
 #[Inject(['entityType' => PageEntity::class, 'entityMap' => PageEntityMap::class])]
 class PageRepository extends BasePostgresqlRepository
 {

@@ -7,6 +7,7 @@ use Fluffy\Data\Repositories\BasePostgresqlRepository;
 use FluffyPaws\Data\Entities\Emails\EmailSuppressionEntity;
 use FluffyPaws\Data\Entities\Emails\EmailSuppressionEntityMap;
 
+/** @extends BasePostgresqlRepository<EmailSuppressionEntity> */
 #[Inject(['entityType' => EmailSuppressionEntity::class, 'entityMap' => EmailSuppressionEntityMap::class])]
 class EmailSuppressionRepository extends BasePostgresqlRepository
 {
