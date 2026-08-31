@@ -2,7 +2,7 @@
     <div class="layout-app" class.mini-sidebar="{$layout->miniSidebar || $layout->showMobileMenu}">
         <AdminHeader />
         <AdminMenu />
-        <main class="layout-container container-xl">
+        <main class="layout-container" class.container-xl="{!$fullWidth}" class.container-fluid="{$fullWidth}">
             <div class="main-content">
                 <slot></slot>
             </div>
