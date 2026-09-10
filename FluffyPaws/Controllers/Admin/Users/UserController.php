@@ -46,7 +46,9 @@ class UserController extends BaseController
                 }
             }
         }
-        $entities = $this->users->search($where, [UserEntityMap::PROPERTY_CreatedOn => 1], $page, $size);
+        // Newest first — the admin comes here to see who just signed up. Id breaks ties
+        // between users seeded in the same microsecond.
+        $entities = $this->users->search($where, [UserEntityMap::PROPERTY_CreatedOn => -1, UserEntityMap::PROPERTY_Id => -1], $page, $size);
         $models = array_map(fn($entity) => $this->mapper->map(UserModel::class, $entity), $entities['list']);
         return ['list' => $models, 'total' => $entities['total']];
     }
