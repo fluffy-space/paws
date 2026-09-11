@@ -2,7 +2,7 @@
     <h3 class="text-h3 mt-2 mb-4">{t('login.header')}</h3>
     <ActionForm #loginForm (submit)="handleSubmit" classList="mt-8" autocomplete="on" id="login-form" action="/login"
         method="post" rules="{$validation->getValidationRules()}">
-        <TextInput type="text" label="{t('login.email-or-phone')}" placeholder="{t('login.email-or-phone')}"
+        <TextInput type="text" label="{t('register.email')}" placeholder="{t('register.email')}"
             autocomplete="username" inputClass="form-control" wrapperClass="col-12" id="Email"
             model="$loginModel->Email">
             <div class="form-text">{t('login.forgot-your-password')} <a href="/reset-password"
