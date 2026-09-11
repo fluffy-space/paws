@@ -63,7 +63,7 @@ class ImpersonationController extends BaseController
     /** Persistent audit line (journald / Admin Log Viewer). */
     private function audit(string $action, int $impersonatorId, int $targetId): void
     {
-        $ip = $this->httpContext->request->getIp();
-        echo '[Impersonation] ' . date('Y-m-d H:i:s') . " $action admin=$impersonatorId target=$targetId ip=$ip" . PHP_EOL;
+        // Who and whom is the audit trail; the client IP is deliberately not logged.
+        echo '[Impersonation] ' . date('Y-m-d H:i:s') . " $action admin=$impersonatorId target=$targetId" . PHP_EOL;
     }
 }
