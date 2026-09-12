@@ -26,7 +26,17 @@ class MemberGuard implements IMIddleware
                 $c->next();
             } else {
                 $c->next(false); // cancel
-                $this->route->navigate('/login'); // redirect
+                // Carry the intended path, so signing in finishes the errand the visitor came
+                // for instead of dropping them on the home page with nothing said. A query
+                // parameter, not browser storage: this guard also runs during SSR (a link opened
+                // directly, e.g. "keep this link" on an anonymous short URL), where there is no
+                // session storage to write to. Login and Register read it back.
+                $path = $this->route->getUrlPath();
+                $to = '/login';
+                if ($path !== null && $path !== '' && $path !== '/login') {
+                    $to = '/login?redirect=' . rawurlencode($path);
+                }
+                $this->route->navigate($to); // redirect
             }
         });
     }

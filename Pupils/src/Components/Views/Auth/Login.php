@@ -77,7 +77,7 @@ class Login extends BaseComponent
         } elseif ($response['success']) {
             $this->auth->reset();
 
-            $redirectTo = $this->browserSession->getItem('redirectTo');
+            $redirectTo = $this->browserSession->getItem('redirectTo') ?? $this->redirectFromQuery();
             if ($redirectTo !== null) {
                 $this->browserSession->removeItem('redirectTo');
                 $this->route->navigate($redirectTo);
@@ -91,5 +91,32 @@ class Login extends BaseComponent
                 });
             }
         }
+    }
+
+    /**
+     * `?redirect=/some/path`, set by a guard that bounced an unauthenticated visitor here.
+     *
+     * A query parameter rather than browser session storage, because the guard also runs during
+     * SSR — a link opened directly, such as "keep this link" from an anonymous result — where
+     * there is no browser storage to write to.
+     *
+     * Only a same-site absolute path is accepted: "//evil.example" and "https://evil.example"
+     * would make this an open redirect.
+     */
+    private function redirectFromQuery(): ?string
+    {
+        $params = $this->route->getQueryParams();
+        $to = $params === null ? '' : (string) ($params['redirect'] ?? '');
+        if ($to === '' || substr($to, 0, 1) !== '/' || substr($to, 0, 2) === '//') {
+            return null;
+        }
+        return $to;
+    }
+
+    /** Keeps `?redirect=` on the "create an account" link, so registering finishes the errand too. */
+    public function registerUrl(): string
+    {
+        $to = $this->redirectFromQuery();
+        return $to === null ? '/register' : '/register?redirect=' . rawurlencode($to);
     }
 }

@@ -33,7 +33,7 @@
         <ValidationMessage #generalMessages fallback="true" />
 
         <div class="form-text mt-4">
-            {t('register.have-account')} <a href="/login" class="text-secondary">{t('register.login-here')}</a>
+            {t('register.have-account')} <a href="{loginUrl()}" class="text-secondary">{t('register.login-here')}</a>
         </div>
 
         <div class="form-text mt-4">{t('login.forgot-your-password')}

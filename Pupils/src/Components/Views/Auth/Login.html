@@ -21,7 +21,7 @@
         <ValidationMessage #generalMessages fallback="true" />
 
         <div class="form-text mt-4">
-            {t('login.do-not-have-account')} <a href="/register" class="text-secondary">{t('login.register-here')}</a>
+            {t('login.do-not-have-account')} <a href="{registerUrl()}" class="text-secondary">{t('login.register-here')}</a>
         </div>
     </ActionForm>
 </BoxLayout>
