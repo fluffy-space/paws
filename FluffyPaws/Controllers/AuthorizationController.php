@@ -17,6 +17,7 @@ use FluffyPaws\Services\Localization\LocalizationService;
 use SharedPaws\Models\Auth\ConfirmEmailModel;
 use SharedPaws\Models\Auth\LoginModel;
 use SharedPaws\Models\Auth\LoginValidation;
+use Fluffy\Domain\Configuration\Config;
 use SharedPaws\Models\Auth\RegisterModel;
 use SharedPaws\Models\Auth\RegisterValidation;
 use SharedPaws\Models\Auth\ResetPasswordModel;
@@ -30,8 +31,22 @@ class AuthorizationController extends BaseController
     function __construct(
         protected AuthorizationService $auth,
         protected IMapper $mapper,
-        protected EmailService $emailService
+        protected EmailService $emailService,
+        protected Config $config
     ) {}
+
+    /**
+     * Whether registration insists on a name / a confirmed password, from `configs/app.php`.
+     *
+     * Absent means true, so an app that has not opted out keeps the rules it always had. The
+     * Register component reads the same two keys from publicConfig for the browser — they must
+     * agree, or a form submits fields the server rejects (or accepts ones the form never showed).
+     */
+    private function registerFlag(string $key): bool
+    {
+        $auth = $this->config->values['auth'] ?? [];
+        return !array_key_exists($key, $auth) || (bool) $auth[$key];
+    }
 
     public function Me()
     {
@@ -111,7 +126,8 @@ class AuthorizationController extends BaseController
             return $this->Forbidden('Invalid CSRF-token.');
         }
         $validationMessages = [];
-        $validationRules = (new RegisterValidation($registerModel, fn(string $key) => $localization->localize($key)))->getValidationRules();
+        $validationRules = (new RegisterValidation($registerModel, fn(string $key) => $localization->localize($key)))
+            ->getValidationRules(true, $this->registerFlag('registerAskName'), $this->registerFlag('registerAskPasswordConfirmation'));
         // replace rule
         // $validationRules['Email']['email']  = function () use ($registerModel) {
         //     return (!$registerModel->Email || filter_var($registerModel->Email, FILTER_VALIDATE_EMAIL)) ? true : 'Email is in wrong format, please check again.';

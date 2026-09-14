@@ -9,17 +9,21 @@ class RegisterValidation
     public function __construct(private RegisterModel $model, private $localize) {}
 
     /**
-     * Registration asks for an email and a password, and nothing else.
+     * Which fields a registration form insists on.
      *
-     * A person's name is not needed to open an account, and the second password box is worse at
-     * catching a typo than being able to read the first one — both were dropped from the form, so
-     * requiring them here would fail a submission over fields nobody can see. They stay available
-     * as opt-ins for an app that does render them; `FirstName`/`LastName` are nullable in the
-     * schema and editable later on the account page, so nothing downstream needs them at signup.
-     * Display sites must use {@see \SharedPaws\Support\UserDisplay::forUser()} rather than
-     * concatenating the two fields, which renders a bare space for an account that has neither.
+     * Defaults match what the form has always asked for, so an app that upgrades Paws sees no
+     * change. An app that trims the form must pass `false` for whatever it stopped rendering —
+     * otherwise the submission fails validation on fields nobody can see. Urlicer drives both
+     * flags from the `registerAskName` / `registerAskPasswordConfirmation` config keys; the
+     * Register component reads them for the browser and AuthorizationController for the server,
+     * so the two sides cannot disagree.
+     *
+     * `FirstName`/`LastName` are nullable in the schema and editable later on the account page,
+     * so nothing downstream needs them at signup — but a display site must then use
+     * {@see \SharedPaws\Support\UserDisplay::forUser()} rather than concatenating the two,
+     * which renders a bare space for an account that has neither.
      */
-    public function getValidationRules(bool $requireEmail = true, bool $requireName = false, bool $confirmPassword = false)
+    public function getValidationRules(bool $requireEmail = true, bool $requireName = true, bool $confirmPassword = true)
     {
         $rules = ValidationRules::rules($this->model)
             //->phone('Phone', ($this->localize)('register.validation.wrong-phone'))

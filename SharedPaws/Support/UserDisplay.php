@@ -2,10 +2,6 @@
 
 namespace SharedPaws\Support;
 
-use Fluffy\Models\Users\UserModel as FluffyUserModel;
-use SharedPaws\Models\Auth\UserViewModel;
-use SharedPaws\Models\User\UserModel;
-
 /**
  * How a user is named on screen and in email.
  *
@@ -23,8 +19,12 @@ class UserDisplay
      * First+last, else the local part of the email address, else 'User'.
      *
      * Never returns an empty string, so callers can take a first character for an avatar without
-     * guarding. The union covers the three unrelated model classes that carry these same fields;
-     * they are data shapes for the IDE, so the name is derived here rather than on them.
+     * guarding.
+     *
+     * `$user` is deliberately untyped: any user model with `FirstName`, `LastName`, `Email` and
+     * `UserName`, or null. The three that qualify live in different namespaces and two are both
+     * called `UserModel` — Viewi has no namespaces, so importing them to write a union collides
+     * in the bundle, and a union is not worth having here anyway.
      *
      * `??` is deliberate on `UserName`: it is a non-nullable typed property that the registration
      * mapper never sets, so reading it directly can throw on an uninitialised value.
@@ -33,7 +33,7 @@ class UserDisplay
      * `Function.name` is non-writable — that assignment throws in strict mode once bundled, while
      * PHP and SSR are perfectly happy. Avoid `name`, `length` and `caller` for statics here.
      */
-    public static function forUser(UserViewModel|UserModel|FluffyUserModel|null $user): string
+    public static function forUser($user): string
     {
         if ($user === null) {
             return 'User';

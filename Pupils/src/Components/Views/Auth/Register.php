@@ -12,6 +12,7 @@ use Pupils\Components\Services\Session\SessionState;
 use Viewi\UI\Components\Forms\ActionForm;
 use Viewi\UI\Components\Validation\ValidationMessage;
 use Viewi\Components\BaseComponent;
+use Viewi\Components\Config\ConfigService;
 use Viewi\Components\DOM\DomEvent;
 use Viewi\Components\Http\HttpClient;
 use Viewi\Components\Http\Message\Response;
@@ -28,12 +29,34 @@ class Register extends BaseComponent
     public bool $isPayment = false;
     public bool $trackedView = false;
 
-    public function __construct(private HttpClient $http, private ClientRoute $route, private AuthService $auth, private BrowserSession $browserSession, private AnalyticsService $analytics) {}
+    /**
+     * Whether the form asks for a name / a second password box, from the app's publicConfig
+     * (`registerAskName`, `registerAskPasswordConfirmation`). Absent means true: the framework
+     * keeps the form every existing app already ships, and an app opts out deliberately.
+     * AuthorizationController reads the same two keys server-side.
+     */
+    public bool $askName = true;
+    public bool $askPasswordConfirmation = true;
+
+    /**
+     * Built in init() rather than called from the template: the flags have to reach
+     * getValidationRules(), and no template in this codebase calls a method with an argument.
+     */
+    public array $rules = [];
+
+    public function __construct(private HttpClient $http, private ClientRoute $route, private AuthService $auth, private BrowserSession $browserSession, private AnalyticsService $analytics, ConfigService $config)
+    {
+        $askName = $config->get('registerAskName');
+        $askConfirm = $config->get('registerAskPasswordConfirmation');
+        $this->askName = $askName !== null ? (bool) $askName : true;
+        $this->askPasswordConfirmation = $askConfirm !== null ? (bool) $askConfirm : true;
+    }
 
     public function init()
     {
         $this->registerModel = new RegisterModel();
         $this->validation = new RegisterValidation($this->registerModel, fn(string $key) => $this->localization->t($key));
+        $this->rules = $this->validation->getValidationRules(true, $this->askName, $this->askPasswordConfirmation);
         $productId = $this->browserSession->getItem('purchaseItem');
         if ($productId !== null) {
             $productId = (int)$productId;
