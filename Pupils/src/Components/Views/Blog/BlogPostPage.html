@@ -1,5 +1,6 @@
 <PageLayout title="$title" description="{$post?->MetaDescription}" keywords="{$post?->MetaKeywords}"
     image="{$post?->Picture?->Path}" metaType="article">
+    <StructuredData json="{$articleJson}" />
     <div if="$post">
         <h1 class="py-5">{$post->Title}</h1>
 
