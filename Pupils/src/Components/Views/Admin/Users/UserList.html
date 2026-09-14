@@ -3,7 +3,7 @@
         <DataTable>
             <slotContent name="column_FirstName" data="$item">
                 <td>
-                    <div>{$item->FirstName} {$item->LastName}</div>
+                    <div if="{$item->FirstName}">{$item->FirstName} {$item->LastName}</div>
                     <div class="mt-2">
                         {$item->UserName}
                     </div>

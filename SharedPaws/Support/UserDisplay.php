@@ -20,7 +20,7 @@ use SharedPaws\Models\User\UserModel;
 class UserDisplay
 {
     /**
-     * First+last, else the user name, else the local part of the email, else 'User'.
+     * First+last, else the local part of the email address, else 'User'.
      *
      * Never returns an empty string, so callers can take a first character for an avatar without
      * guarding. The union covers the three unrelated model classes that carry these same fields;
@@ -42,11 +42,12 @@ class UserDisplay
         if ($name !== '') {
             return $name;
         }
-        $userName = $user->UserName ?? '';
-        if ($userName !== '') {
-            return $userName;
-        }
+        // UserName is the email — AuthorizationService::registerUser sets it to Email (or Phone
+        // when there is no email), so this is a fallback for the address, not a separate handle.
         $email = $user->Email ?? '';
+        if ($email === '') {
+            $email = $user->UserName ?? '';
+        }
         if ($email !== '') {
             return explode('@', $email)[0];
         }
