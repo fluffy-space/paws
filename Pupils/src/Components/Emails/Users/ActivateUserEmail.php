@@ -17,6 +17,13 @@ class ActivateUserEmail extends BaseComponent implements IPlainTextEmail
     public UserViewModel $user;
     public string $verificationCode;
 
+    /**
+     * Resolved here, not in the template: a `Class::method()` call inside a Viewi template does
+     * not resolve, and an email component that throws takes the whole send down silently — the
+     * EmailLog row is never written, so it looks like nothing was ever dispatched.
+     */
+    public string $userName = '';
+
     public function __construct(
         UserViewModel $user,
         string $verificationCode,
@@ -26,6 +33,7 @@ class ActivateUserEmail extends BaseComponent implements IPlainTextEmail
         $this->user = $user;
         $this->verificationCode = $verificationCode;
         $this->baseUrl = $configService->get('baseUrl');
+        $this->userName = UserDisplay::forUser($user);
     }
 
     /**
@@ -37,7 +45,7 @@ class ActivateUserEmail extends BaseComponent implements IPlainTextEmail
     {
         $confirm = $this->localization->t(
             'email.activate.please-confirm',
-            ['name' => UserDisplay::forUser($this->user), 'surname' => '']
+            ['name' => $this->userName, 'surname' => '']
         );
         $action = $this->localization->t('email.activate.click-here-to-activate');
         $link = "{$this->baseUrl}/account/confirm/{$this->verificationCode}";

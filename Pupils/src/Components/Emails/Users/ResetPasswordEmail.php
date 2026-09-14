@@ -17,6 +17,13 @@ class ResetPasswordEmail extends BaseComponent implements IPlainTextEmail
     public UserViewModel $user;
     public string $verificationCode;
 
+    /**
+     * Resolved here, not in the template: a `Class::method()` call inside a Viewi template does
+     * not resolve, and an email component that throws takes the whole send down silently — the
+     * EmailLog row is never written, so it looks like nothing was ever dispatched.
+     */
+    public string $userName = '';
+
     public function __construct(
         UserViewModel $user,
         string $verificationCode,
@@ -26,6 +33,7 @@ class ResetPasswordEmail extends BaseComponent implements IPlainTextEmail
         $this->user = $user;
         $this->verificationCode = $verificationCode;
         $this->baseUrl = $configService->get('baseUrl');
+        $this->userName = UserDisplay::forUser($user);
     }
 
     /**
@@ -36,7 +44,7 @@ class ResetPasswordEmail extends BaseComponent implements IPlainTextEmail
     {
         $intro = $this->localization->t(
             'email.activate.message',
-            ['name' => UserDisplay::forUser($this->user), 'surname' => '']
+            ['name' => $this->userName, 'surname' => '']
         );
         $action = $this->localization->t('email.reset-password.click-here');
         $link = "{$this->baseUrl}/password/reset/{$this->verificationCode}";
