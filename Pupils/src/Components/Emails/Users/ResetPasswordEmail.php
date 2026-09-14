@@ -7,6 +7,7 @@ use SharedPaws\Models\Auth\UserViewModel;
 use SharedPaws\Models\Emails\IPlainTextEmail;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Config\ConfigService;
+use SharedPaws\Support\UserDisplay;
 
 class ResetPasswordEmail extends BaseComponent implements IPlainTextEmail
 {
@@ -35,7 +36,7 @@ class ResetPasswordEmail extends BaseComponent implements IPlainTextEmail
     {
         $intro = $this->localization->t(
             'email.activate.message',
-            ['name' => $this->user->FirstName, 'surname' => $this->user->LastName]
+            ['name' => UserDisplay::forUser($this->user), 'surname' => '']
         );
         $action = $this->localization->t('email.reset-password.click-here');
         $link = "{$this->baseUrl}/password/reset/{$this->verificationCode}";

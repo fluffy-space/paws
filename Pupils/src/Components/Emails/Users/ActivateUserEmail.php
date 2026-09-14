@@ -7,6 +7,7 @@ use SharedPaws\Models\Auth\UserViewModel;
 use SharedPaws\Models\Emails\IPlainTextEmail;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Config\ConfigService;
+use SharedPaws\Support\UserDisplay;
 
 class ActivateUserEmail extends BaseComponent implements IPlainTextEmail
 {
@@ -36,7 +37,7 @@ class ActivateUserEmail extends BaseComponent implements IPlainTextEmail
     {
         $confirm = $this->localization->t(
             'email.activate.please-confirm',
-            ['name' => $this->user->FirstName, 'surname' => $this->user->LastName]
+            ['name' => UserDisplay::forUser($this->user), 'surname' => '']
         );
         $action = $this->localization->t('email.activate.click-here-to-activate');
         $link = "{$this->baseUrl}/account/confirm/{$this->verificationCode}";

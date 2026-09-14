@@ -3,14 +3,6 @@
     <ActionForm #registerForm (submit)="handleSubmit" class="mt-8" autocomplete="on" id="register-form"
         action="/register" method="post" rules="{$validation->getValidationRules()}">
 
-        <TextInput label="{t('register.first-name')}" type="text" placeholder="{t('register.first-name')}"
-            autocomplete="given-name" inputClass="form-control" wrapperClass="col-12" id="FirstName"
-            model="$registerModel->FirstName" />
-
-        <TextInput label="{t('register.last-name')}" type="text" placeholder="{t('register.last-name')}"
-            autocomplete="family-name" inputClass="form-control" wrapperClass="col-12" id="LastName"
-            model="$registerModel->LastName" />
-
         <TextInput label="{t('register.email')}" type="text" placeholder="{t('register.email')}" autocomplete="username"
             inputClass="form-control" wrapperClass="col-12" id="Email" model="$registerModel->Email" />
 
@@ -20,11 +12,6 @@
         <TextInput label="{t('login.password')}" type="password" placeholder="{t('login.password')}"
             autocomplete="new-password" inputClass="form-control" wrapperClass="col-12" id="Password" name="Password"
             model="$registerModel->Password" />
-
-        <TextInput label="{t('register.password-confirm')}" type="password"
-            placeholder="{t('register.password-confirm')}" autocomplete="new-password" inputClass="form-control"
-            wrapperClass="col-12" id="PasswordConfirmation" name="PasswordConfirmation"
-            model="$registerModel->PasswordConfirmation" />
 
         <button type="submit" disabled="$loading" class="btn btn-primary mt-3 w-100">
             { $isPayment ? t('products.list.purchase') : t('register.register-button')}
