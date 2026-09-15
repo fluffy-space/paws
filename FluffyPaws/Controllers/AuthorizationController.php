@@ -48,6 +48,40 @@ class AuthorizationController extends BaseController
         return !array_key_exists($key, $auth) || (bool) $auth[$key];
     }
 
+    /**
+     * Does this address end in a suffix the app refuses to register? Empty/absent config = no
+     * refusals, which is what every existing app gets.
+     *
+     * Suffixes are matched against the domain and must carry their leading dot — `.ru` is the
+     * whole point of that rule, since a bare `ru` would also refuse `something.guru`. Matching is
+     * a plain suffix test rather than a TLD parse: it is the last segment that matters, and a
+     * would-be `evil.ru.com` is a different domain that this correctly does not touch.
+     *
+     * The refusal is deliberately stated without a reason, here and in the message. Telling a
+     * caller which rule they tripped only helps someone working around it, and any reason given
+     * would be a claim about the person rather than about the address.
+     */
+    private function emailSuffixRefused(?string $email): bool
+    {
+        $auth = $this->config->values['auth'] ?? [];
+        $suffixes = $auth['blockedEmailSuffixes'] ?? [];
+        if ($email === null || !is_array($suffixes) || count($suffixes) === 0) {
+            return false;
+        }
+        $at = strrpos($email, '@');
+        if ($at === false) {
+            return false;
+        }
+        $domain = strtolower(substr($email, $at + 1));
+        foreach ($suffixes as $suffix) {
+            $suffix = strtolower(trim((string) $suffix));
+            if ($suffix !== '' && str_ends_with($domain, $suffix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function Me()
     {
         $user = $this->auth->getAuthorizedUser();
@@ -142,6 +176,10 @@ class AuthorizationController extends BaseController
         }
         if (count($validationMessages) > 0) {
             return $this->BadRequest($validationMessages);
+        }
+
+        if ($this->emailSuffixRefused($registerModel->Email)) {
+            return $this->BadRequest([$localization->localize('register.validation.email-not-accepted')]);
         }
 
         if (!$rateLimit->limit($httpContext->request->getIp(), 10, 5 * 60)) {
