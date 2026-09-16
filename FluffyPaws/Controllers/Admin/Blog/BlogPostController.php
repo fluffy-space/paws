@@ -16,6 +16,7 @@ use FluffyPaws\Services\Utils\SlugService;
 use SharedPaws\Models\Blog\BlogPostModel;
 use SharedPaws\Models\Blog\BlogValidation;
 use SharedPaws\Models\Media\PictureModel;
+use Fluffy\Data\Query\Search;
 
 use function Fluffy\Data\Query\c;
 use function Fluffy\Data\Query\from;
@@ -44,14 +45,14 @@ class BlogPostController extends BaseController
 
         if ($search) {
             $search = strtolower($search);
-            $parts = explode(' ', $search);
+            $parts = Search::terms($search);
             $searchExpression = null;
             foreach ($parts as $part) {
                 if (trim($part)) {
                     if ($searchExpression) {
-                        $searchExpression->or(c('Title'), 'LIKE', "%$part%");
+                        $searchExpression->or(c('Title'), 'LIKE', Search::contains($part));
                     } else {
-                        $searchExpression = x(c('Title'), 'LIKE', "%$part%");
+                        $searchExpression = x(c('Title'), 'LIKE', Search::contains($part));
                     }
                 }
             }

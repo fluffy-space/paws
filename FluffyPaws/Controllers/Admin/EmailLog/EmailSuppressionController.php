@@ -13,6 +13,7 @@ use FluffyPaws\Services\Emails\EmailSuppressionService;
 use SharedPaws\Models\Emails\EmailSuppressionModel;
 use SharedPaws\Models\Emails\EmailSuppressionReason;
 use SharedPaws\Models\Emails\EmailSuppressionSource;
+use Fluffy\Data\Query\Search;
 
 use function Fluffy\Data\Query\c;
 use function Fluffy\Data\Query\from;
@@ -50,9 +51,9 @@ class EmailSuppressionController extends BaseController
             $expression = null;
             foreach (['Email', 'Reason', 'Source', 'Detail'] as $col) {
                 if ($expression) {
-                    $expression->or(c($col), 'LIKE', "%$search%");
+                    $expression->or(c($col), 'LIKE', Search::contains($search));
                 } else {
-                    $expression = x(c($col), 'LIKE', "%$search%");
+                    $expression = x(c($col), 'LIKE', Search::contains($search));
                 }
             }
             $query->where($expression);

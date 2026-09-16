@@ -12,6 +12,7 @@ use FluffyPaws\Security\PawsCapability;
 use Fluffy\Swoole\Cache\CacheManager;
 use SharedPaws\Models\Localization\LocaleResourceModel;
 use SharedPaws\Models\Localization\LocaleResourceValidation;
+use Fluffy\Data\Query\Search;
 
 class LocaleResourceController extends BaseController
 {
@@ -34,12 +35,12 @@ class LocaleResourceController extends BaseController
         }
         if ($search) {
             $search = strtolower($search);
-            $parts = explode(' ', $search);
+            $parts = Search::terms($search);
             foreach ($parts as $part) {
                 if (trim($part)) {
                     $where[] = [
-                        [LocaleResourceEntityMap::PROPERTY_Name, 'like', "%$part%"],
-                        [LocaleResourceEntityMap::PROPERTY_Value, 'like', "%$part%"]
+                        [LocaleResourceEntityMap::PROPERTY_Name, 'like', Search::contains($part)],
+                        [LocaleResourceEntityMap::PROPERTY_Value, 'like', Search::contains($part)]
                     ];
                 }
             }

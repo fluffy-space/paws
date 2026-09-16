@@ -12,6 +12,7 @@ use FluffyPaws\Data\Entities\Menu\MenuItemEntityMap;
 use FluffyPaws\Data\Repositories\MenuItemRepository;
 use SharedPaws\Models\MenuItem\MenuItemModel;
 use SharedPaws\Models\MenuItem\MenuItemValidation;
+use Fluffy\Data\Query\Search;
 
 class MenuController extends BaseController
 {
@@ -30,7 +31,7 @@ class MenuController extends BaseController
         $search = trim($search ?? '');
         $where = $location !== null ? [[MenuItemEntityMap::PROPERTY_Location, $location]] : [];
         if ($search) {
-            $where[] = [MenuItemEntityMap::PROPERTY_Title, 'like', "%$search%"];
+            $where[] = [MenuItemEntityMap::PROPERTY_Title, 'like', Search::contains($search)];
         }
         $entities = $this->menuItems->search($where, ['Row' => 1, 'Column' => 1, MenuItemEntityMap::PROPERTY_Order => 1, MenuItemEntityMap::PROPERTY_Id => 1], $page, $size);
         $models = array_map(fn($entity) => $this->mapper->map(MenuItemModel::class, $entity), $entities['list']);

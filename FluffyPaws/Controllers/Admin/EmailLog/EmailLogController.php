@@ -10,6 +10,7 @@ use FluffyPaws\Data\Entities\Emails\EmailLogEntity;
 use FluffyPaws\Data\Repositories\EmailLogRepository;
 use FluffyPaws\Security\PawsCapability;
 use SharedPaws\Models\Emails\EmailLogModel;
+use Fluffy\Data\Query\Search;
 
 use function Fluffy\Data\Query\c;
 use function Fluffy\Data\Query\from;
@@ -41,7 +42,7 @@ class EmailLogController extends BaseController
         $search = trim($search ?? '');
         if ($search) {
             $search = strtolower($search);
-            $parts = explode(' ', $search);
+            $parts = Search::terms($search);
             $searchExpression = null;
             foreach ($parts as $part) {
                 $part = trim($part);
@@ -50,9 +51,9 @@ class EmailLogController extends BaseController
                 }
                 foreach (['Recipient', 'Subject', 'Type', 'Status'] as $col) {
                     if ($searchExpression) {
-                        $searchExpression->or(c($col), 'LIKE', "%$part%");
+                        $searchExpression->or(c($col), 'LIKE', Search::contains($part));
                     } else {
-                        $searchExpression = x(c($col), 'LIKE', "%$part%");
+                        $searchExpression = x(c($col), 'LIKE', Search::contains($part));
                     }
                 }
             }

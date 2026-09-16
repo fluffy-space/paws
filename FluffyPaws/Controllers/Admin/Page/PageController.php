@@ -16,6 +16,7 @@ use FluffyPaws\Services\Utils\SlugService;
 use SharedPaws\Models\Content\PageModel;
 use SharedPaws\Models\Content\PageValidation;
 use SharedPaws\Models\Media\PictureModel;
+use Fluffy\Data\Query\Search;
 
 class PageController extends BaseController
 {
@@ -36,7 +37,7 @@ class PageController extends BaseController
         $search = trim($search ?? '');
         $where = [];
         if ($search) {
-            $where = [[PageEntityMap::PROPERTY_Title, 'like', "%$search%"]];
+            $where = [[PageEntityMap::PROPERTY_Title, 'like', Search::contains($search)]];
         }
         $entities = $this->pages->search($where, [PageEntityMap::PROPERTY_CreatedOn => 1], $page, $size);
         $models = array_map(fn ($entity) => $this->mapper->map(PageModel::class, $entity), $entities['list']);

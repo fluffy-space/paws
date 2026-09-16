@@ -11,6 +11,7 @@ use Fluffy\Services\Auth\AuthorizationService;
 use Fluffy\Services\Settings\SettingsService;
 use FluffyPaws\Security\PawsCapability;
 use SharedPaws\Models\Settings\SettingModel;
+use Fluffy\Data\Query\Search;
 
 /**
  * Standard admin CRUD for the runtime settings store, gated by ManageSettings
@@ -39,9 +40,9 @@ class SettingController extends BaseController
         $search = trim($search ?? '');
         if ($search) {
             $where[] = [
-                [SettingEntityMap::PROPERTY_Key, 'like', "%$search%"],
-                [SettingEntityMap::PROPERTY_Group, 'like', "%$search%"],
-                [SettingEntityMap::PROPERTY_Label, 'like', "%$search%"],
+                [SettingEntityMap::PROPERTY_Key, 'like', Search::contains($search)],
+                [SettingEntityMap::PROPERTY_Group, 'like', Search::contains($search)],
+                [SettingEntityMap::PROPERTY_Label, 'like', Search::contains($search)],
             ];
         }
         $result = $this->settings->search(

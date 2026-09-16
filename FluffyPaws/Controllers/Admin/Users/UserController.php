@@ -15,6 +15,7 @@ use FluffyPaws\Security\PawsCapability;
 use SharedPaws\Models\User\RoleOptionModel;
 use SharedPaws\Models\User\UserModel;
 use SharedPaws\Models\User\UserValidation;
+use Fluffy\Data\Query\Search;
 
 class UserController extends BaseController
 {
@@ -33,15 +34,15 @@ class UserController extends BaseController
         $where = [];
         if ($search) {
             $search = strtolower($search);
-            $parts = explode(' ', $search);
+            $parts = Search::terms($search);
             foreach ($parts as $part) {
                 if (trim($part)) {
                     $where[] = [
-                        [UserEntityMap::PROPERTY_FirstName, 'like', "%$part%"],
-                        [UserEntityMap::PROPERTY_LastName, 'like', "%$part%"],
-                        [UserEntityMap::PROPERTY_UserName, 'like', "%$part%"],
-                        [UserEntityMap::PROPERTY_Email, 'like', "%$part%"],
-                        [UserEntityMap::PROPERTY_Phone, 'like', "%$part%"]
+                        [UserEntityMap::PROPERTY_FirstName, 'like', Search::contains($part)],
+                        [UserEntityMap::PROPERTY_LastName, 'like', Search::contains($part)],
+                        [UserEntityMap::PROPERTY_UserName, 'like', Search::contains($part)],
+                        [UserEntityMap::PROPERTY_Email, 'like', Search::contains($part)],
+                        [UserEntityMap::PROPERTY_Phone, 'like', Search::contains($part)]
                     ];
                 }
             }

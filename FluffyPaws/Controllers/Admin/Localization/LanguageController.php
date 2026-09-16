@@ -11,6 +11,7 @@ use Fluffy\Services\Auth\AuthorizationService;
 use FluffyPaws\Security\PawsCapability;
 use SharedPaws\Models\Localization\LanguageModel;
 use SharedPaws\Models\Localization\LanguageValidation;
+use Fluffy\Data\Query\Search;
 
 class LanguageController extends BaseController
 {
@@ -28,7 +29,7 @@ class LanguageController extends BaseController
         $search = trim($search ?? '');
         $where = [];
         if ($search) {
-            $where = [[LanguageEntityMap::PROPERTY_Name, 'like', "%$search%"]];
+            $where = [[LanguageEntityMap::PROPERTY_Name, 'like', Search::contains($search)]];
         }
         $entities = $this->languages->search($where, [LanguageEntityMap::PROPERTY_CreatedOn => 1], $page, $size);
         $models = array_map(fn($entity) => $this->mapper->map(LanguageModel::class, $entity), $entities['list']);
