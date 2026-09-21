@@ -2,7 +2,7 @@
 <div class="d-flex justify-content-between mt-2 mb-4 stack-sm">
     <div>
         <h3 if="$title" class="text-h3">$title</h3>
-        <a class="icon-link" href="$backUrl">
+        <a class="icon-link" href="{$backHref ?? $backUrl}">
             <Icon name="bi-arrow-left" classList="icon" />
             Back
         </a>

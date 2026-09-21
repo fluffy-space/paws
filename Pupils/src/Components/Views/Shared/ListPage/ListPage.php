@@ -48,6 +48,16 @@ class ListPage extends BaseComponent
      */
     public $newFactory = null;
     public array $query = [];
+    /**
+     * Keep the list's own state in the address bar — `?search=…&page=…` — so a list can be shared,
+     * survives a refresh, and Back from an edit page lands where the person left. Other query
+     * parameters (a page's own filters, e.g. `folder`) are preserved untouched. Opt-in: a list
+     * embedded in another page must not start rewriting that page's URL.
+     *
+     * With it on, the edit and create links carry `?return=<this list's URL>`, which EditHeader's
+     * Back link then honours.
+     */
+    public bool $syncUrl = false;
 
     public function __construct(
         private HttpClient $http,
@@ -67,6 +77,9 @@ class ListPage extends BaseComponent
         if ($this->apiUrl === null) {
             $this->apiUrl = $this->urlSegment;
         }
+        if ($this->syncUrl) {
+            $this->readUrl();
+        }
         $this->getData();
         $this->tableContext->passProps([
             'items' => $this->items,
@@ -79,7 +92,9 @@ class ListPage extends BaseComponent
             'addText' => $this->addText ?? "Add {$this->name}",
             'edit' => $this->edit,
             'remove' => $this->remove,
-            'paging' => 1
+            'paging' => 1,
+            // So a search restored from the URL is also visible in the box.
+            'searchValue' => $this->filter->searchText,
         ]);
         $this->tableContext->on('search', fn($event) => $this->onSearch($event));
         $this->tableContext->on('page', fn($event) => $this->onPageChange($event));
@@ -109,6 +124,7 @@ class ListPage extends BaseComponent
                 $this->cancelEdit();
                 $this->tableContext->passProps(['items' => $this->items]);
                 $this->filter->paging->setTotal($items['total']);
+                $this->writeUrl();
             }, function () {
                 // error
             });
@@ -117,6 +133,56 @@ class ListPage extends BaseComponent
     public function onSearch()
     {
         $this->getData();
+    }
+
+    /** Restore search and page from the address bar (syncUrl). */
+    private function readUrl()
+    {
+        $params = $this->route->getQueryParams();
+        $search = $params['search'] ?? '';
+        $page = (int) ($params['page'] ?? 1);
+        $this->filter->searchText = '' . $search;
+        $this->filter->paging->page = $page > 0 ? $page : 1;
+    }
+
+    /**
+     * This list's URL as it should read now: every parameter the page already had, with search and
+     * page rewritten (and left out when they are the default, so a plain list keeps a plain URL).
+     */
+    private function currentListUrl(): string
+    {
+        $params = $this->route->getQueryParams();
+        $query = '';
+        $glue = '?';
+        foreach ($params as $name => $value) {
+            if ($name === 'search' || $name === 'page' || $name === 'return') {
+                continue;
+            }
+            $query .= $glue . $name . '=' . urlencode('' . $value);
+            $glue = '&';
+        }
+        if ($this->filter->searchText !== '') {
+            $query .= $glue . 'search=' . urlencode($this->filter->searchText);
+            $glue = '&';
+        }
+        if ($this->filter->paging->page > 1) {
+            $query .= $glue . 'page=' . $this->filter->paging->page;
+        }
+        return $this->route->getUrlPath() . $query;
+    }
+
+    /** Replace, not push: typing a search should not leave one history entry per keystroke. */
+    private function writeUrl()
+    {
+        if ($this->syncUrl) {
+            $this->route->replaceUrl($this->currentListUrl());
+        }
+    }
+
+    /** `?return=` for the edit and create links, so Back comes home to this exact list. */
+    private function returnParam(): string
+    {
+        return $this->syncUrl ? '?return=' . urlencode($this->currentListUrl()) : '';
     }
 
     public function onPageChange()
@@ -147,7 +213,7 @@ class ListPage extends BaseComponent
     {
         if ($this->editInline) {
         } else {
-            $this->route->navigate("{$this->routeBase}{$this->urlSegment}/{$item->Id}");
+            $this->route->navigate("{$this->routeBase}{$this->urlSegment}/{$item->Id}" . $this->returnParam());
         }
     }
 
@@ -167,7 +233,7 @@ class ListPage extends BaseComponent
                 ]);
             }
         } else {
-            $this->route->navigate("{$this->routeBase}{$this->urlSegment}/create");
+            $this->route->navigate("{$this->routeBase}{$this->urlSegment}/create" . $this->returnParam());
         }
     }
 
