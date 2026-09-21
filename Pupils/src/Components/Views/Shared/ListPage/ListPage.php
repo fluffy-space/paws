@@ -158,17 +158,26 @@ class ListPage extends BaseComponent
             if ($name === 'search' || $name === 'page' || $name === 'return') {
                 continue;
             }
-            $query .= $glue . $name . '=' . urlencode('' . $value);
+            $query .= $glue . $name . '=' . self::queryValue('' . $value);
             $glue = '&';
         }
         if ($this->filter->searchText !== '') {
-            $query .= $glue . 'search=' . urlencode($this->filter->searchText);
+            $query .= $glue . 'search=' . self::queryValue($this->filter->searchText);
             $glue = '&';
         }
         if ($this->filter->paging->page > 1) {
             $query .= $glue . 'page=' . $this->filter->paging->page;
         }
         return $this->route->getUrlPath() . $query;
+    }
+
+    /**
+     * Encoded for a query string, but with "/" left as it is: it is legal there, and it keeps an
+     * address that names a path readable — ?folder=Campaigns/Q4 rather than Campaigns%2FQ4.
+     */
+    private static function queryValue(string $value): string
+    {
+        return str_replace('%2F', '/', urlencode($value));
     }
 
     /** Replace, not push: typing a search should not leave one history entry per keystroke. */
