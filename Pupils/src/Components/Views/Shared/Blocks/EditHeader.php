@@ -5,6 +5,7 @@ namespace Pupils\Components\Views\Shared\Blocks;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\DOM\DomEvent;
 use Viewi\Components\Routing\ClientRoute;
+use Viewi\UI\Components\Modals\ModalService;
 
 class EditHeader extends BaseComponent
 {
@@ -14,8 +15,15 @@ class EditHeader extends BaseComponent
     public ?string $title = null;
     /** Where Back actually goes: the list the person came from when it said so, else backUrl. */
     public ?string $backHref = null;
+    /**
+     * Offer Delete beside Save (never while creating). The header asks the question; on "yes" it
+     * emits `delete` with where Back leads, so the page can delete and land on the same list state
+     * the person came from (EditPage::onDelete does both).
+     */
+    public bool $removable = false;
+    public string $deleteMessage = 'Delete this item? This cannot be undone.';
 
-    public function __construct(private ClientRoute $route)
+    public function __construct(private ClientRoute $route, private ModalService $modal)
     {
     }
 
@@ -35,6 +43,13 @@ class EditHeader extends BaseComponent
             return null;
         }
         return $value;
+    }
+
+    public function confirmDelete()
+    {
+        $this->modal->confirm($this->deleteMessage, function () {
+            $this->emitEvent('delete', $this->backHref ?? $this->backUrl ?? '');
+        });
     }
 
     public function onSave(DomEvent $event)

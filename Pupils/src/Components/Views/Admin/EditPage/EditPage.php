@@ -98,6 +98,22 @@ abstract class EditPage extends BaseComponent
     }
 
     /**
+     * EditHeader's `delete` (after its confirm): delete the record and go back where Back leads —
+     * the list, in the state it was left — or to this area's list when there is no such place.
+     */
+    public function onDelete(string $back)
+    {
+        $this->http->delete("{$this->apiBase}{$this->apiUrl}/{$this->id}")->then(function () use ($back) {
+            $this->messages->success("{$this->name} was deleted.", 5000);
+            $this->route->navigate($back !== '' ? $back : "{$this->routeBase}{$this->segment}");
+        }, function ($response) {
+            $this->messages->error($response->status === 403
+                ? "You don't have permission to delete this {$this->name}."
+                : "{$this->name} could not be deleted. Please try again.", 5000);
+        });
+    }
+
+    /**
      * Hook: a create just succeeded, before the navigate to the saved record. No-op by default —
      * subclasses override it for side effects that only make sense on creation (analytics events,
      * one-time onboarding nudges). Deliberately not a hook for *edits*: nothing has needed one, and

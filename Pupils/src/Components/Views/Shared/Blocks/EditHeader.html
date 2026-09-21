@@ -9,6 +9,10 @@
     </div>
     <div class="text-right d-flex align-items-start gap-2">
         <slot name="actions"></slot>
+        <button if="{$removable && !$createMode}" type="button" class="btn btn-outline-danger text-nowrap"
+            (click)="confirmDelete">
+            <Icon name="bi-trash" classList="icon" /> Delete
+        </button>
         <ActionButton text="{$createMode ? 'Create' : 'Save'}" state="$state" (click)="onSave" />
     </div>
 </div>

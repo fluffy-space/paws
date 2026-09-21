@@ -120,6 +120,15 @@ class ListPage extends BaseComponent
         }
         $this->http->get("{$this->apiBase}{$this->apiUrl}?page={$this->filter->paging->page}&size={$this->filter->paging->size}&search={$searchEncoded}{$query}")
             ->then(function ($items) {
+                $total = $items['total'];
+                $size = $this->filter->paging->size;
+                if (count($items['list']) === 0 && $total > 0 && $this->filter->paging->page > 1) {
+                    // The rows this page showed are gone (moved away, deleted): show the new last
+                    // page rather than an empty one that says "no matches".
+                    $this->filter->paging->page = (int) ceil($total / $size);
+                    $this->getData();
+                    return;
+                }
                 $this->items = $items['list'];
                 $this->cancelEdit();
                 $this->tableContext->passProps(['items' => $this->items]);
@@ -128,6 +137,15 @@ class ListPage extends BaseComponent
             }, function () {
                 // error
             });
+    }
+
+    /**
+     * Fetch the current page again, after the page changed rows behind the list's back (moved them
+     * to another folder, say). Stays on the page it is on; steps back when that page is now empty.
+     */
+    public function reload()
+    {
+        $this->getData();
     }
 
     public function onSearch()
