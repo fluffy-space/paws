@@ -98,6 +98,7 @@ class ListPage extends BaseComponent
         ]);
         $this->tableContext->on('search', fn($event) => $this->onSearch($event));
         $this->tableContext->on('page', fn($event) => $this->onPageChange($event));
+        $this->tableContext->on('pageSize', fn($event) => $this->onPageSize($event));
         $this->tableContext->on('create', fn($event) => $this->onCreate($event));
         $this->tableContext->on('edit', fn($event) => $this->onEdit($event));
         $this->tableContext->on('delete', fn($event) => $this->onDelete($event));
@@ -149,6 +150,14 @@ class ListPage extends BaseComponent
         $this->getData();
     }
 
+    /** Rows per page changed: start at page 1, so the new page size shows from the top. */
+    public function onPageSize($size)
+    {
+        $this->filter->paging->setPageSize((int) $size);
+        $this->filter->paging->page = 1;
+        $this->getData();
+    }
+
     public function onSearch()
     {
         $this->getData();
@@ -160,8 +169,12 @@ class ListPage extends BaseComponent
         $params = $this->route->getQueryParams();
         $search = $params['search'] ?? '';
         $page = (int) ($params['page'] ?? 1);
+        $size = (int) ($params['size'] ?? 0);
         $this->filter->searchText = '' . $search;
         $this->filter->paging->page = $page > 0 ? $page : 1;
+        if ($size > 0) {
+            $this->filter->paging->setPageSize($size);
+        }
     }
 
     /**
@@ -174,7 +187,7 @@ class ListPage extends BaseComponent
         $query = '';
         $glue = '?';
         foreach ($params as $name => $value) {
-            if ($name === 'search' || $name === 'page' || $name === 'return') {
+            if ($name === 'search' || $name === 'page' || $name === 'size' || $name === 'return') {
                 continue;
             }
             $query .= $glue . $name . '=' . self::queryValue('' . $value);
@@ -186,6 +199,13 @@ class ListPage extends BaseComponent
         }
         if ($this->filter->paging->page > 1) {
             $query .= $glue . 'page=' . $this->filter->paging->page;
+            $glue = '&';
+        }
+        // In a local first: the transpiler drops the ?? inside a unary plus, so `+ ($x ?? 10)`
+        // reaches the browser as `+$x` and compares against 0 when nothing was passed.
+        $defaultSize = $this->pageSize ?? 10;
+        if ($this->filter->paging->size !== (int) $defaultSize) {
+            $query .= $glue . 'size=' . $this->filter->paging->size;
         }
         return $this->route->getUrlPath() . $query;
     }
