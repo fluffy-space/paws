@@ -12,6 +12,7 @@ use Fluffy\Security\Capability;
 use Fluffy\Security\Permissions;
 use Fluffy\Services\Auth\AuthorizationService;
 use Fluffy\Swoole\RateLimit\IRateLimitService;
+use FluffyPaws\Services\Auth\AuthFormGuard;
 use FluffyPaws\Services\Emails\EmailService;
 use FluffyPaws\Services\Localization\LocalizationService;
 use SharedPaws\Models\Auth\ConfirmEmailModel;
@@ -32,8 +33,15 @@ class AuthorizationController extends BaseController
         protected AuthorizationService $auth,
         protected IMapper $mapper,
         protected EmailService $emailService,
-        protected Config $config
+        protected Config $config,
+        protected AuthFormGuard $formGuard
     ) {}
+
+    /** The signed "form issued at" token register / reset-password send back (AuthFormGuard). */
+    public function FormToken()
+    {
+        return ['FormToken' => $this->formGuard->issueToken(), 'MinSeconds' => $this->formGuard->minSeconds()];
+    }
 
     /**
      * Whether registration insists on a name / a confirmed password, from `configs/app.php`.
@@ -182,7 +190,24 @@ class AuthorizationController extends BaseController
             return $this->BadRequest([$localization->localize('register.validation.email-not-accepted')]);
         }
 
-        if (!$rateLimit->limit($httpContext->request->getIp(), 10, 5 * 60)) {
+        $ip = $httpContext->request->getIp();
+        if (!$rateLimit->limit($ip, 10, 5 * 60)) {
+            return $this->TooManyRequests($localization->localize('rate-limit.too-many-requests'));
+        }
+
+        // A plain failure, not a silent success: a person whose password manager filled the
+        // honeypot must be told to try again, and the message names no rule.
+        $botReason = $this->formGuard->botReason($registerModel->Website, $registerModel->FormToken);
+        if ($botReason !== null) {
+            AuthFormGuard::log('register', $botReason, $ip, $registerModel->Email);
+            return $this->BadRequest([$localization->localize('register.validation.failed')]);
+        }
+        if ($this->formGuard->dottedGmail($registerModel->Email)) {
+            AuthFormGuard::log('register', 'dotted-gmail', $ip, $registerModel->Email);
+            return $this->BadRequest([$localization->localize('register.validation.email-not-accepted')]);
+        }
+        if (!$this->formGuard->takeMailBudget($ip)) {
+            AuthFormGuard::log('register', 'mail-budget', $ip, $registerModel->Email);
             return $this->TooManyRequests($localization->localize('rate-limit.too-many-requests'));
         }
 
@@ -286,13 +311,14 @@ class AuthorizationController extends BaseController
         return ['success' => true];
     }
 
-    public function ResetPassword(string $Email, UserRepository $users, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext)
+    public function ResetPassword(string $Email, UserRepository $users, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext, ?string $Website = null, ?string $FormToken = null)
     {
         if (!$this->auth->authorizeCSRF()) {
             return $this->Forbidden('Invalid CSRF-token.');
         }
 
-        if (!$rateLimit->limit($httpContext->request->getIp(), 10, 5 * 60)) {
+        $ip = $httpContext->request->getIp();
+        if (!$rateLimit->limit($ip, 10, 5 * 60)) {
             return $this->TooManyRequests($localization->localize('rate-limit.too-many-requests'));
         }
 
@@ -313,10 +339,22 @@ class AuthorizationController extends BaseController
         if (count($validationMessages) > 0) {
             return $this->BadRequest($validationMessages);
         }
+        // Refused the same way as an unknown address - a silent success - so a bot learns nothing.
+        // A person who trips it sees "email sent", never gets it, and can simply ask again.
+        $botReason = $this->formGuard->botReason($Website, $FormToken)
+            ?? ($this->formGuard->dottedGmail($Email) ? 'dotted-gmail' : null);
+        if ($botReason !== null) {
+            AuthFormGuard::log('reset-password', $botReason, $ip, $Email);
+            return ['success' => true];
+        }
         $user = $users->find(UserEntityMap::PROPERTY_UserName, $Email);
         if ($user === null) {
             // nothing to send
             return ['success' => true];
+        }
+        if (!$this->formGuard->takeMailBudget($ip)) {
+            AuthFormGuard::log('reset-password', 'mail-budget', $ip, $Email);
+            return $this->TooManyRequests($localization->localize('rate-limit.too-many-requests'));
         }
         $verificationCode = $this->auth->createVerificationCode($user->Id);
         // send activation email

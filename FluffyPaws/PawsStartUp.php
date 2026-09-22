@@ -30,6 +30,7 @@ use FluffyPaws\Services\Emails\SnsMessageVerifier;
 use FluffyPaws\Services\Emails\EmailPreviewRegistry;
 use FluffyPaws\Services\Emails\IEmailPreviewProvider;
 use FluffyPaws\Services\Emails\PawsEmailPreviewProvider;
+use FluffyPaws\Services\Auth\AuthFormGuard;
 use FluffyPaws\Services\Emails\EmailService;
 use FluffyPaws\Services\Localization\LocalizationService;
 use FluffyPaws\Services\Sitemap\SitemapService;
@@ -60,6 +61,7 @@ class PawsStartUp implements IStartUp
         $serviceProvider->addScoped(SitemapService::class);
         $serviceProvider->addScoped(EmailRenderer::class);
         $serviceProvider->addScoped(EmailService::class);
+        $serviceProvider->addScoped(AuthFormGuard::class);
         $serviceProvider->addScoped(EmailSuppressionService::class);
         $serviceProvider->addScoped(EmailLogService::class);
         $serviceProvider->addScoped(SesNotificationService::class);

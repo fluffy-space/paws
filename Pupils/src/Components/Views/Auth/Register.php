@@ -6,6 +6,7 @@ use SharedPaws\Models\Auth\RegisterModel;
 use SharedPaws\Models\Auth\RegisterValidation;
 use Pupils\Components\Services\Analytics\AnalyticsService;
 use Pupils\Components\Services\Auth\AuthService;
+use Pupils\Components\Services\Auth\FormTokenService;
 use Viewi\Components\Browser\BrowserSession;
 use Pupils\Components\Services\Localization\HasLocalization;
 use Pupils\Components\Services\Session\SessionState;
@@ -44,7 +45,7 @@ class Register extends BaseComponent
      */
     public array $rules = [];
 
-    public function __construct(private HttpClient $http, private ClientRoute $route, private AuthService $auth, private BrowserSession $browserSession, private AnalyticsService $analytics, ConfigService $config)
+    public function __construct(private HttpClient $http, private ClientRoute $route, private AuthService $auth, private BrowserSession $browserSession, private AnalyticsService $analytics, private FormTokenService $formToken, ConfigService $config)
     {
         $askName = $config->get('registerAskName');
         $askConfirm = $config->get('registerAskPasswordConfirmation');
@@ -73,6 +74,7 @@ class Register extends BaseComponent
         if (!$this->trackedView) {
             $this->trackedView = true;
             $this->analytics->track('signup_started');
+            $this->formToken->prefetch();
         }
     }
 
@@ -86,23 +88,32 @@ class Register extends BaseComponent
 
         $this->loading = true;
         $this->generalMessages->show = false;
-        $this->http
-            ->withInterceptor(SessionState::class)
-            ->post('/api/authorization/register', $this->registerModel)
-            ->then(
-                function ($response) {
-                    $this->handleResponse(false, $response);
-                },
-                function (Response $response) {
-                    $this->handleResponse(true, $response->body);
-                }
-            );
+        // Waits for the "form issued at" stamp to be old enough, so a fast person is never refused.
+        $this->formToken->whenReady(function (?string $token) {
+            if ($token === null) {
+                $this->handleResponse(true, []);
+                return;
+            }
+            $this->registerModel->FormToken = $token;
+            $this->http
+                ->withInterceptor(SessionState::class)
+                ->post('/api/authorization/register', $this->registerModel)
+                ->then(
+                    function ($response) {
+                        $this->handleResponse(false, $response);
+                    },
+                    function (Response $response) {
+                        $this->handleResponse(true, $response->body);
+                    }
+                );
+        });
     }
 
     public function handleResponse(bool $hasError, $response = null)
     {
         $this->loading = false;
         if ($hasError) {
+            $this->formToken->discard();
             if ($response['errors']) {
                 $this->generalMessages->messages = $response['errors'];
             } else if ($response['message']) {

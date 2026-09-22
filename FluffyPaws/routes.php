@@ -62,6 +62,8 @@ $router->section('/api/', function (Router $router) {
     // user isn't an admin), so it sits outside the admin block.
     $router->post('impersonation/exit', [ImpersonationController::class, 'Exit']);
     $router->post('authorization/register', [AuthorizationController::class, 'Register']);
+    // signed "form issued at" token for register / reset-password (AuthFormGuard)
+    $router->get('authorization/form-token', [AuthorizationController::class, 'FormToken']);
     // resend the activation email to the signed-in user's own address (rate-limited inside)
     $router->post('authorization/resend-verification', [AuthorizationController::class, 'ResendVerification']);
     // what the confirmation page's button posts; a POST on purpose, so link scanners can't confirm
