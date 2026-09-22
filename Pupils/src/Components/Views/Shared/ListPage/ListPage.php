@@ -115,8 +115,9 @@ class ListPage extends BaseComponent
     {
         $searchEncoded = urlencode($this->filter->searchText);
         $query = '';
+        // Encoded: values arrive decoded ('Feature request', a folder path with '&' in it).
         foreach ($this->query as $name => $value) {
-            $query .= "&{$name}={$value}";
+            $query .= '&' . $name . '=' . urlencode('' . $value);
         }
         $this->http->get("{$this->apiBase}{$this->apiUrl}?page={$this->filter->paging->page}&size={$this->filter->paging->size}&search={$searchEncoded}{$query}")
             ->then(function ($items) {
