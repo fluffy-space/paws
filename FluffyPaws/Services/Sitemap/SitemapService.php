@@ -172,15 +172,23 @@ class SitemapService
 
     protected function getStaticSitemap(string $baseUrl)
     {
-        $sitemap = '';
-        $pages = [
-            '/blog'
+        // The blog index changes when a post does, so its lastmod is the newest listed post's.
+        // It used to be gmdate('Y-m-d'): an always-today lastmod that crawlers learn to ignore,
+        // and that made the index look changed to IndexNow-style "send what moved" consumers
+        // every single day.
+        /**
+         * @var BlogPostRepository $posts
+         */
+        $posts = $this->container->serviceProvider->get(BlogPostRepository::class);
+        $where = [
+            [BlogPostEntityMap::PROPERTY_Published, true],
+            [BlogPostEntityMap::PROPERTY_IncludeInSitemap, true]
         ];
-        foreach ($pages as $page) {
-            $lastMod = gmdate('Y-m-d');
-            $url = $baseUrl . $page;
-            $sitemap .= "<url><loc>$url</loc><changefreq>weekly</changefreq><lastmod>$lastMod</lastmod></url>";
-        }
-        return $sitemap;
+        /**
+         * @var BlogPostEntity[] $newest
+         */
+        $newest = $posts->search($where, [BlogPostEntityMap::PROPERTY_UpdatedOn => -1], 1, 1, false)['list'];
+        $lastMod = count($newest) > 0 ? gmdate('Y-m-d', (int)($newest[0]->UpdatedOn / 1000000)) : gmdate('Y-m-d');
+        return "<url><loc>$baseUrl/blog</loc><changefreq>weekly</changefreq><lastmod>$lastMod</lastmod></url>";
     }
 }
