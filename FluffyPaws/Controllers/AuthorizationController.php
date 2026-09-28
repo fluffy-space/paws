@@ -2,6 +2,7 @@
 
 namespace FluffyPaws\Controllers;
 
+use DotDi\DependencyInjection\Container;
 use Fluffy\Controllers\BaseController;
 use Fluffy\Data\Entities\Auth\UserEntity;
 use Fluffy\Data\Entities\Auth\UserEntityMap;
@@ -13,6 +14,7 @@ use Fluffy\Security\Permissions;
 use Fluffy\Services\Auth\AuthorizationService;
 use Fluffy\Swoole\RateLimit\IRateLimitService;
 use FluffyPaws\Services\Auth\AuthFormGuard;
+use FluffyPaws\Services\Auth\IEmailConfirmedListener;
 use FluffyPaws\Services\Emails\EmailService;
 use FluffyPaws\Services\Localization\LocalizationService;
 use SharedPaws\Models\Auth\ConfirmEmailModel;
@@ -289,7 +291,7 @@ class AuthorizationController extends BaseController
      *
      * Still code-only, no session required — the mail is often opened on another device.
      */
-    public function ConfirmEmail(ConfirmEmailModel $confirmModel, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext)
+    public function ConfirmEmail(ConfirmEmailModel $confirmModel, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext, UserRepository $users, Container $container)
     {
         if (!$this->auth->authorizeCSRF()) {
             return $this->Forbidden('Invalid CSRF-token.');
@@ -306,8 +308,23 @@ class AuthorizationController extends BaseController
         if ($userCode === null) {
             return $this->BadRequest([$localization->localize('confirm-email.failed')]);
         }
+        /** @var UserEntity|null $user */
+        $user = $users->getById($userCode->UserId);
+        $wasUnconfirmed = $user !== null && !$user->EmailConfirmed;
         $this->auth->activateUser($userCode->UserId);
         $this->auth->invalidateCode($userCode);
+        if ($wasUnconfirmed) {
+            /** @var IEmailConfirmedListener[] $listeners */
+            $listeners = $container->serviceProvider->getAll(IEmailConfirmedListener::class);
+            foreach ($listeners as $listener) {
+                try {
+                    $listener->onEmailConfirmed($userCode->UserId);
+                } catch (\Throwable $e) {
+                    // The address is confirmed either way; a listener's failure must not fail the click.
+                    echo '[ConfirmEmail] listener ' . $listener::class . ' failed for user ' . $userCode->UserId . ': ' . $e->getMessage() . PHP_EOL;
+                }
+            }
+        }
         return ['success' => true];
     }
 
