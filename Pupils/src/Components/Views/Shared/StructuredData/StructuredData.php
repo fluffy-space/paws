@@ -28,8 +28,8 @@ use Viewi\Components\BaseComponent;
  *
  * WHAT IS WORTH MARKING UP (2026): `Organization` and `WebSite` for the entity and its logo,
  * `BreadcrumbList`, `BlogPosting`, and `SoftwareApplication` with `offers` so the price can appear.
- * `FAQPage` deliberately is NOT here: Google restricted FAQ rich results to government and health
- * sites in 2023, so marking up our FAQ blocks would render nothing.
+ * `FAQPage` deliberately is NOT here: Google stopped showing FAQ rich results on 2026-05-07, so
+ * marking up our FAQ blocks would render nothing.
  */
 class StructuredData extends BaseComponent
 {

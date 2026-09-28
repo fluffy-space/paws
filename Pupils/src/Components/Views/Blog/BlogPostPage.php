@@ -4,6 +4,7 @@ namespace Pupils\Components\Views\Blog;
 
 use Pupils\Components\Services\Localization\HasLocalization;
 use SharedPaws\Models\Blog\BlogPostModel;
+use SharedPaws\Support\Breadcrumbs;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Config\ConfigService;
 use Viewi\Components\DOM\HtmlNode;
@@ -52,6 +53,9 @@ class BlogPostPage extends BaseComponent
      */
     public string $articleJson = '';
 
+    /** BreadcrumbList JSON-LD (Home > Blog > post); same rules as $articleJson. */
+    public string $breadcrumbJson = '';
+
     /** Absolute site root, for the @id values. */
     public string $siteUrl = '';
 
@@ -78,6 +82,11 @@ class BlogPostPage extends BaseComponent
                 $this->previousPost = $data['previous'];
                 if ($this->jsonLdEnabled) {
                     $this->articleJson = $this->buildArticleJson($this->post);
+                    $this->breadcrumbJson = Breadcrumbs::jsonLd([
+                        ['Home', $this->siteUrl . '/'],
+                        ['Blog', $this->siteUrl . '/blog'],
+                        [$this->post->Title, $this->siteUrl . '/blog/' . $this->post->Slug],
+                    ]);
                 }
                 $this->onBlogSet($data);
             }, function (Response $response) {
