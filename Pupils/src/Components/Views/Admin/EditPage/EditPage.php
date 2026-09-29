@@ -22,6 +22,8 @@ abstract class EditPage extends BaseComponent
     public int $state = ActionButton::STATE_PENDING;
     public bool $createMode = false;
     public $validation = null;
+    /** The item could not be loaded (404, no access, server restarting): the page says so instead of staying blank. */
+    public bool $loadFailed = false;
     private ?ActionForm $actionForm = null;
     public ?ValidationMessage $generalMessages = null;
 
@@ -53,8 +55,9 @@ abstract class EditPage extends BaseComponent
                 ->then(function ($item) {
                     $this->item = $item;
                     $this->validation = $this->getValidation($item);
+                    $this->loadFailed = false;
                 }, function () {
-                    // error
+                    $this->loadFailed = true;
                 });
         } else {
             // create
