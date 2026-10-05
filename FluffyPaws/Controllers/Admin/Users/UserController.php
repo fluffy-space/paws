@@ -12,6 +12,9 @@ use Fluffy\Security\PermissionRegistry;
 use Fluffy\Security\Role;
 use Fluffy\Services\Auth\AuthorizationService;
 use FluffyPaws\Security\PawsCapability;
+use FluffyPaws\Services\Emails\EmailService;
+use Fluffy\Swoole\RateLimit\IRateLimitService;
+use SharedPaws\Models\Auth\UserViewModel;
 use SharedPaws\Models\User\RoleOptionModel;
 use SharedPaws\Models\User\UserModel;
 use SharedPaws\Models\User\UserValidation;
@@ -199,6 +202,38 @@ class UserController extends BaseController
         $result = $this->mapper->map(UserModel::class, $entity);
         $result->Roles = $this->roleOptions($entity->Permissions);
         return $result;
+    }
+
+    /**
+     * POST admin/user/{id}/send-confirmation - mail this user a fresh confirmation link.
+     *
+     * For following up on a signup whose first mail never arrived (refused by the mailbox
+     * provider, spam folder) and who did not press "send it again" themselves. Same mail and
+     * same 3-day single-use code as the user's own resend. Limited per target account, so a
+     * double click or two admins cannot stack mails in one inbox.
+     */
+    public function SendConfirmation(int $id, EmailService $emailService, IRateLimitService $rateLimit)
+    {
+        if (!$this->auth->authorizeAdminCapability(PawsCapability::ManageUsers)) {
+            return $this->Forbidden();
+        }
+        /** @var UserEntity|null $entity */
+        $entity = $this->users->getById($id);
+        if (!$entity) {
+            return $this->NotFound();
+        }
+        if ($entity->EmailConfirmed) {
+            return $this->BadRequest(['This address is already confirmed.']);
+        }
+        if (!$entity->Email) {
+            return $this->BadRequest(['This user has no email address.']);
+        }
+        if (!$rateLimit->limit("admin-send-confirmation:user:{$entity->Id}", 3, 15 * 60)) {
+            return $this->TooManyRequests('A confirmation email was sent to this user moments ago. Wait a few minutes before sending another.');
+        }
+        $verificationCode = $this->auth->createVerificationCode($entity->Id);
+        $emailService->dispatchUserActivateEmail($this->mapper->map(UserViewModel::class, $entity), $verificationCode->Code);
+        return ['success' => true];
     }
 
     public function Delete(int $id)

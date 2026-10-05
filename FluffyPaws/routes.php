@@ -99,6 +99,7 @@ $router->section('/api/', function (Router $router) {
         $router->get('user/{id}', [UserController::class, 'Get']);
         $router->put('user/{id}', [UserController::class, 'Update']);
         $router->delete('user/{id}', [UserController::class, 'Delete']);
+        $router->post('user/{id}/send-confirmation', [UserController::class, 'SendConfirmation']);
 
         // user login sessions (AUTH tokens) — managed from the user edit "Sessions"
         // tab (scoped by ?userId=); terminate = delete. Distinct 'user-session'

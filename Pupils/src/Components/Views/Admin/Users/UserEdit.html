@@ -30,6 +30,12 @@
                         <CheckBox label="EmailConfirmed" id="EmailConfirmed" model="$item->EmailConfirmed"
                             hint="Indicates that use has confirmed the email address." />
 
+                        <div if="{!$createMode && !$item->EmailConfirmed}" class="mb-3">
+                            <button type="button" class="btn btn-outline-primary" disabled="$sendingConfirmation"
+                                (click)="sendConfirmation">Send confirmation email</button>
+                            <div class="form-text">Mails this user a new confirmation link, valid for 3 days.</div>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">Roles</label>
                             <div foreach="$item->Roles as $role">

@@ -2,6 +2,7 @@
 
 namespace Pupils\Components\Views\Auth;
 
+use Pupils\Components\Services\Analytics\AnalyticsService;
 use Pupils\Components\Services\Localization\HasLocalization;
 use Pupils\Components\Services\Session\SessionState;
 use Viewi\Components\BaseComponent;
@@ -28,7 +29,7 @@ class ResendVerification extends BaseComponent
     public bool $sent = false;
     public string $error = '';
 
-    public function __construct(private HttpClient $http) {}
+    public function __construct(private HttpClient $http, private AnalyticsService $analytics) {}
 
     public function resend()
     {
@@ -37,6 +38,7 @@ class ResendVerification extends BaseComponent
         }
         $this->sending = true;
         $this->error = '';
+        $this->analytics->track('verification_resend_clicked');
         $this->http
             ->withInterceptor(SessionState::class)
             ->post('/api/authorization/resend-verification')

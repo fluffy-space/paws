@@ -28,6 +28,7 @@ class UserEdit extends EditPage
     public string $name = "User";
     /** SuperAdmin-only "view as user" action, shown on an existing user. */
     public bool $canImpersonate = false;
+    public bool $sendingConfirmation = false;
 
     public function __construct(
         public int $id,
@@ -70,6 +71,30 @@ class UserEdit extends EditPage
                     });
             }
         );
+    }
+
+    /** Mail the user a fresh confirmation link (their first one may never have arrived). */
+    public function sendConfirmation()
+    {
+        if ($this->sendingConfirmation) {
+            return;
+        }
+        $this->sendingConfirmation = true;
+        $this->http->post("/api/admin/user/{$this->id}/send-confirmation")
+            ->then(function () {
+                $this->sendingConfirmation = false;
+                $this->messages->success('Confirmation email sent. See the email log for the delivery result.', 6000);
+            }, function ($response) {
+                $this->sendingConfirmation = false;
+                $text = 'Could not send the confirmation email.';
+                // A 400 carries the reason in errors[] (its message is just "Bad Request"); a 429 in message.
+                if ($response->body !== null && $response->body['errors']) {
+                    $text = $response->body['errors'][0];
+                } elseif ($response->body !== null && $response->body['message']) {
+                    $text = $response->body['message'];
+                }
+                $this->messages->error($text, 6000);
+            });
     }
 
     /** Hard navigation into the member app so the impersonation cookie takes full effect. */
