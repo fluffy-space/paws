@@ -22,6 +22,7 @@ use Pupils\Components\Views\Auth\Login;
 use Pupils\Components\Views\Auth\Register;
 use Pupils\Components\Views\Auth\ResetPassword;
 use Pupils\Components\Views\Auth\ResetPasswordRequest;
+use Pupils\Components\Views\Auth\OAuthCompletePage;
 use Pupils\Components\Views\Auth\WelcomePage;
 use Pupils\Components\Views\Blog\BlogListPage;
 use Pupils\Components\Views\Blog\BlogPostPage;
@@ -39,6 +40,8 @@ $router->get('/login', Login::class);
 $router->get('/register', Register::class);
 // where Register lands after signing the new user in — says what was emailed and where to go next
 $router->get('/welcome', WelcomePage::class);
+// where a provider sign-in (Google, Microsoft, OIDC) lands before moving on
+$router->get('/oauth/complete', OAuthCompletePage::class);
 $router->get('/reset-password', ResetPasswordRequest::class);
 // where the activation email points: a page with a button, not a side-effecting GET
 $router->get('/account/confirm/{code}', ConfirmEmailPage::class);

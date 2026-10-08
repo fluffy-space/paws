@@ -26,6 +26,15 @@ class Login extends BaseComponent
     private ?ActionForm $loginForm = null;
     public ?LoginValidation $validation = null;
 
+    /** `?redirect=` for the provider buttons, so "Continue with Google" finishes the errand too. */
+    public string $providerRedirect = '';
+
+    /**
+     * Why a provider sign-in did not go through (`?oauth=<code>`, set by OAuthController), as a
+     * localization key. The template translates it, so it is right in SSR and after hydration.
+     */
+    public string $providerMessageKey = '';
+
     public function __construct(
         private HttpClient $http,
         private ClientRoute $route,
@@ -37,6 +46,14 @@ class Login extends BaseComponent
     {
         $this->loginModel = new LoginModel();
         $this->validation = new LoginValidation($this->loginModel, $this->translateFn());
+        $redirect = $this->redirectFromQuery();
+        $this->providerRedirect = $redirect !== null ? $redirect : '';
+        $params = $this->route->getQueryParams();
+        $code = $params === null ? '' : (string) ($params['oauth'] ?? '');
+        // A fixed list: the code comes off the URL, and only a known one may pick a message.
+        if (in_array($code, ['cancelled', 'failed', 'no-email', 'account-exists', 'not-accepted'])) {
+            $this->providerMessageKey = 'oauth.error.' . $code;
+        }
     }
 
     public function handleSubmit(DomEvent $event)

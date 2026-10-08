@@ -1,5 +1,7 @@
 <BoxLayout title="{t('login.title')}">
     <h3 class="text-h3 mt-2 mb-4">{t('login.header')}</h3>
+    <Alert if="{$providerMessageKey !== ''}" variant="warning" body="{t($providerMessageKey)}" dismissible="{false}" />
+    <ProviderButtons redirect="$providerRedirect" />
     <ActionForm #loginForm (submit)="handleSubmit" classList="mt-8" autocomplete="on" id="login-form" action="/login"
         method="post" rules="{$validation->getValidationRules()}">
         <TextInput type="text" label="{t('register.email')}" placeholder="{t('register.email')}"

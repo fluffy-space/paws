@@ -51,6 +51,53 @@ class AnalyticsService
     }
 
     /**
+     * Fire a conversion event, then call `$callback` once it has been handed to the network.
+     *
+     * For a page that leaves with a full navigation right after the event (OAuthCompletePage):
+     * track() would lose it there, either still waiting for the tracking script on a cold load
+     * or cut off by the navigation. The callback always runs: after the send settles, after a
+     * short cap if it does not, and after ~3s if the script never loads (an ad blocker), so a
+     * visitor is never left on the page.
+     */
+    public function trackAndWait(string $eventName, $callback): void
+    {
+        <<<'javascript'
+        (function (name, proceed) {
+            var left = false;
+            var leave = function () {
+                if (!left) {
+                    left = true;
+                    proceed();
+                }
+            };
+            var tries = 0;
+            var send = function () {
+                if (typeof window.pirsch === 'function') {
+                    var sent = null;
+                    try {
+                        sent = window.pirsch(name);
+                    } catch (e) {
+                    }
+                    if (sent && typeof sent.then === 'function') {
+                        sent.then(leave, leave);
+                        window.setTimeout(leave, 1500);
+                    } else {
+                        window.setTimeout(leave, 300);
+                    }
+                    return;
+                }
+                if (++tries < 12) {
+                    window.setTimeout(send, 250);
+                } else {
+                    leave();
+                }
+            };
+            send();
+        })(eventName, callback);
+        javascript;
+    }
+
+    /**
      * Fire an event at most once per browser, keyed by `$onceKey`.
      *
      * For milestones that are only interesting the first time — "created their first link" stops

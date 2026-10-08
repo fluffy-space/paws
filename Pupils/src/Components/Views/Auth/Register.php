@@ -45,6 +45,9 @@ class Register extends BaseComponent
      */
     public array $rules = [];
 
+    /** `?redirect=` for the provider buttons, so "Continue with Google" finishes the errand too. */
+    public string $providerRedirect = '';
+
     public function __construct(private HttpClient $http, private ClientRoute $route, private AuthService $auth, private BrowserSession $browserSession, private AnalyticsService $analytics, private FormTokenService $formToken, ConfigService $config)
     {
         $askName = $config->get('registerAskName');
@@ -58,6 +61,8 @@ class Register extends BaseComponent
         $this->registerModel = new RegisterModel();
         $this->validation = new RegisterValidation($this->registerModel, fn(string $key) => $this->localization->t($key));
         $this->rules = $this->validation->getValidationRules(true, $this->askName, $this->askPasswordConfirmation);
+        $redirect = $this->redirectFromQuery();
+        $this->providerRedirect = $redirect !== null ? $redirect : '';
         $productId = $this->browserSession->getItem('purchaseItem');
         if ($productId !== null) {
             $productId = (int)$productId;

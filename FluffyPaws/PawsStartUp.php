@@ -31,6 +31,12 @@ use FluffyPaws\Services\Emails\EmailPreviewRegistry;
 use FluffyPaws\Services\Emails\IEmailPreviewProvider;
 use FluffyPaws\Services\Emails\PawsEmailPreviewProvider;
 use FluffyPaws\Services\Auth\AuthFormGuard;
+use FluffyPaws\Services\Auth\EmailConfirmedNotifier;
+use FluffyPaws\Services\Auth\OAuth\GoogleProvider;
+use FluffyPaws\Services\Auth\OAuth\IOAuthProvider;
+use FluffyPaws\Services\Auth\OAuth\MicrosoftProvider;
+use FluffyPaws\Services\Auth\OAuth\OAuthService;
+use FluffyPaws\Services\Auth\OAuth\OAuthSettings;
 use FluffyPaws\Services\Emails\EmailService;
 use FluffyPaws\Services\Localization\LocalizationService;
 use FluffyPaws\Services\Sitemap\SitemapService;
@@ -50,6 +56,9 @@ class PawsStartUp implements IStartUp
         PawsPermissions::register();
         // Mail deliverability knobs (SNS topic allowlist, signature verification).
         MailSettings::register();
+        // Client credentials for provider sign-in. Storing them switches nothing on: a provider
+        // is live only when config `auth.providers` lists it.
+        OAuthSettings::register();
         $serviceProvider->addScoped(BlogPostRepository::class);
         $serviceProvider->addScoped(PageRepository::class);
         $serviceProvider->addScoped(LanguageRepository::class);
@@ -62,6 +71,10 @@ class PawsStartUp implements IStartUp
         $serviceProvider->addScoped(EmailRenderer::class);
         $serviceProvider->addScoped(EmailService::class);
         $serviceProvider->addScoped(AuthFormGuard::class);
+        $serviceProvider->addScoped(EmailConfirmedNotifier::class);
+        $serviceProvider->addScoped(OAuthService::class);
+        $serviceProvider->addScoped(IOAuthProvider::class, GoogleProvider::class);
+        $serviceProvider->addScoped(IOAuthProvider::class, MicrosoftProvider::class);
         $serviceProvider->addScoped(EmailSuppressionService::class);
         $serviceProvider->addScoped(EmailLogService::class);
         $serviceProvider->addScoped(SesNotificationService::class);

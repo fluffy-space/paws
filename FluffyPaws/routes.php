@@ -19,6 +19,7 @@ use FluffyPaws\Controllers\BlogController;
 use FluffyPaws\Controllers\ContentController;
 use FluffyPaws\Controllers\LocalizationController;
 use FluffyPaws\Controllers\MiscController;
+use FluffyPaws\Controllers\OAuthController;
 use FluffyPaws\Controllers\SitemapController;
 use Viewi\App;
 use Viewi\Components\Http\Message\Response;
@@ -70,6 +71,11 @@ $router->section('/api/', function (Router $router) {
     $router->post('authorization/confirm-email', [AuthorizationController::class, 'ConfirmEmail']);
     $router->post('authorization/reset-password', [AuthorizationController::class, 'ResetPassword']);
     $router->post('authorization/reset-password-confirm', [AuthorizationController::class, 'ResetPasswordConfirm']);
+    // provider sign-in (Google, Microsoft, OIDC): GETs that redirect; 404 unless config
+    // `auth.providers` lists the provider and it has credentials (OAuthService::enabled)
+    $router->get('authorization/oauth/providers', [OAuthController::class, 'Providers']);
+    $router->get('authorization/oauth/{provider}/start', [OAuthController::class, 'Start']);
+    $router->get('authorization/oauth/{provider}/callback', [OAuthController::class, 'Callback']);
 
     // SES bounce/complaint notifications over SNS — public + unauthenticated
     // (SNS-signature-verified and topic-allowlisted inside), so it sits outside

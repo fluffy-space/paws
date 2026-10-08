@@ -1,5 +1,6 @@
 <BoxLayout title="{t('register.title')}">
     <h3 class="text-h3 mt-2 mb-4">{t('register.header')}</h3>
+    <ProviderButtons redirect="$providerRedirect" />
     <ActionForm #registerForm (submit)="handleSubmit" class="mt-8" autocomplete="on" id="register-form"
         action="/register" method="post" rules="$rules">
 

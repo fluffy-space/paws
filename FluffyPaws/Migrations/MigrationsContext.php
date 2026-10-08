@@ -15,6 +15,7 @@ use FluffyPaws\Migrations\Localization\LocaleEnglishMigration02;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration03;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration04;
 use FluffyPaws\Migrations\Localization\LocaleEnglishMigration05;
+use FluffyPaws\Migrations\Localization\LocaleEnglishMigration06;
 use FluffyPaws\Migrations\Localization\LocaleResourceMigration;
 use FluffyPaws\Migrations\Media\PictureMigration;
 use FluffyPaws\Migrations\Menu\MenuItemMigration;
@@ -45,6 +46,7 @@ class MigrationsContext extends BaseMigrationsContext
         $this->runMigration(LocaleEnglishMigration05::class);
         $this->runMigration(EmailLogMigration::class);
         $this->runMigration(EmailSuppressionMigration::class);
+        $this->runMigration(LocaleEnglishMigration06::class);
         /** @insert **/
         // !Do not delete the line above!
     }
