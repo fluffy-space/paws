@@ -2,6 +2,7 @@
 
 namespace Pupils\Components\Views\Auth;
 
+use Pupils\Components\Services\Auth\AuthService;
 use Pupils\Components\Services\Localization\HasLocalization;
 use Pupils\Components\Services\Session\SessionState;
 use SharedPaws\Models\Auth\ConfirmEmailModel;
@@ -33,7 +34,8 @@ class ConfirmEmailPage extends BaseComponent
     public function __construct(
         private string $code,
         private HttpClient $http,
-        private ClientRoute $route
+        private ClientRoute $route,
+        private AuthService $auth
     ) {}
 
     public function confirm()
@@ -50,6 +52,7 @@ class ConfirmEmailPage extends BaseComponent
             ->post('/api/authorization/confirm-email', $confirmModel)
             ->then(
                 function ($response) {
+                    $this->auth->reset();
                     $this->route->navigate('/account/verified');
                 },
                 function (Response $response) {
