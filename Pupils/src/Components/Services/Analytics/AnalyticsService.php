@@ -37,7 +37,9 @@ class AnalyticsService
             var tries = 0;
             var send = function () {
                 if (typeof window.pirsch === 'function') {
-                    window.pirsch(name);
+                    // Always pass options: Pirsch's pa.js reads options.non_interactive and
+                    // throws a TypeError on pirsch(name) alone, so the event is never sent.
+                    window.pirsch(name, {});
                     return;
                 }
                 // ~5s of grace, then give up rather than leak a timer forever.
@@ -75,7 +77,7 @@ class AnalyticsService
                 if (typeof window.pirsch === 'function') {
                     var sent = null;
                     try {
-                        sent = window.pirsch(name);
+                        sent = window.pirsch(name, {});
                     } catch (e) {
                     }
                     if (sent && typeof sent.then === 'function') {
