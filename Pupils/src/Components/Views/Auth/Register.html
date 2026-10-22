@@ -35,6 +35,7 @@
         <button type="submit" disabled="$loading" class="btn btn-primary mt-3 w-100">
             { $isPayment ? t('products.list.purchase') : t('register.register-button')}
         </button>
+        <RegisterNote />
 
         <ValidationMessage #generalMessages fallback="true" />
 
