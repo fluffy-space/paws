@@ -29,6 +29,13 @@ class Register extends BaseComponent
     public ?RegisterValidation $validation = null;
     public bool $isPayment = false;
     public bool $trackedView = false;
+    public bool $trackedFocus = false;
+
+    /**
+     * The address already has an account. Only then is the reset-password line shown: on a
+     * first visit it is noise next to the one thing the page is for.
+     */
+    public bool $accountExists = false;
 
     /**
      * Whether the form asks for a name / a second password box, from the app's publicConfig
@@ -88,6 +95,7 @@ class Register extends BaseComponent
         $event->preventDefault();
         // validate
         if (!$this->registerForm->validate()) {
+            $this->analytics->track('signup_refused', ['reason' => 'form']);
             return;
         }
 
@@ -96,7 +104,7 @@ class Register extends BaseComponent
         // Waits for the "form issued at" stamp to be old enough, so a fast person is never refused.
         $this->formToken->whenReady(function (?string $token) {
             if ($token === null) {
-                $this->handleResponse(true, []);
+                $this->handleResponse(true, [], 'token');
                 return;
             }
             $this->registerModel->FormToken = $token;
@@ -108,17 +116,37 @@ class Register extends BaseComponent
                         $this->handleResponse(false, $response);
                     },
                     function (Response $response) {
-                        $this->handleResponse(true, $response->body);
+                        $this->handleResponse(true, $response->body, $response->status === 429 ? 'rate' : ($response->status === 400 ? 'refused' : 'server'));
                     }
                 );
         });
     }
 
-    public function handleResponse(bool $hasError, $response = null)
+    /**
+     * Visitors who type nothing and leave look the same as visitors who type and leave, unless
+     * the first touch is counted. focusin bubbles from any field in the form, so one listener
+     * on the wrapper covers them all.
+     */
+    public function formFocused()
+    {
+        if (!$this->trackedFocus) {
+            $this->trackedFocus = true;
+            $this->analytics->track('signup_form_focused');
+        }
+    }
+
+    /**
+     * `$reason` says why a submit was refused, for the `signup_refused` event: 'refused' (the
+     * server said no: a rule, the honeypot, a blocked address), 'exists', 'rate', 'token' or
+     * 'server'. Never the message itself: it can carry the address.
+     */
+    public function handleResponse(bool $hasError, $response = null, string $reason = '')
     {
         $this->loading = false;
         if ($hasError) {
             $this->formToken->discard();
+            $this->accountExists = $response['errors'] ? in_array($this->localization->t('register.validation.user-exists'), $response['errors']) : false;
+            $this->analytics->track('signup_refused', ['reason' => $this->accountExists ? 'exists' : $reason]);
             if ($response['errors']) {
                 $this->generalMessages->messages = $response['errors'];
             } else if ($response['message']) {

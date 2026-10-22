@@ -1,6 +1,7 @@
 <BoxLayout title="{t('register.title')}">
-    <h3 class="text-h3 mt-2 mb-4">{t('register.header')}</h3>
-    <ProviderButtons redirect="$providerRedirect" />
+    <RegisterIntro />
+    <ProviderButtons redirect="$providerRedirect" trackAs="signup" />
+    <div (focusin)="formFocused">
     <ActionForm #registerForm (submit)="handleSubmit" class="mt-8" autocomplete="on" id="register-form"
         action="/register" method="post" rules="$rules">
 
@@ -12,7 +13,7 @@
             autocomplete="family-name" inputClass="form-control" wrapperClass="col-12" id="LastName"
             model="$registerModel->LastName" />
 
-        <TextInput label="{t('register.email')}" type="text" placeholder="{t('register.email')}" autocomplete="username"
+        <TextInput label="{t('register.email')}" type="email" placeholder="{t('register.email')}" autocomplete="username"
             inputClass="form-control" wrapperClass="col-12" id="Email" model="$registerModel->Email" />
 
         <!-- <TextInput label="{t('register.phone')}" type="text" placeholder="+380971234567" autocomplete="tel"
@@ -20,7 +21,7 @@
 
         <TextInput label="{t('login.password')}" type="password" placeholder="{t('login.password')}"
             autocomplete="new-password" inputClass="form-control" wrapperClass="col-12" id="Password" name="Password"
-            model="$registerModel->Password" />
+            revealable="true" model="$registerModel->Password" />
 
         <TextInput if="$askPasswordConfirmation" label="{t('register.password-confirm')}" type="password"
             placeholder="{t('register.password-confirm')}" autocomplete="new-password" inputClass="form-control"
@@ -41,8 +42,9 @@
             {t('register.have-account')} <a href="{loginUrl()}" class="text-secondary">{t('register.login-here')}</a>
         </div>
 
-        <div class="form-text mt-4">{t('login.forgot-your-password')}
+        <div if="$accountExists" class="form-text mt-4">{t('login.forgot-your-password')}
             <a href="/reset-password" class="text-secondary">{t('login.reset-here')}</a>
         </div>
     </ActionForm>
+    </div>
 </BoxLayout>

@@ -29,17 +29,21 @@ class AnalyticsService
      * Retries briefly, because the tracking script is loaded `defer` while component hydration is
      * not — on a cold load the first event can easily reach here before `window.pirsch` exists,
      * and a dropped `signup_completed` is exactly the data point nobody notices is missing.
+     *
+     * `$meta` becomes the event's metadata (Pirsch shows it as a breakdown under the event), so
+     * one event can say why or where without minting a new event name per case. Keep the values
+     * a short fixed vocabulary: never an address or anything else a person typed.
      */
-    public function track(string $eventName): void
+    public function track(string $eventName, ?array $meta = null): void
     {
         <<<'javascript'
-        (function (name) {
+        (function (name, meta) {
             var tries = 0;
             var send = function () {
                 if (typeof window.pirsch === 'function') {
                     // Always pass options: Pirsch's pa.js reads options.non_interactive and
                     // throws a TypeError on pirsch(name) alone, so the event is never sent.
-                    window.pirsch(name, {});
+                    window.pirsch(name, meta ? { meta: meta } : {});
                     return;
                 }
                 // ~5s of grace, then give up rather than leak a timer forever.
@@ -48,7 +52,7 @@ class AnalyticsService
                 }
             };
             send();
-        })(eventName);
+        })(eventName, meta);
         javascript;
     }
 

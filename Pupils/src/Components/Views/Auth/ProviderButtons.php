@@ -2,8 +2,10 @@
 
 namespace Pupils\Components\Views\Auth;
 
+use Pupils\Components\Services\Analytics\AnalyticsService;
 use Pupils\Components\Services\Localization\HasLocalization;
 use Viewi\Components\BaseComponent;
+use Viewi\Components\DOM\DomEvent;
 use Viewi\Components\Http\HttpClient;
 
 /**
@@ -28,11 +30,18 @@ class ProviderButtons extends BaseComponent
     /** Same-site path to come back to after signing in ('' = the default landing). */
     public string $redirect = '';
 
+    /**
+     * Event prefix for a click ('signup' fires `signup_oauth_clicked`), '' = not tracked.
+     * It is the only way to see a visitor who left on the provider's consent screen: the start
+     * endpoint is a redirect, which page-view tracking never sees.
+     */
+    public string $trackAs = '';
+
     /** One entry per enabled provider: key, action (start URL), label (localization key). */
     public array $buttons = [];
     public bool $any = false;
 
-    public function __construct(private HttpClient $http) {}
+    public function __construct(private HttpClient $http, private AnalyticsService $analytics) {}
 
     public function init()
     {
@@ -49,6 +58,23 @@ class ProviderButtons extends BaseComponent
             $this->any = count($buttons) > 0;
         }, function () {
             // No list, no buttons: the form below still works.
+        });
+    }
+
+    /**
+     * Holds the GET back until the event has gone, then submits it. form.submit() does not
+     * raise another submit event, so this runs once. Before hydration the form simply submits,
+     * untracked.
+     */
+    public function start(DomEvent $event)
+    {
+        if ($this->trackAs === '') {
+            return;
+        }
+        $event->preventDefault();
+        $form = $event->target;
+        $this->analytics->trackAndWait($this->trackAs . '_oauth_clicked', function () use ($form) {
+            $form->submit();
         });
     }
 }
