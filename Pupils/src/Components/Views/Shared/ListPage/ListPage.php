@@ -271,9 +271,15 @@ class ListPage extends BaseComponent
             $this->route->navigate($this->addLink);
         } elseif ($this->editInline) {
             if ($this->newFactory !== null) {
-                $newItem = ($this->newFactory)();
-                array_unshift($this->items, $newItem);
-                $this->items = [...$this->items];
+                // Add clicked again while a new row is still unsaved: reuse that row, so repeat
+                // clicks don't stack blank rows that drop out of edit mode.
+                if (count($this->items) > 0 && $this->items[0]->Id === 0) {
+                    $newItem = $this->items[0];
+                } else {
+                    $newItem = ($this->newFactory)();
+                    array_unshift($this->items, $newItem);
+                    $this->items = [...$this->items];
+                }
                 $this->tableContext->passProps([
                     'items' => $this->items,
                     'editItem' => $newItem,
