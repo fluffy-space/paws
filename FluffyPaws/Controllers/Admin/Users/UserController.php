@@ -2,6 +2,7 @@
 
 namespace FluffyPaws\Controllers\Admin\Users;
 
+use DotDi\DependencyInjection\Container;
 use Fluffy\Controllers\BaseController;
 use Fluffy\Data\Entities\Auth\UserEntity;
 use Fluffy\Data\Entities\Auth\UserEntityMap;
@@ -12,6 +13,7 @@ use Fluffy\Security\PermissionRegistry;
 use Fluffy\Security\Role;
 use Fluffy\Services\Auth\AuthorizationService;
 use FluffyPaws\Security\PawsCapability;
+use FluffyPaws\Services\Auth\IUserDeleter;
 use FluffyPaws\Services\Emails\EmailService;
 use Fluffy\Swoole\RateLimit\IRateLimitService;
 use SharedPaws\Models\Auth\UserViewModel;
@@ -25,7 +27,8 @@ class UserController extends BaseController
     function __construct(
         protected IMapper $mapper,
         protected UserRepository $users,
-        protected AuthorizationService $auth
+        protected AuthorizationService $auth,
+        protected Container $container
     ) {}
 
     public function List(int $page = 1, int $size = 10, ?string $search = null)
@@ -244,6 +247,11 @@ class UserController extends BaseController
         $entity = $this->users->getById($id);
         if (!$entity) {
             return $this->NotFound();
+        }
+        /** @var IUserDeleter[] $deleters */
+        $deleters = $this->container->serviceProvider->getAll(IUserDeleter::class);
+        if (count($deleters) > 0) {
+            return $deleters[0]->deleteUser($entity->Id);
         }
         $success = $this->users->delete($entity);
         return $success;
