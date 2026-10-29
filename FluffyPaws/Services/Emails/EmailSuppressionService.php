@@ -43,7 +43,10 @@ class EmailSuppressionService
         return $this->find($email) !== null;
     }
 
-    /** The suppression row for an address, or null. */
+    /**
+     * The suppression row for an address, or null. A row whose Email is `@domain` suppresses the
+     * whole domain (demo accounts on a prospect's domain: nothing may reach anyone there).
+     */
     public function find(string $email): ?EmailSuppressionEntity
     {
         $normalized = self::normalize($email);
@@ -51,7 +54,9 @@ class EmailSuppressionService
             return null;
         }
         try {
-            return $this->repository->findByEmail($normalized);
+            $at = strrpos($normalized, '@');
+            return $this->repository->findByEmail($normalized)
+                ?? ($at !== false ? $this->repository->findByEmail(substr($normalized, $at)) : null);
         } catch (Throwable $t) {
             echo '[EmailSuppression] lookup failed for ' . $normalized . ': ' . $t->getMessage() . PHP_EOL;
             return null;
