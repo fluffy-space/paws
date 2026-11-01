@@ -74,15 +74,12 @@ class OAuthCompletePage extends BaseComponent
         });
     }
 
-    /** Only a same-site absolute path: "//evil.example" would make this an open redirect. */
+    /** Only a same-site path: see AuthService::safeRedirect. */
     private function redirectFromQuery(): ?string
     {
         $params = $this->route->getQueryParams();
         $to = $params === null ? '' : (string) ($params['redirect'] ?? '');
-        if ($to === '' || substr($to, 0, 1) !== '/' || substr($to, 0, 2) === '//') {
-            return null;
-        }
-        return $to;
+        return $this->auth->safeRedirect($to);
     }
 
     public function leave()

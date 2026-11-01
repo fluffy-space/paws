@@ -53,6 +53,19 @@ class AuthService
         return $session->user->Active || !$session->user->EmailConfirmed;
     }
 
+    /**
+     * A `?redirect=` value this site may follow, or null. It must be a path on this site. Browsers read
+     * a backslash as a slash and drop tabs and newlines, so "/\\evil.example" and "/<tab>/evil.example"
+     * leave the site just as "//evil.example" does: anything but a plain path is refused.
+     */
+    public function safeRedirect(string $to): ?string
+    {
+        if ($to === '' || substr($to, 0, 1) !== '/' || substr($to, 0, 2) === '//' || preg_match('/[\\\\\s]/', $to)) {
+            return null;
+        }
+        return $to;
+    }
+
     public function isAuthorized(callable $callback)
     {
         $this->fetchUser();

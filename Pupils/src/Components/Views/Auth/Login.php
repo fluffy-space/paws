@@ -124,10 +124,7 @@ class Login extends BaseComponent
     {
         $params = $this->route->getQueryParams();
         $to = $params === null ? '' : (string) ($params['redirect'] ?? '');
-        if ($to === '' || substr($to, 0, 1) !== '/' || substr($to, 0, 2) === '//') {
-            return null;
-        }
-        return $to;
+        return $this->auth->safeRedirect($to);
     }
 
     /** Keeps `?redirect=` on the "create an account" link, so registering finishes the errand too. */

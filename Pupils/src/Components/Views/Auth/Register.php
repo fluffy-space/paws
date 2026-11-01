@@ -188,10 +188,7 @@ class Register extends BaseComponent
     {
         $params = $this->route->getQueryParams();
         $to = $params === null ? '' : (string) ($params['redirect'] ?? '');
-        if ($to === '' || substr($to, 0, 1) !== '/' || substr($to, 0, 2) === '//') {
-            return null;
-        }
-        return $to;
+        return $this->auth->safeRedirect($to);
     }
 
     /** Keeps `?redirect=` on the "log in" link, so an existing user finishes the errand too. */
