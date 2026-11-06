@@ -11,6 +11,7 @@ use Fluffy\Domain\Message\HttpContext;
 use Fluffy\Security\Capability;
 use Fluffy\Security\Permissions;
 use Fluffy\Services\Auth\AuthorizationService;
+use Fluffy\Services\Auth\TwoFactorService;
 use Fluffy\Swoole\RateLimit\IRateLimitService;
 use FluffyPaws\Services\Auth\AuthFormGuard;
 use FluffyPaws\Services\Auth\EmailConfirmedNotifier;
@@ -24,6 +25,7 @@ use SharedPaws\Models\Auth\RegisterModel;
 use SharedPaws\Models\Auth\RegisterValidation;
 use SharedPaws\Models\Auth\ResetPasswordModel;
 use SharedPaws\Models\Auth\ResetPasswordValidation;
+use SharedPaws\Models\Auth\TwoFactorCodeModel;
 use SharedPaws\Models\Auth\UserAuthSessionModel;
 use SharedPaws\Models\Auth\UserViewModel;
 use SharedPaws\Validation\ValidationRules;
@@ -91,7 +93,7 @@ class AuthorizationController extends BaseController
         return ['success' => true];
     }
 
-    public function Login(LoginModel $loginModel, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext)
+    public function Login(LoginModel $loginModel, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext, TwoFactorService $twoFactor)
     {
         if (!$this->auth->authorizeCSRF()) {
             return $this->Forbidden('Invalid CSRF-token.');
@@ -125,8 +127,31 @@ class AuthorizationController extends BaseController
         if (!$result->Success) {
             return $this->Unauthorized($localization->localize('login.validation.wrong-username-or-password'));
         }
+        if ($twoFactor->needsChallenge($result->User)) {
+            // Not signed in yet: the page asks for the code and posts it to TwoFactor().
+            $twoFactor->startChallenge($result->User, $loginModel->RememberMe);
+            return ['success' => false, 'twoFactor' => true];
+        }
         $this->auth->authorizeUser($result->User, $loginModel->RememberMe);
         return ['success' => true];
+    }
+
+    /** The second sign-in step, after Login (or a provider or invitation sign-in) asked for a code. */
+    public function TwoFactor(TwoFactorCodeModel $model, IRateLimitService $rateLimit, HttpContext $httpContext, TwoFactorService $twoFactor)
+    {
+        if (!$this->auth->authorizeCSRF()) {
+            return $this->Forbidden('Invalid CSRF-token.');
+        }
+        if (!$rateLimit->limit('tfa:ip:' . $httpContext->request->getIp(), 10, 5 * 60)) {
+            return $this->TooManyRequests('Too many attempts. Wait a few minutes and try again.');
+        }
+        $result = $twoFactor->complete(trim($model->Code ?? ''));
+        return match ($result) {
+            TwoFactorService::RESULT_OK => ['success' => true],
+            TwoFactorService::RESULT_EXPIRED => $this->Unauthorized('Your sign-in timed out. Sign in again.'),
+            TwoFactorService::RESULT_TOO_MANY => $this->TooManyRequests('Too many wrong codes. Wait 15 minutes and try again.'),
+            default => $this->Unauthorized('That code didn\'t work. Try the current code from your app, or a recovery code.'),
+        };
     }
 
     public function Register(RegisterModel $registerModel, LocalizationService $localization, IRateLimitService $rateLimit, HttpContext $httpContext)

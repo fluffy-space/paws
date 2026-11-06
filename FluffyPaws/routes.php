@@ -57,6 +57,8 @@ $router->section('/api/', function (Router $router) {
 
     $router->post('authorization/session', [AuthorizationController::class, 'Session']);
     $router->post('authorization/login', [AuthorizationController::class, 'Login']);
+    // second sign-in step (two-factor); TwoFactorService holds the challenge cookie on this path
+    $router->post('authorization/two-factor', [AuthorizationController::class, 'TwoFactor']);
     $router->post('authorization/logout', [AuthorizationController::class, 'Logout']);
 
     // Exit impersonation — authorized by the IMP overlay itself (the effective

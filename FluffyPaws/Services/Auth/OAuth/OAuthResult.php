@@ -13,6 +13,8 @@ class OAuthResult
     public ?string $Error = null;
     /** True when this sign-in created the account. */
     public bool $Created = false;
+    /** True when the account uses two-factor sign-in: not signed in yet, a code is needed first. */
+    public bool $TwoFactor = false;
     /** Same-site path the visitor asked to come back to, if any. */
     public ?string $ReturnTo = null;
 

@@ -17,7 +17,7 @@ use FluffyPaws\Services\Auth\OAuth\OAuthService;
  */
 class OAuthController extends BaseController
 {
-    /** Where a failed or cancelled sign-in lands; the page reads `?oauth=<code>`. */
+    /** Where a failed or cancelled sign-in lands (the page reads `?oauth=<code>`), and one that still needs the two-factor code (`?twofactor=1`). */
     private const FAILURE_PATH = '/login';
     /** Where a successful one lands (Pupils OAuthCompletePage). */
     private const COMPLETE_PATH = '/oauth/complete';
@@ -62,6 +62,14 @@ class OAuthController extends BaseController
             $to = self::FAILURE_PATH . '?oauth=' . rawurlencode((string) $result->Error);
             if ($result->ReturnTo !== null) {
                 // Keep the errand: the login page already carries ?redirect= through a sign-in.
+                $to .= '&redirect=' . rawurlencode($result->ReturnTo);
+            }
+            return $this->leave($to);
+        }
+        if ($result->TwoFactor) {
+            // The login page shows the code step; the errand rides along as on any sign-in.
+            $to = self::FAILURE_PATH . '?twofactor=1';
+            if ($result->ReturnTo !== null) {
                 $to .= '&redirect=' . rawurlencode($result->ReturnTo);
             }
             return $this->leave($to);

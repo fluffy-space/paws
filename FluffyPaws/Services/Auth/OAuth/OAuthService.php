@@ -13,6 +13,7 @@ use Fluffy\Data\Repositories\UserRepository;
 use Fluffy\Domain\Configuration\Config;
 use Fluffy\Domain\Message\HttpContext;
 use Fluffy\Services\Auth\AuthorizationService;
+use Fluffy\Services\Auth\TwoFactorService;
 use Fluffy\Services\Settings\SettingsService;
 use Fluffy\Services\UtilsService;
 use FluffyPaws\Services\Auth\AuthFormGuard;
@@ -60,7 +61,8 @@ class OAuthService
         private EmailService $emailService,
         private EmailConfirmedNotifier $confirmedNotifier,
         private IMapper $mapper,
-        private Container $container
+        private Container $container,
+        private TwoFactorService $twoFactor
     ) {}
 
     // --- which providers are on ----------------------------------------------
@@ -361,10 +363,16 @@ class OAuthService
         if ($this->auth->isDeactivated($user)) {
             return $this->refuse('-', 'deactivated', 'failed');
         }
-        $this->auth->authorizeUser($user, true);
         $result = new OAuthResult();
         $result->Success = true;
         $result->Created = $created;
+        if ($this->twoFactor->needsChallenge($user)) {
+            // The provider vouches for the first factor only; the login page asks for the code.
+            $this->twoFactor->startChallenge($user, true);
+            $result->TwoFactor = true;
+            return $result;
+        }
+        $this->auth->authorizeUser($user, true);
         return $result;
     }
 
