@@ -1,0 +1,14 @@
+<div class="py-3">
+    <div if="{!$loaded}" class="text-muted">Loading…</div>
+    <div if="{$loaded && $status === null}" class="text-muted">Could not load two-factor sign-in for this user.</div>
+    <div if="{$loaded && $status !== null}">
+        <p if="$status->Enabled" class="mb-1">Two-factor sign-in is <strong>on</strong>.</p>
+        <p if="$status->Enabled" class="text-muted small">{$status->RecoveryCodesLeft} of 10 recovery codes left.</p>
+        <p if="{!$status->Enabled}" class="mb-1">Two-factor sign-in is <strong>off</strong>.</p>
+        <p if="{!$status->Enabled && $status->Required}" class="text-warning small">This user can open the admin area, so
+            they have a member's access only until they turn it on.</p>
+        <button if="{$status->Enabled && $canReset}" type="button" class="btn btn-outline-danger mt-2"
+            disabled="$resetting" (click)="reset">Reset two-factor sign-in</button>
+        <p if="{$status->Enabled && !$canReset}" class="text-muted small mt-2">Only a SuperAdmin can reset it.</p>
+    </div>
+</div>

@@ -22,6 +22,21 @@ class PawsEmailPreviewProvider implements IEmailPreviewProvider
                 'Confirm email',
                 fn(EmailPreviewContext $ctx) => $ctx->emailService->getUserActivateEmail($ctx->demoUser(), $ctx->demoCode())->html
             ),
+            new EmailPreviewTemplate(
+                'two-factor-changed',
+                'Two-factor sign-in turned on',
+                fn(EmailPreviewContext $ctx) => $ctx->emailService->getTwoFactorChangedEmail($ctx->demoUser(), true)->html
+            ),
+            new EmailPreviewTemplate(
+                'two-factor-changed-off',
+                'Two-factor sign-in turned off',
+                fn(EmailPreviewContext $ctx) => $ctx->emailService->getTwoFactorChangedEmail($ctx->demoUser(), false)->html
+            ),
+            new EmailPreviewTemplate(
+                'two-factor-changed-reset',
+                'Two-factor sign-in reset by an admin',
+                fn(EmailPreviewContext $ctx) => $ctx->emailService->getTwoFactorChangedEmail($ctx->demoUser(), false, true)->html
+            ),
         ];
     }
 }

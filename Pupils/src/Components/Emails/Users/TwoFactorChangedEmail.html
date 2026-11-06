@@ -1,0 +1,17 @@
+<EmailLayout title="{$turnedOn ? 'Two-factor sign-in is on' : 'Two-factor sign-in is off'}">
+    <p>Hi {$userName},</p>
+    <div if="$turnedOn">
+        <p>Two-factor sign-in is now on for your account. Signing in will ask for a code from your authenticator app.</p>
+        <p>If you did not do this, <a href="{$baseUrl}/reset-password">reset your password now</a>.</p>
+    </div>
+    <div if="{!$turnedOn && $byAdmin}">
+        <p>An administrator turned off two-factor sign-in for your account, which is how we help someone who lost
+            their authenticator app. You have been signed out everywhere.</p>
+        <p>Sign in with your password, then <a href="{$baseUrl}/app/account">turn it on again on your account page</a>.</p>
+        <p>If you did not ask for this, <a href="{$baseUrl}/reset-password">reset your password now</a>.</p>
+    </div>
+    <div if="{!$turnedOn && !$byAdmin}">
+        <p>Two-factor sign-in is now off for your account. Your password alone signs you in.</p>
+        <p>If you did not do this, <a href="{$baseUrl}/reset-password">reset your password now</a>.</p>
+    </div>
+</EmailLayout>

@@ -27,6 +27,10 @@ class AdminGuard implements IMIddleware
         $this->auth->getUserSession(function (UserAuthSessionModel $session) use ($c) {
             if ($this->authorize($session)) {
                 $c->next();
+            } elseif ($session->twoFactorSetupRequired) {
+                // An admin who has not turned on two-factor sign-in: the account page says why.
+                $c->next(false);
+                $this->route->navigate('/app/account');
             } else {
                 $c->next(false); // cancel
                 $this->route->navigate('/login'); // redirect

@@ -65,9 +65,12 @@ class AuthorizationController extends BaseController
         $response = new UserAuthSessionModel();
         if ($user !== null) {
             $response->user = $this->mapper->map(UserViewModel::class, $user);
-            $response->user->CanAccessAdmin = Permissions::can($user->Permissions, Capability::AccessAdmin);
-            $response->roles = Permissions::roleNames($user->Permissions);
-            $response->capabilities = Permissions::capabilityNames($user->Permissions);
+            // permissions(), not the user's own bits: an admin without two-factor sign-in has none yet.
+            $permissions = $this->auth->permissions();
+            $response->user->CanAccessAdmin = Permissions::can($permissions, Capability::AccessAdmin);
+            $response->roles = Permissions::roleNames($permissions);
+            $response->capabilities = Permissions::capabilityNames($permissions);
+            $response->twoFactorSetupRequired = $this->auth->twoFactorSetupRequired();
             $response->isAuthenticated = true;
             // Impersonation overlay: $user is the effective (target) user; surface
             // the acting admin so the client can render the "viewing as" banner.

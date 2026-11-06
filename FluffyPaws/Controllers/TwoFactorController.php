@@ -5,6 +5,7 @@ namespace FluffyPaws\Controllers;
 use DotDi\DependencyInjection\Container;
 use Fluffy\Controllers\BaseController;
 use Fluffy\Data\Entities\Auth\UserEntity;
+use Fluffy\Data\Mapper\IMapper;
 use Fluffy\Domain\Configuration\Config;
 use Fluffy\Domain\Message\HttpContext;
 use Fluffy\Services\Auth\AuthorizationService;
@@ -12,10 +13,12 @@ use Fluffy\Services\Auth\TotpService;
 use Fluffy\Services\Auth\TwoFactorService;
 use Fluffy\Services\Qr\IQrCodeRenderer;
 use Fluffy\Swoole\RateLimit\IRateLimitService;
+use FluffyPaws\Services\Emails\EmailService;
 use SharedPaws\Models\Auth\TwoFactorConfirmModel;
 use SharedPaws\Models\Auth\TwoFactorRecoveryCodesModel;
 use SharedPaws\Models\Auth\TwoFactorSetupModel;
 use SharedPaws\Models\Auth\TwoFactorStatusModel;
+use SharedPaws\Models\Auth\UserViewModel;
 
 /**
  * /api/account/two-factor: the signed-in user turns two-factor sign-in on and off and renews
@@ -31,7 +34,9 @@ class TwoFactorController extends BaseController
     function __construct(
         protected AuthorizationService $auth,
         protected TwoFactorService $twoFactor,
-        protected Config $config
+        protected Config $config,
+        protected EmailService $emails,
+        protected IMapper $mapper
     ) {}
 
     /** GET /api/account/two-factor */
@@ -45,6 +50,7 @@ class TwoFactorController extends BaseController
         $status->Enabled = $this->twoFactor->isEnabled($user->Id);
         $status->RecoveryCodesLeft = $status->Enabled ? $this->twoFactor->recoveryCodesLeft($user->Id) : 0;
         $status->HasPassword = $this->hasPassword($user);
+        $status->Required = $this->auth->twoFactorRequiredFor($user);
         return $status;
     }
 
@@ -92,6 +98,7 @@ class TwoFactorController extends BaseController
         }
         // Sessions opened before this had only the password behind them.
         $this->auth->revokeOtherSessions($user->Id);
+        $this->emails->dispatchTwoFactorChangedEmail($this->mapper->map(UserViewModel::class, $user), true);
         $result = new TwoFactorRecoveryCodesModel();
         $result->Codes = $codes;
         return $result;
@@ -126,6 +133,9 @@ class TwoFactorController extends BaseController
         if (!$rateLimit->limit('tfa:ip:' . $httpContext->request->getIp(), 10, 5 * 60)) {
             return $this->TooManyRequests('Too many attempts. Wait a few minutes and try again.');
         }
+        if ($this->auth->twoFactorRequiredFor($user)) {
+            return $this->BadRequest(['Accounts with admin access must keep two-factor sign-in on.']);
+        }
         if ($this->hasPassword($user) && !password_verify((string) $model->Password, (string) $user->Password)) {
             return $this->BadRequest(['Your password is incorrect.']);
         }
@@ -137,6 +147,7 @@ class TwoFactorController extends BaseController
             return $this->BadRequest(['That code didn\'t work. Use the code the app shows now, or a recovery code.']);
         }
         $this->twoFactor->disable($user->Id);
+        $this->emails->dispatchTwoFactorChangedEmail($this->mapper->map(UserViewModel::class, $user), false);
         return ['success' => true];
     }
 

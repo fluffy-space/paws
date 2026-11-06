@@ -44,6 +44,7 @@ class HasCapability extends AdminGuard
      *  - admin access, but missing the capability -> stay inside the admin
      *    area on an "insufficient permissions" page (the user is signed in and
      *    allowed here, they just can't see this feature)
+     *  - an admin without two-factor sign-in -> /app/account, to turn it on
      *  - no admin access at all     -> /login
      */
     public function run(IMIddlewareContext $c)
@@ -58,6 +59,9 @@ class HasCapability extends AdminGuard
                 // JS `super`, which is illegal inside this nested callback.
                 if ($session->user?->CanAccessAdmin === true) {
                     $this->route->navigate('/admin/access-denied');
+                } else if ($session->twoFactorSetupRequired) {
+                    // An admin who has not turned on two-factor sign-in: the account page says why.
+                    $this->route->navigate('/app/account');
                 } else {
                     $this->route->navigate('/login');
                 }

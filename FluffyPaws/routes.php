@@ -14,6 +14,7 @@ use FluffyPaws\Controllers\Admin\Settings\SettingController;
 use FluffyPaws\Controllers\Admin\Users\UserController;
 use FluffyPaws\Controllers\Admin\Users\UserSessionController;
 use FluffyPaws\Controllers\Admin\Users\ImpersonationController;
+use FluffyPaws\Controllers\Admin\Users\UserTwoFactorController;
 use FluffyPaws\Controllers\AuthorizationController;
 use FluffyPaws\Controllers\BlogController;
 use FluffyPaws\Controllers\ContentController;
@@ -126,6 +127,9 @@ $router->section('/api/', function (Router $router) {
         // impersonation start ("view as user") — SuperAdmin/ImpersonateUsers. Exit
         // lives outside the admin block (the effective user isn't an admin then).
         $router->post('user/{id}/impersonate', [ImpersonationController::class, 'Start']);
+        // two-factor sign-in: status (ManageUsers), reset for a locked-out user (SuperAdmin)
+        $router->get('user/{id}/two-factor', [UserTwoFactorController::class, 'Get']);
+        $router->post('user/{id}/two-factor/reset', [UserTwoFactorController::class, 'Reset']);
 
         // localization
         $router->get('language', [LanguageController::class, 'List']);

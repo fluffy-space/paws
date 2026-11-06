@@ -7,6 +7,7 @@ use Exception;
 use Fluffy\Swoole\Task\TaskManager;
 use Pupils\Components\Emails\Users\ActivateUserEmail;
 use Pupils\Components\Emails\Users\ResetPasswordEmail;
+use Pupils\Components\Emails\Users\TwoFactorChangedEmail;
 use ReflectionException;
 use SharedPaws\Models\Auth\UserViewModel;
 use Viewi\App;
@@ -54,5 +55,23 @@ class EmailService
     public function getSendPasswordResetEmail(UserViewModel $user, $verificationCode): RenderedEmail
     {
         return $this->renderer->render(ResetPasswordEmail::class, ['user' => $user, 'verificationCode' => $verificationCode]);
+    }
+
+    // TwoFactorChangedEmail: two-factor sign-in turned on or off (byAdmin: an admin reset)
+    public function dispatchTwoFactorChangedEmail(UserViewModel $user, bool $turnedOn, bool $byAdmin = false)
+    {
+        $this->tasks->dispatch($this->sendTwoFactorChangedEmail(...), $user, $turnedOn, $byAdmin);
+    }
+
+    public function sendTwoFactorChangedEmail(UserViewModel $user, bool $turnedOn, bool $byAdmin = false)
+    {
+        $email = $this->getTwoFactorChangedEmail($user, $turnedOn, $byAdmin);
+        $subject = $turnedOn ? 'Two-factor sign-in is on' : 'Two-factor sign-in is off';
+        $this->emailLog->send('two-factor-changed', $user->Email, $subject, $email->html, UserDisplay::forUser($user), $email->text);
+    }
+
+    public function getTwoFactorChangedEmail(UserViewModel $user, bool $turnedOn, bool $byAdmin = false): RenderedEmail
+    {
+        return $this->renderer->render(TwoFactorChangedEmail::class, ['user' => $user, 'turnedOn' => $turnedOn, 'byAdmin' => $byAdmin]);
     }
 }

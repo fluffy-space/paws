@@ -64,6 +64,9 @@
             <Tab if="{!$createMode}" title="Sessions">
                 <UserSessionList user="$id" />
             </Tab>
+            <Tab if="{!$createMode}" title="Two-factor">
+                <UserTwoFactorAdmin user="$id" />
+            </Tab>
         </Tabs>
     </div>
 </AdminLayout>

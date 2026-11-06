@@ -2,6 +2,7 @@
 
 namespace Pupils\Components\Views\Account;
 
+use Pupils\Components\Services\Auth\AuthService;
 use SharedPaws\Models\Auth\TwoFactorConfirmModel;
 use SharedPaws\Models\Auth\TwoFactorSetupModel;
 use SharedPaws\Models\Auth\TwoFactorStatusModel;
@@ -30,7 +31,7 @@ class TwoFactorSettings extends BaseComponent
     public bool $busy = false;
     public bool $copied = false;
 
-    public function __construct(private HttpClient $http) {}
+    public function __construct(private HttpClient $http, private AuthService $auth) {}
 
     public function init()
     {
@@ -95,6 +96,8 @@ class TwoFactorSettings extends BaseComponent
             $this->busy = false;
             $this->showCodes($result->Codes);
             $this->status->Enabled = true;
+            // The session may have just gained admin access (an admin had to turn this on first).
+            $this->auth->reset();
         }, function (Response $response) {
             $this->failed($response, 'Could not turn on two-factor sign-in.');
         });

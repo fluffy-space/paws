@@ -4,6 +4,10 @@
     <div if="{$stage === 'loading'}" class="text-muted">Loading…</div>
 
     <div if="{$stage === 'off'}">
+        <div if="$status->Required" class="mb-3">
+            <Alert variant="warning" dismissible="{false}"
+                body="Your account can open the admin area, so two-factor sign-in is required. Turn it on to get admin access." />
+        </div>
         <p class="mb-2">Off. Signing in takes only your password.</p>
         <p class="text-muted small mb-3">
             Turn it on and signing in also asks for a 6-digit code from an authenticator app on your
@@ -64,8 +68,9 @@
             or a lost phone will lock you out.</p>
         <div class="d-flex gap-2 stack-sm">
             <button type="button" class="btn btn-outline-primary" (click)="startRenew">New recovery codes</button>
-            <button type="button" class="btn btn-outline-danger" (click)="startDisable">Turn off</button>
+            <button if="{!$status->Required}" type="button" class="btn btn-outline-danger" (click)="startDisable">Turn off</button>
         </div>
+        <p if="$status->Required" class="text-muted small mt-3 mb-0">Accounts with admin access must keep it on.</p>
     </div>
 
     <form if="{$stage === 'renew'}" (submit)="submitRenew">

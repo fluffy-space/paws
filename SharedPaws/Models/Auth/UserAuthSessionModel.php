@@ -26,4 +26,10 @@ class UserAuthSessionModel
 
     /** Display name of the acting admin while impersonating (drives the banner). */
     public ?string $impersonatorName = null;
+
+    /**
+     * The user can open the admin area but has not turned on two-factor sign-in, so this session
+     * has a member's access only until they do. The admin guard sends them to the account page.
+     */
+    public bool $twoFactorSetupRequired = false;
 }

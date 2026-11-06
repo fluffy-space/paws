@@ -112,7 +112,10 @@ class Login extends BaseComponent
                 $this->route->navigate($redirectTo);
             } else {
                 $this->auth->getUserSession(function (?UserAuthSessionModel $userSession) {
-                    if ($userSession !== null && $userSession->user?->CanAccessAdmin) {
+                    if ($userSession !== null && $userSession->twoFactorSetupRequired) {
+                        // An admin without two-factor sign-in: the account page asks them to turn it on.
+                        $this->route->navigate('/app/account');
+                    } else if ($userSession !== null && $userSession->user?->CanAccessAdmin) {
                         $this->route->navigate('/admin');
                     } else {
                         $this->route->navigate('/');
