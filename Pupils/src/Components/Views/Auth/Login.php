@@ -35,6 +35,13 @@ class Login extends BaseComponent
      */
     public string $providerMessageKey = '';
 
+    /**
+     * The password (or provider) step passed and the account uses two-factor sign-in: show the
+     * code step instead of the form. Set by the login answer, or by `?twofactor=1` when a
+     * provider sign-in comes back (OAuthController).
+     */
+    public bool $twoFactor = false;
+
     public function __construct(
         private HttpClient $http,
         private ClientRoute $route,
@@ -53,6 +60,9 @@ class Login extends BaseComponent
         // A fixed list: the code comes off the URL, and only a known one may pick a message.
         if (in_array($code, ['cancelled', 'failed', 'no-email', 'account-exists', 'not-accepted'])) {
             $this->providerMessageKey = 'oauth.error.' . $code;
+        }
+        if ($params !== null && ($params['twofactor'] ?? '') === '1') {
+            $this->twoFactor = true;
         }
     }
 
@@ -91,6 +101,8 @@ class Login extends BaseComponent
                 $this->generalMessages->messages = [$this->localization->t('login.validation.wrong-username-or-password')];
             }
             $this->generalMessages->show = true;
+        } elseif (isset($response['twoFactor']) && $response['twoFactor']) {
+            $this->twoFactor = true;
         } elseif ($response['success']) {
             $this->auth->reset();
 
@@ -108,6 +120,18 @@ class Login extends BaseComponent
                 });
             }
         }
+    }
+
+    /** Start over, e.g. when the code step timed out. */
+    public function backToForm()
+    {
+        $this->twoFactor = false;
+    }
+
+    /** The code step signed the user in: carry on as after a one-step sign-in. */
+    public function twoFactorDone()
+    {
+        $this->handleResponse(false, ['success' => true]);
     }
 
     /**

@@ -20,6 +20,7 @@ use FluffyPaws\Controllers\ContentController;
 use FluffyPaws\Controllers\LocalizationController;
 use FluffyPaws\Controllers\MiscController;
 use FluffyPaws\Controllers\OAuthController;
+use FluffyPaws\Controllers\TwoFactorController;
 use FluffyPaws\Controllers\SitemapController;
 use Viewi\App;
 use Viewi\Components\Http\Message\Response;
@@ -78,6 +79,13 @@ $router->section('/api/', function (Router $router) {
     $router->get('authorization/oauth/providers', [OAuthController::class, 'Providers']);
     $router->get('authorization/oauth/{provider}/start', [OAuthController::class, 'Start']);
     $router->get('authorization/oauth/{provider}/callback', [OAuthController::class, 'Callback']);
+
+    // two-factor sign-in on the signed-in user's own account (TwoFactorController checks the session)
+    $router->get('account/two-factor', [TwoFactorController::class, 'Status']);
+    $router->post('account/two-factor/setup', [TwoFactorController::class, 'Setup']);
+    $router->post('account/two-factor/enable', [TwoFactorController::class, 'Enable']);
+    $router->post('account/two-factor/recovery-codes', [TwoFactorController::class, 'RecoveryCodes']);
+    $router->post('account/two-factor/disable', [TwoFactorController::class, 'Disable']);
 
     // SES bounce/complaint notifications over SNS — public + unauthenticated
     // (SNS-signature-verified and topic-allowlisted inside), so it sits outside
