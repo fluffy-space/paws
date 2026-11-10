@@ -34,7 +34,7 @@ use SharedPaws\Validation\ValidationRules;
 class AuthorizationController extends BaseController
 {
     /** What a sign-in refused by the app's ISignInPolicy (an organisation's SSO) is told. */
-    public const REFUSED_MESSAGE = 'Your organisation signs you in to Urlicer. Use "Sign in with SSO" with your work email.';
+    public const REFUSED_MESSAGE = 'Your organisation signs you in here. Use "Sign in with SSO" with your work email.';
 
     function __construct(
         protected AuthorizationService $auth,

@@ -119,7 +119,7 @@ class OrganisationSignIn extends BaseComponent
     public function messageFor(string $code, string $oauth): string
     {
         if ($oauth === 'sso-required' || $code === 'required') {
-            return 'Your organisation signs you in to Urlicer. Enter your work email to continue.';
+            return 'Your organisation signs you in here. Enter your work email to continue.';
         }
         if ($code === 'ended') {
             return 'Your session with your organisation ended. Enter your work email to sign in again.';
