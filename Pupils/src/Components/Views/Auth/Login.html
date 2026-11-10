@@ -7,6 +7,7 @@
     <div if="{!$twoFactor}">
         <Alert if="{$providerMessageKey !== ''}" variant="warning" body="{t($providerMessageKey)}" dismissible="{false}" />
         <ProviderButtons redirect="$providerRedirect" />
+        <OrganisationSignIn redirect="$providerRedirect" />
         <ActionForm #loginForm (submit)="handleSubmit" classList="mt-8" autocomplete="on" id="login-form" action="/login"
             method="post" rules="{$validation->getValidationRules()}">
             <TextInput type="text" label="{t('register.email')}" placeholder="{t('register.email')}"

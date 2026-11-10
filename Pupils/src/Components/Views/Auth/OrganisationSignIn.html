@@ -1,0 +1,9 @@
+<div if="$enabled" class="organisation-sign-in mb-3">
+    <div if="{$message !== ''}" class="small text-warning-emphasis bg-warning-subtle border border-warning-subtle rounded p-2 mb-2" role="status">{$message}</div>
+    <button if="{!$open}" type="button" class="btn btn-outline-secondary w-100" (click)="toggle">Sign in with SSO</button>
+    <form if="$open" (submit)="submit($event)" novalidate>
+        <label for="sso-email" class="form-label">Work email</label>
+        <input id="sso-email" type="email" class="form-control" autocomplete="username" placeholder="you@company.com" model="$email" />
+        <button type="submit" disabled="$loading" class="btn btn-outline-primary w-100 mt-2">Continue with SSO</button>
+    </form>
+</div>
