@@ -13,6 +13,7 @@ use Fluffy\Data\Repositories\UserRepository;
 use Fluffy\Domain\Configuration\Config;
 use Fluffy\Domain\Message\HttpContext;
 use Fluffy\Services\Auth\AuthorizationService;
+use Fluffy\Services\Auth\ISignInPolicy;
 use Fluffy\Services\Auth\TwoFactorService;
 use Fluffy\Services\Settings\SettingsService;
 use Fluffy\Services\UtilsService;
@@ -362,6 +363,10 @@ class OAuthService
     {
         if ($this->auth->isDeactivated($user)) {
             return $this->refuse('-', 'deactivated', 'failed');
+        }
+        if ($this->auth->signInRefusal($user, ISignInPolicy::METHOD_PROVIDER) !== null) {
+            // The app wants this account to sign in another way (its organisation's SSO).
+            return $this->refuse('-', 'sign-in-policy', 'sso-required');
         }
         $result = new OAuthResult();
         $result->Success = true;

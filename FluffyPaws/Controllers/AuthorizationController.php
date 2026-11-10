@@ -11,6 +11,7 @@ use Fluffy\Domain\Message\HttpContext;
 use Fluffy\Security\Capability;
 use Fluffy\Security\Permissions;
 use Fluffy\Services\Auth\AuthorizationService;
+use Fluffy\Services\Auth\ISignInPolicy;
 use Fluffy\Services\Auth\TwoFactorService;
 use Fluffy\Swoole\RateLimit\IRateLimitService;
 use FluffyPaws\Services\Auth\AuthFormGuard;
@@ -32,6 +33,9 @@ use SharedPaws\Validation\ValidationRules;
 
 class AuthorizationController extends BaseController
 {
+    /** What a sign-in refused by the app's ISignInPolicy (an organisation's SSO) is told. */
+    public const REFUSED_MESSAGE = 'Your organisation signs you in to Urlicer. Use "Sign in with SSO" with your work email.';
+
     function __construct(
         protected AuthorizationService $auth,
         protected IMapper $mapper,
@@ -127,6 +131,10 @@ class AuthorizationController extends BaseController
         if ($result->Disabled) {
             return $this->Forbidden('This account has been disabled.');
         }
+        if ($result->Refused !== null) {
+            // The password was right, but the app's ISignInPolicy wants another way in (SSO).
+            return $this->Forbidden(self::REFUSED_MESSAGE);
+        }
         if (!$result->Success) {
             return $this->Unauthorized($localization->localize('login.validation.wrong-username-or-password'));
         }
@@ -208,6 +216,9 @@ class AuthorizationController extends BaseController
 
         // DB validations
         $user = $this->mapper->map(UserEntity::class, $registerModel);
+        if ($this->auth->signInRefusal($user, ISignInPolicy::METHOD_REGISTER) !== null) {
+            return $this->BadRequest([self::REFUSED_MESSAGE]);
+        }
         $registerResult = $this->auth->registerUser($user);
         if (!$registerResult->Success) {
             if ($registerResult->UserNameTaken) {
@@ -351,6 +362,11 @@ class AuthorizationController extends BaseController
         $user = $users->find(UserEntityMap::PROPERTY_UserName, $Email);
         if ($user === null) {
             // nothing to send
+            return ['success' => true];
+        }
+        if ($this->auth->signInRefusal($user, ISignInPolicy::METHOD_RESET) !== null) {
+            // A password would not let them in (their organisation signs them in): no reset mail.
+            AuthFormGuard::log('reset-password', 'sign-in-policy', $ip, $Email);
             return ['success' => true];
         }
         if (!$this->formGuard->takeMailBudget($ip)) {
