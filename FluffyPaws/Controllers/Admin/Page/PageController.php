@@ -39,7 +39,7 @@ class PageController extends BaseController
         if ($search) {
             $where = [[PageEntityMap::PROPERTY_Title, 'like', Search::contains($search)]];
         }
-        $entities = $this->pages->search($where, [PageEntityMap::PROPERTY_CreatedOn => 1], $page, $size);
+        $entities = $this->pages->search($where, [PageEntityMap::PROPERTY_Id => -1], $page, $size);
         $models = array_map(fn ($entity) => $this->mapper->map(PageModel::class, $entity), $entities['list']);
         return ['list' => $models, 'total' => $entities['total']];
     }

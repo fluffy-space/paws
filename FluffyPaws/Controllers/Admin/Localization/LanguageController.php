@@ -31,7 +31,7 @@ class LanguageController extends BaseController
         if ($search) {
             $where = [[LanguageEntityMap::PROPERTY_Name, 'like', Search::contains($search)]];
         }
-        $entities = $this->languages->search($where, [LanguageEntityMap::PROPERTY_CreatedOn => 1], $page, $size);
+        $entities = $this->languages->search($where, [LanguageEntityMap::PROPERTY_Id => -1], $page, $size);
         $models = array_map(fn($entity) => $this->mapper->map(LanguageModel::class, $entity), $entities['list']);
         return ['list' => $models, 'total' => $entities['total']];
     }

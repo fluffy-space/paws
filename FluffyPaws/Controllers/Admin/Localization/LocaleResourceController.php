@@ -45,7 +45,7 @@ class LocaleResourceController extends BaseController
                 }
             }
         }
-        $entities = $this->localeResources->search($where, [LocaleResourceEntityMap::PROPERTY_CreatedOn => 1], $page, $size);
+        $entities = $this->localeResources->search($where, [LocaleResourceEntityMap::PROPERTY_Id => -1], $page, $size);
         $models = array_map(fn($entity) => $this->mapper->map(LocaleResourceModel::class, $entity), $entities['list']);
         return ['list' => $models, 'total' => $entities['total']];
     }
