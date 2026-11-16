@@ -71,7 +71,10 @@ class UserClock
             $this.browserZone = null;
         }
         javascript;
-        if ($this->browserZone === null) {
+        // A browser that says UTC is usually hiding its zone (privacy mode, a headless test run).
+        // Recording it would stop the person's ordinary browser from setting the real one later,
+        // and an account with no zone reads as UTC anyway.
+        if ($this->browserZone === null || $this->browserZone === self::UTC || $this->browserZone === 'Etc/UTC') {
             return;
         }
         $this->reported = true;

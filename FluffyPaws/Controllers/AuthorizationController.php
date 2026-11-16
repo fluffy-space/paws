@@ -106,6 +106,11 @@ class AuthorizationController extends BaseController
             return $this->Unauthorized();
         }
         $zone = TimeZones::valid($model->Zone);
+        // UTC from a browser is usually a hidden zone (privacy mode, headless). Not worth keeping:
+        // an empty setting already reads as UTC, and stays open for the real zone.
+        if (in_array($zone, ['UTC', 'Etc/UTC', 'Etc/UCT', 'UCT', 'Etc/Universal', 'Universal', 'Etc/Zulu', 'Zulu'], true)) {
+            $zone = null;
+        }
         // Not while an admin views as this person: the browser is the admin's, not theirs.
         if ($user->TimeZone === null && $zone !== null && !$this->auth->isImpersonating()) {
             $user->TimeZone = $zone;
