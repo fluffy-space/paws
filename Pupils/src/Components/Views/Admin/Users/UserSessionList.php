@@ -3,6 +3,7 @@
 namespace Pupils\Components\Views\Admin\Users;
 
 use SharedPaws\Models\User\UserSessionModel;
+use Pupils\Components\Services\Dates\UserClock;
 use Viewi\Components\BaseComponent;
 use Viewi\UI\Components\Tables\TableColumn;
 
@@ -18,6 +19,8 @@ class UserSessionList extends BaseComponent
     /** The owning user id (passed from UserEdit). */
     public int $user = 0;
 
+    public function __construct(private UserClock $clock) {}
+
     public function init()
     {
         $this->columns = [
@@ -31,7 +34,7 @@ class UserSessionList extends BaseComponent
     /** Expire is unix seconds UTC (not microseconds), so it can't use DateColumn. */
     public function expireText(?int $seconds): string
     {
-        return $seconds && $seconds > 0 ? gmdate('M j, Y H:i', $seconds) . ' UTC' : 'Never';
+        return $seconds && $seconds > 0 ? $this->clock->date('M j, Y H:i', $seconds) . $this->clock->suffix() : 'Never';
     }
 
     /** Short, non-secret identifier for the session (first chars of the token hash). */

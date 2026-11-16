@@ -5,6 +5,7 @@ namespace Pupils\Components\Views\Admin\EmailLogs;
 use Pupils\Components\Guards\HasCapability;
 use SharedPaws\Models\Emails\EmailLogModel;
 use Viewi\Components\Attributes\Middleware;
+use Pupils\Components\Services\Dates\UserClock;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Http\HttpClient;
 
@@ -20,7 +21,8 @@ class EmailLogView extends BaseComponent
 
     public function __construct(
         public int $id,
-        private HttpClient $http
+        private HttpClient $http,
+        private UserClock $clock
     ) {}
 
     public function init()
@@ -38,6 +40,6 @@ class EmailLogView extends BaseComponent
         if (!$micro) {
             return '—';
         }
-        return date('Y-m-d H:i:s', (int)($micro / 1000000));
+        return $this->clock->date('Y-m-d H:i:s', (int)($micro / 1000000)) . $this->clock->suffix();
     }
 }

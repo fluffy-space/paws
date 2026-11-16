@@ -18,6 +18,7 @@ use FluffyPaws\Services\Auth\AuthFormGuard;
 use FluffyPaws\Services\Auth\EmailConfirmedNotifier;
 use FluffyPaws\Services\Emails\EmailService;
 use FluffyPaws\Services\Localization\LocalizationService;
+use FluffyPaws\Services\Time\TimeZones;
 use SharedPaws\Models\Auth\ConfirmEmailModel;
 use SharedPaws\Models\Auth\LoginModel;
 use SharedPaws\Models\Auth\LoginValidation;
@@ -26,6 +27,7 @@ use SharedPaws\Models\Auth\RegisterModel;
 use SharedPaws\Models\Auth\RegisterValidation;
 use SharedPaws\Models\Auth\ResetPasswordModel;
 use SharedPaws\Models\Auth\ResetPasswordValidation;
+use SharedPaws\Models\Auth\TimeZoneModel;
 use SharedPaws\Models\Auth\TwoFactorCodeModel;
 use SharedPaws\Models\Auth\UserAuthSessionModel;
 use SharedPaws\Models\Auth\UserViewModel;
@@ -41,7 +43,8 @@ class AuthorizationController extends BaseController
         protected IMapper $mapper,
         protected EmailService $emailService,
         protected Config $config,
-        protected AuthFormGuard $formGuard
+        protected AuthFormGuard $formGuard,
+        protected UserRepository $users
     ) {}
 
     /** The signed "form issued at" token register / reset-password send back (AuthFormGuard). */
@@ -72,6 +75,7 @@ class AuthorizationController extends BaseController
             // permissions(), not the user's own bits: an admin without two-factor sign-in has none yet.
             $permissions = $this->auth->permissions();
             $response->user->CanAccessAdmin = Permissions::can($permissions, Capability::AccessAdmin);
+            $response->user->TimeZoneOffsets = TimeZones::offsets($user->TimeZone);
             $response->roles = Permissions::roleNames($permissions);
             $response->capabilities = Permissions::capabilityNames($permissions);
             $response->twoFactorSetupRequired = $this->auth->twoFactorSetupRequired();
@@ -86,6 +90,28 @@ class AuthorizationController extends BaseController
             }
         }
         return $response;
+    }
+
+    /**
+     * POST authorization/time-zone: the browser reports its zone for an account that has none.
+     *
+     * Only fills an empty setting. A zone the person chose is never replaced here, so signing in
+     * from another country does not move their dates. Always 200 for a signed-in user; `zone` is
+     * what the account holds afterwards.
+     */
+    public function TimeZone(TimeZoneModel $model)
+    {
+        $user = $this->auth->getAuthorizedUser();
+        if ($user === null) {
+            return $this->Unauthorized();
+        }
+        $zone = TimeZones::valid($model->Zone);
+        // Not while an admin views as this person: the browser is the admin's, not theirs.
+        if ($user->TimeZone === null && $zone !== null && !$this->auth->isImpersonating()) {
+            $user->TimeZone = $zone;
+            $this->users->update($user, [UserEntityMap::PROPERTY_TimeZone]);
+        }
+        return ['zone' => $user->TimeZone];
     }
 
     public function Session()

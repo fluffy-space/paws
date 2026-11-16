@@ -56,6 +56,8 @@ $router->section('/api/', function (Router $router) {
 
     // Auth
     $router->get('authorization/me', [AuthorizationController::class, 'Me']);
+    // the browser's own zone, kept only while the account has none
+    $router->post('authorization/time-zone', [AuthorizationController::class, 'TimeZone']);
 
     $router->post('authorization/session', [AuthorizationController::class, 'Session']);
     $router->post('authorization/login', [AuthorizationController::class, 'Login']);
