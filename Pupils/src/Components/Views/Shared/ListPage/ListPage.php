@@ -6,6 +6,7 @@ use SharedPaws\Models\BaseModel;
 use SharedPaws\Validation\IValidationRules;
 use Viewi\Components\BaseComponent;
 use Viewi\Components\Http\HttpClient;
+use Viewi\Components\Http\Message\Response;
 use Viewi\Components\Routing\ClientRoute;
 use Viewi\DI\Inject;
 use Viewi\DI\Scope;
@@ -243,10 +244,18 @@ class ListPage extends BaseComponent
         $this->http->delete("{$this->apiBase}{$this->apiUrl}/{$item->Id}")->then(function () {
             $this->messages->success("{$this->name} has been successfully deleted", 5000);
             $this->getData();
-        }, function ($error) {
-            // error
-            echo $error;
-            $this->messages->error("{$this->name} deletion has failed", 5000);
+        }, function (Response $response) {
+            // Say why when the server does: a refused delete answers 400 with its reason in
+            // `errors` ("Unpublish it first"), and a bare "deletion has failed" hides it.
+            $text = "{$this->name} deletion has failed";
+            if ($response->status === 403) {
+                $text = "You don't have permission to delete this {$this->name}.";
+            } elseif ($response->status === 400 && $response->body !== null && $response->body['errors'] && count($response->body['errors']) > 0) {
+                $text = $response->body['errors'][0];
+            } elseif ($response->body !== null && $response->body['message']) {
+                $text = "{$this->name} deletion has failed: {$response->body['message']}";
+            }
+            $this->messages->error($text, 8000);
         });
     }
 
